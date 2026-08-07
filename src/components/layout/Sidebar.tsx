@@ -127,8 +127,6 @@ const MENU_GROUPS = [
     items: [
       { name: 'Audit Logs', path: '/system/audit-logs', module: 'audit-logs', icon: ClipboardList },
       { name: 'Dynamic App Configs', path: '/system/app-configs', module: 'app-configs', icon: Settings },
-      { name: 'Notification Configs', path: '/system/notification-configs', module: 'notification-configs', icon: Bell },
-      { name: 'UI & Discovery', path: '/system/ui-discovery', module: 'ui-discovery', icon: LayoutGrid },
       { name: 'Employee Mgmt', path: '/system/employees', module: 'employees', icon: Users2 },
     ]
   }

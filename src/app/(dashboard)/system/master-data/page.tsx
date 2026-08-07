@@ -8,9 +8,9 @@ import { AddCityModal, AddInterestModal, AddLanguageModal } from '@/modules/syst
 
 export default function MasterDataPage() {
   const { 
-    cities, interests, languages, isLoading,
+    cities, interests, languages, isLoading, defaults, isUpdatingDefaults,
     toggleCity, toggleInterest, toggleLanguage,
-    addCity, addInterest, addLanguage
+    addCity, addInterest, addLanguage, updateDefaults
   } = useMasterData();
 
   const [activeTab, setActiveTab] = useState('cities');
@@ -18,17 +18,17 @@ export default function MasterDataPage() {
   const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
-    if (useMasterData().defaults) {
-      setFormData(useMasterData().defaults);
+    if (defaults) {
+      setFormData(defaults);
     }
-  }, [useMasterData().defaults]);
+  }, [defaults]);
 
   const handleSubmitDefaults = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData) useMasterData().updateDefaults(formData);
+    if (formData) updateDefaults(formData);
   };
 
-  if (isLoading || (useMasterData().defaults && !formData)) return <div className="p-6">Loading master data...</div>;
+  if (isLoading || (defaults && !formData)) return <div className="p-6">Loading master data...</div>;
 
   return (
     <>
@@ -89,10 +89,10 @@ export default function MasterDataPage() {
 
                   <button 
                     type="submit" 
-                    disabled={useMasterData().isUpdatingDefaults}
+                    disabled={isUpdatingDefaults}
                     className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"
                   >
-                    {useMasterData().isUpdatingDefaults ? 'Saving...' : 'Save Defaults'}
+                    {isUpdatingDefaults ? 'Saving...' : 'Save Defaults'}
                   </button>
                 </form>
               </div>

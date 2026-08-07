@@ -15,3 +15,10 @@ export interface ConsentLog {
   timestamp: string;
   ipAddress: string;
 }
+
+export interface LegalSettings {
+  contactEmail: string;
+  supportPhone: string;
+  termsUrl: string;
+  privacyUrl: string;
+}

@@ -9,3 +9,10 @@ export interface RefundRequest {
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PROCESSED';
   requestedAt: string;
 }
+
+export interface BookingSettings {
+  minBookingDurationMins: number;
+  maxBookingDurationMins: number;
+  cancellationGracePeriodMins: number;
+  autoCancelUnacceptedMins: number;
+}

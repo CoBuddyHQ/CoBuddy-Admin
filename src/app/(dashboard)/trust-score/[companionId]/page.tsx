@@ -115,7 +115,7 @@ export default function TrustScoreDetailPage() {
                       <span className="text-xs">{new Date(over.timestamp).toLocaleDateString()}</span>
                     </div>
                     <p className="mt-1">By: {over.overrideBy}</p>
-                    <p className="mt-1 text-xs italic">"{over.justification}"</p>
+                    <p className="mt-1 text-xs italic">&quot;{over.justification}&quot;</p>
                   </div>
                 ))}
               </div>

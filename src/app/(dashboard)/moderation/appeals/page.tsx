@@ -50,8 +50,8 @@ export default function AppealsPage() {
                   </TableCell>
                   <TableCell>{a.originalBanReason}</TableCell>
                   <TableCell>
-                    <div className="max-w-xs whitespace-normal text-sm italic">
-                      "{a.appealStatement}"
+                    <div className="text-sm font-medium mt-1">
+                      &quot;{a.appealStatement}&quot;
                     </div>
                   </TableCell>
                   <TableCell>

@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { ShieldAlert, Ban, CheckCircle } from 'lucide-react';
 
+import Link from 'next/link';
+
 export default function CustomersPage() {
   const { customers, isLoading, updateStatus } = useCustomers();
 
@@ -43,7 +45,9 @@ export default function CustomersPage() {
               {customers.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell>
-                    <div className="font-medium">{customer.name}</div>
+                    <Link href={`/customers/${customer.id}`} className="font-medium hover:underline text-primary">
+                      {customer.name}
+                    </Link>
                     <div className="text-xs text-muted-foreground">{customer.id}</div>
                   </TableCell>
                   <TableCell>

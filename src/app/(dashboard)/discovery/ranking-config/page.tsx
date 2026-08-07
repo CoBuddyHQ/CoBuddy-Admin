@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { useUIDiscovery } from '@/modules/system/ui-discovery/hooks/useUIDiscovery';
+import { useUIDiscovery } from '@/modules/discovery/ranking-config/hooks/useUIDiscovery';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

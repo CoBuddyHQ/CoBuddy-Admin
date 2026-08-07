@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cityLaunchApi } from '../api';
 import { toast } from 'sonner';
-import { CityLaunch } from '../types';
+import { CityLaunch, WaitlistConfig } from '../types';
 
 export const useCityLaunch = () => {
   const queryClient = useQueryClient();
@@ -26,10 +26,43 @@ export const useCityLaunch = () => {
     },
   });
 
+  const configQuery = useQuery({
+    queryKey: ['waitlist-config'],
+    queryFn: cityLaunchApi.getConfig,
+  });
+
+  const entriesQuery = useQuery({
+    queryKey: ['waitlist-entries'],
+    queryFn: cityLaunchApi.getEntries,
+  });
+
+  const updateConfigMutation = useMutation({
+    mutationFn: (config: WaitlistConfig) => cityLaunchApi.updateConfig(config),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waitlist-config'] });
+      toast.success('Waitlist configuration updated');
+    },
+  });
+
+  const approveEntryMutation = useMutation({
+    mutationFn: (id: string) => cityLaunchApi.approveEntry(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waitlist-entries'] });
+      toast.success('User approved from waitlist');
+    },
+  });
+
   return {
     launches: launchesQuery.data ?? [],
-    isLoading: launchesQuery.isLoading,
+    isLoadingLaunches: launchesQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
     toggleTask: toggleTaskMutation.mutate,
+
+    config: configQuery.data,
+    entries: entriesQuery.data ?? [],
+    isLoadingWaitlist: configQuery.isLoading || entriesQuery.isLoading,
+    updateConfig: updateConfigMutation.mutate,
+    isUpdatingConfig: updateConfigMutation.isPending,
+    approveEntry: approveEntryMutation.mutate,
   };
 };

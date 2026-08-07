@@ -1,6 +1,6 @@
 import { CompanionApplication, ApplicationDecisionPayload } from './types';
 
-let mockApplications: CompanionApplication[] = [
+const mockApplications: CompanionApplication[] = [
   {
     id: 'APP-1002',
     applicantName: 'Neha Gupta',

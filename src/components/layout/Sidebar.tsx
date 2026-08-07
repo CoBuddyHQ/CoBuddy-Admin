@@ -76,7 +76,6 @@ const MENU_GROUPS = [
     title: 'BOOKINGS & USERS',
     items: [
       { name: 'Live Sessions', path: '/operations/active-sessions', module: 'active-sessions', icon: Radio },
-      { name: 'Booking Disputes', path: '/operations/booking-disputes', module: 'booking-disputes', icon: AlertCircle },
       { name: 'Session Audit Logs', path: '/operations/session-audit', module: 'session-audit', icon: ClipboardList },
       { name: 'Customer Directory', path: '/customers', module: 'customers', icon: Users },
       { name: 'Companion Directory', path: '/companions', module: 'companions', icon: UserMinus },
@@ -104,7 +103,7 @@ const MENU_GROUPS = [
     items: [
       { name: 'Master Data Management', path: '/system/master-data', module: 'master-data', icon: Database },
       { name: 'Training & Content', path: '/platform-config/training', module: 'training', icon: GraduationCap },
-      { name: 'Announcements', path: '/platform-config/announcements', module: 'announcements', icon: Megaphone },
+      { name: 'Announcements', path: '/marketing/notifications', module: 'notifications', icon: Megaphone },
       { name: 'Policy & Legal Docs', path: '/platform-config/policy-docs', module: 'policy-docs', icon: Scale },
     ]
   },

@@ -65,4 +65,13 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Module #38 Data Privacy/Account Deletion Requests:** Implemented at `legal/data-privacy`. Fulfill exports, confirm deletion, apply Legal Hold.
 - **Module #39 Legal/Law-Enforcement Tracker:** Implemented at `legal/legal-requests`. Preserve evidence and track deadlines for incoming court orders.
 
-**All Part A and Part B tasks have been completed successfully. System has been type-checked and compiled without errors (`npx tsc --noEmit`).**
+## Follow-up Corrective Actions (Consolidation & Cleanup)
+- **Master Data (System):** Integrated `global-settings` (currency/language defaults) into `master-data` API, hook, and UI via a dedicated "Global Defaults" tab.
+- **Notifications (Marketing):** Integrated `notification-configs` (FCM/APNs/SMS) into the `notifications` module by adding a Settings tab.
+- **Discovery (Discovery):** Migrated `ui-discovery` module (theme, layout) into `discovery/ranking-config/` as an "App Settings" tab.
+- **Deleted Obsolete Folders:** Cleaned up `system/global-settings`, `system/notification-configs`, and `system/ui-discovery` after logic consolidation.
+- **DropdownMenu Fix:** Resolved the "Base UI: MenuGroupContext is missing" error by ensuring `DropdownMenuLabel` works correctly inside Base UI contexts.
+- **List+Detail Upgrades:** Converted `customers` and `companions` to proper List + Detail templates using `[id]/page.tsx` dynamic routes matching the provided designs.
+- **ESLint & TS Cleanup:** Repaired all remaining repo-wide type issues and ESLint problems (`react-hooks/set-state-in-effect`, `no-explicit-any`, unescaped entities).
+
+**All Part A, Part B, and Follow-up Corrective tasks have been completed successfully. System has been fully type-checked (`npx tsc --noEmit` returns 0 errors) and linted (`npx eslint src` returns 0 errors). Code is ready for final push.**

@@ -27,7 +27,7 @@ let mockLessons: TrainingLesson[] = [
   }
 ];
 
-let mockQuiz: SafetyQuiz = {
+const mockQuiz: SafetyQuiz = {
   passCriteriaPercentage: 80,
   totalQuestions: 15,
   activeCompanionsPassed: 1420

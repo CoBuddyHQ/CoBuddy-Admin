@@ -1,6 +1,6 @@
 import { AppealItem } from './types';
 
-let mockAppeals: AppealItem[] = [
+const mockAppeals: AppealItem[] = [
   { id: 'APP-001', userId: 'CompB', userName: 'Bob', originalBanReason: 'Severe policy violation', appealStatement: 'It was a misunderstanding, here is the proof.', status: 'PENDING', submittedAt: new Date().toISOString() }
 ];
 

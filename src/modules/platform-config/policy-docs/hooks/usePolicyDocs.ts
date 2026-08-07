@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { policyApi } from '../api';
 import { toast } from 'sonner';
-import { PolicyDocument } from '../types';
+import { PolicyDocument, LegalSettings } from '../types';
 
 export const usePolicyDocs = () => {
   const queryClient = useQueryClient();
@@ -16,6 +16,11 @@ export const usePolicyDocs = () => {
     queryFn: policyApi.getConsentLogs,
   });
 
+  const settingsQuery = useQuery({
+    queryKey: ['legal-settings'],
+    queryFn: policyApi.getSettings,
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: PolicyDocument['publishStatus'] }) => policyApi.updatePolicyStatus(id, status),
     onSuccess: (_, { status }) => {
@@ -24,10 +29,21 @@ export const usePolicyDocs = () => {
     },
   });
 
+  const updateSettingsMutation = useMutation({
+    mutationFn: (settings: LegalSettings) => policyApi.updateSettings(settings),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['legal-settings'] });
+      toast.success('Legal settings updated successfully');
+    },
+  });
+
   return {
     policies: policiesQuery.data ?? [],
     consentLogs: logsQuery.data ?? [],
-    isLoading: policiesQuery.isLoading || logsQuery.isLoading,
+    settings: settingsQuery.data,
+    isLoading: policiesQuery.isLoading || logsQuery.isLoading || settingsQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
+    updateSettings: updateSettingsMutation.mutate,
+    isUpdatingSettings: updateSettingsMutation.isPending,
   };
 };

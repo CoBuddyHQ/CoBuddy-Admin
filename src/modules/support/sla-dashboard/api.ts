@@ -21,7 +21,7 @@ let mockAlerts: SLAAlert[] = [
   }
 ];
 
-let mockPerformance: AgentPerformance[] = [
+const mockPerformance: AgentPerformance[] = [
   {
     agentId: 'AGT-001',
     agentName: 'Alice',

@@ -1,6 +1,6 @@
 import { EmergencyWorkflow } from './types';
 
-let mockWorkflows: EmergencyWorkflow[] = [
+const mockWorkflows: EmergencyWorkflow[] = [
   { id: 'EWF-001', sosAlertId: 'SOS-991', status: 'STEP_1_CONTACT_USER', log: [{ timestamp: new Date().toISOString(), action: 'Workflow initiated.', handledBy: 'System' }], createdAt: new Date().toISOString() }
 ];
 

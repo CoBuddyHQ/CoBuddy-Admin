@@ -20,3 +20,8 @@ export interface Language {
   name: string;
   active: boolean;
 }
+
+export interface SystemDefaults {
+  defaultCurrency: string;
+  defaultLanguage: string;
+}

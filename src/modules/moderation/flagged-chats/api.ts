@@ -1,11 +1,11 @@
 import { FlaggedChatSummary, FlaggedChatDetail } from './types';
 
-let mockChats: FlaggedChatSummary[] = [
+const mockChats: FlaggedChatSummary[] = [
   { id: 'FC-101', participants: ['UserA', 'CompB'], flagReason: 'Off-platform payment', confidenceScore: 0.95, timestamp: new Date().toISOString(), status: 'PENDING' },
   { id: 'FC-102', participants: ['UserC', 'CompD'], flagReason: 'Inappropriate language', confidenceScore: 0.88, timestamp: new Date().toISOString(), status: 'PENDING' },
 ];
 
-let mockDetail: FlaggedChatDetail = {
+const mockDetail: FlaggedChatDetail = {
   ...mockChats[0],
   messages: [
     { id: 'M1', sender: 'UserA', content: 'Hi, can we meet?', timestamp: new Date(Date.now() - 50000).toISOString(), isFlagged: false },

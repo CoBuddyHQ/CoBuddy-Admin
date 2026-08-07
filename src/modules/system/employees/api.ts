@@ -2,7 +2,7 @@ import axios from '@/lib/api/client';
 import { Employee, AddEmployeePayload, UpdateEmployeeRolesPayload } from './types';
 
 // Mock data for development
-let mockEmployees: Employee[] = [
+const mockEmployees: Employee[] = [
   {
     id: 'emp-1',
     name: 'Admin User',

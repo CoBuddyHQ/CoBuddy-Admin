@@ -1,6 +1,6 @@
 import { PayoutItem } from './types';
 
-let mockPayouts: PayoutItem[] = [
+const mockPayouts: PayoutItem[] = [
   { id: 'PAY-001', companionId: 'CompA', companionName: 'Alice', amount: 12500, periodStart: '2026-07-01', periodEnd: '2026-07-15', status: 'PENDING', dueDate: new Date().toISOString() },
   { id: 'PAY-002', companionId: 'CompB', companionName: 'Bob', amount: 8400, periodStart: '2026-07-01', periodEnd: '2026-07-15', status: 'ON_HOLD', dueDate: new Date().toISOString() },
 ];

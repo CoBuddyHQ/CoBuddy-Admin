@@ -1,9 +1,19 @@
-import { PushNotification } from './types';
+import { PushNotification, NotificationConfig } from './types';
 
-let mockNotifications: PushNotification[] = [
+const mockNotifications: PushNotification[] = [
   { id: 'PN-01', title: 'Weekend Special!', message: 'Get 20% off all bookings this weekend.', targetAudience: 'CUSTOMERS', status: 'SENT', sentAt: new Date(Date.now() - 86400000).toISOString() },
   { id: 'PN-02', title: 'Mumbai Meetup', message: 'Join the companion mixer in Bandra.', targetAudience: 'CITY_SPECIFIC', targetCity: 'Mumbai', status: 'SCHEDULED', scheduledFor: new Date(Date.now() + 86400000).toISOString() },
 ];
+
+let mockConfig: NotificationConfig = {
+  fcmServerKey: 'AIzaSyB...mock...Key',
+  apnsKeyId: 'ABCD123456',
+  apnsTeamId: 'XYZ9876543',
+  apnsTopic: 'com.cobuddy.app',
+  enableSmsFallback: true,
+  smsProvider: 'TWILIO',
+  smsApiKey: 'tw_live_mock_key',
+};
 
 export const notificationsApi = {
   getNotifications: async (): Promise<PushNotification[]> => Promise.resolve([...mockNotifications]),
@@ -20,6 +30,12 @@ export const notificationsApi = {
       n.status = 'SENT';
       n.sentAt = new Date().toISOString();
     }
+    return Promise.resolve();
+  },
+
+  getConfig: async (): Promise<NotificationConfig> => Promise.resolve({ ...mockConfig }),
+  updateConfig: async (config: NotificationConfig): Promise<void> => {
+    mockConfig = { ...config };
     return Promise.resolve();
   }
 };

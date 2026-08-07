@@ -1,6 +1,6 @@
 import { AgeEscalationCase } from './types';
 
-let mockCases: AgeEscalationCase[] = [
+const mockCases: AgeEscalationCase[] = [
   { id: 'AGE-001', userId: 'CompY', userName: 'Charlie', dobMismatchDetails: 'Aadhaar says 2005 (age 21), selfie AI estimates 16.', idEstimate: 21, selfieEstimate: 16, associatedRecordLink: '/verification', status: 'PENDING_REVIEW', timestamp: new Date().toISOString() },
 ];
 

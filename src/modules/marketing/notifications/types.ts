@@ -8,3 +8,13 @@ export interface PushNotification {
   scheduledFor?: string;
   sentAt?: string;
 }
+
+export interface NotificationConfig {
+  fcmServerKey: string;
+  apnsKeyId: string;
+  apnsTeamId: string;
+  apnsTopic: string;
+  enableSmsFallback: boolean;
+  smsProvider: 'TWILIO' | 'MSG91' | 'AWS_SNS';
+  smsApiKey: string;
+}

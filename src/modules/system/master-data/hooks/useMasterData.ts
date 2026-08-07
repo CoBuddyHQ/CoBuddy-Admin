@@ -36,11 +36,19 @@ export const useMasterData = () => {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['languages'] }); toast.success('Language added'); }
   });
 
+  const defaultsQuery = useQuery({ queryKey: ['system-defaults'], queryFn: masterDataApi.getDefaults });
+
+  const updateDefaultsMutation = useMutation({
+    mutationFn: masterDataApi.updateDefaults,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['system-defaults'] }); toast.success('Defaults updated'); }
+  });
+
   return {
     cities: citiesQuery.data || [],
     interests: interestsQuery.data || [],
     languages: languagesQuery.data || [],
-    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading,
+    defaults: defaultsQuery.data,
+    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || defaultsQuery.isLoading,
     
     toggleCity: toggleCityMutation.mutate,
     toggleInterest: toggleInterestMutation.mutate,
@@ -49,5 +57,8 @@ export const useMasterData = () => {
     addCity: addCityMutation.mutate,
     addInterest: addInterestMutation.mutate,
     addLanguage: addLanguageMutation.mutate,
+
+    updateDefaults: updateDefaultsMutation.mutate,
+    isUpdatingDefaults: updateDefaultsMutation.isPending,
   };
 };

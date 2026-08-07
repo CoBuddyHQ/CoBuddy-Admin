@@ -2,7 +2,7 @@ import { VerificationCase, DecisionPayload, AutomationThresholds } from './types
 import { DEFAULT_THRESHOLDS } from './constants';
 // import axios from '@/lib/api/client';
 
-let mockCases: VerificationCase[] = [
+const mockCases: VerificationCase[] = [
   {
     id: 'CASE-4821',
     applicantName: 'Riya Sharma',

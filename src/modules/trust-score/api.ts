@@ -1,11 +1,11 @@
 import { TrustScoreSummary, TrustScoreDetail, SafetyBonusRule } from './types';
 
-let mockSummaries: TrustScoreSummary[] = [
+const mockSummaries: TrustScoreSummary[] = [
   { companionId: 'COMP-001', companionName: 'Ayesha Khan', currentScore: 92, lastUpdated: new Date().toISOString(), status: 'EXCELLENT' },
   { companionId: 'COMP-002', companionName: 'Rahul Singh', currentScore: 65, lastUpdated: new Date().toISOString(), status: 'NEEDS_IMPROVEMENT' },
 ];
 
-let mockDetail: TrustScoreDetail = {
+const mockDetail: TrustScoreDetail = {
   ...mockSummaries[0],
   punctualityScore: 95,
   completionRateScore: 98,
@@ -18,7 +18,7 @@ let mockDetail: TrustScoreDetail = {
   manualOverrides: []
 };
 
-let mockRules: SafetyBonusRule[] = [
+const mockRules: SafetyBonusRule[] = [
   { id: 'R1', description: 'Incident-free month', triggerEvent: 'INCIDENT_FREE_MONTH', bonusPoints: 5, active: true },
   { id: 'R2', description: 'Fast SOS response history', triggerEvent: 'SOS_FAST_RESPONSE', bonusPoints: 10, active: true },
 ];

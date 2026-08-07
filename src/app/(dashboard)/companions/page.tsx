@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Ban, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CompanionsPage() {
   const { companions, isLoading, updateStatus } = useCompanions();
@@ -17,13 +18,13 @@ export default function CompanionsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Companion Directory"
-        description="Search and manage all companion profiles, trust scores, and session histories."
+        description="Manage companion profiles, onboarding status, and performance."
       />
 
       <Card>
         <CardHeader>
           <CardTitle>All Companions</CardTitle>
-          <CardDescription>View performance, verification status, and manage account access.</CardDescription>
+          <CardDescription>View performance, approve applications, or manage accounts.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -44,7 +45,9 @@ export default function CompanionsPage() {
               {companions.map((companion) => (
                 <TableRow key={companion.id}>
                   <TableCell>
-                    <div className="font-medium">{companion.name}</div>
+                    <Link href={`/companions/${companion.id}`} className="font-medium hover:underline text-primary">
+                      {companion.name}
+                    </Link>
                     <div className="text-xs text-muted-foreground">{companion.id}</div>
                   </TableCell>
                   <TableCell>

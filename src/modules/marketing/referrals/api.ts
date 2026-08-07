@@ -6,7 +6,7 @@ let mockConfig: ReferralConfig = {
   isActive: true,
 };
 
-let mockStats: ReferralStat[] = [
+const mockStats: ReferralStat[] = [
   { userId: 'UserA', userName: 'Alice', totalReferrals: 12, totalEarned: 6000 },
   { userId: 'CompB', userName: 'Bob', totalReferrals: 5, totalEarned: 2500 },
 ];

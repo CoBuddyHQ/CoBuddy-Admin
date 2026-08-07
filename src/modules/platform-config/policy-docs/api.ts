@@ -1,4 +1,4 @@
-import { PolicyDocument, ConsentLog } from './types';
+import { PolicyDocument, ConsentLog, LegalSettings } from './types';
 
 let mockPolicies: PolicyDocument[] = [
   {
@@ -27,10 +27,17 @@ let mockPolicies: PolicyDocument[] = [
   }
 ];
 
-let mockConsentLogs: ConsentLog[] = [
+const mockConsentLogs: ConsentLog[] = [
   { id: 'LOG-1', userId: 'USR-882', documentType: 'TERMS_OF_SERVICE', documentVersion: 'v2.1', timestamp: '2023-10-02T10:00:00Z', ipAddress: '192.168.1.1' },
   { id: 'LOG-2', userId: 'COMP-112', documentType: 'TERMS_OF_SERVICE', documentVersion: 'v2.1', timestamp: '2023-10-02T10:15:00Z', ipAddress: '10.0.0.5' },
 ];
+
+let mockSettings: LegalSettings = {
+  contactEmail: 'support@cobuddy.app',
+  supportPhone: '+91 9876543210',
+  termsUrl: 'https://cobuddy.app/terms',
+  privacyUrl: 'https://cobuddy.app/privacy',
+};
 
 export const policyApi = {
   getPolicies: async (): Promise<PolicyDocument[]> => {
@@ -43,5 +50,11 @@ export const policyApi = {
 
   getConsentLogs: async (): Promise<ConsentLog[]> => {
     return [...mockConsentLogs];
+  },
+  
+  getSettings: async (): Promise<LegalSettings> => Promise.resolve({ ...mockSettings }),
+  updateSettings: async (settings: LegalSettings): Promise<void> => {
+    mockSettings = { ...settings };
+    return Promise.resolve();
   }
 };

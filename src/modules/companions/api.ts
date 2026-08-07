@@ -43,8 +43,30 @@ export const companionsApi = {
   getCompanions: async (): Promise<CompanionRecord[]> => {
     return [...mockCompanions];
   },
-  
+  getCompanionById: async (id: string): Promise<CompanionRecord | undefined> => {
+    return mockCompanions.find(c => c.id === id);
+  },
   updateStatus: async (id: string, status: CompanionRecord['status']): Promise<void> => {
     mockCompanions = mockCompanions.map(c => c.id === id ? { ...c, status } : c);
+  },
+  getTrustScoreHistory: async (id: string): Promise<import('./types').TrustScoreHistoryEntry[]> => {
+    return [
+      { id: '1', date: '2026-08-01', oldScore: 90, newScore: 85, reason: 'Late cancellation' },
+      { id: '2', date: '2026-07-15', oldScore: 88, newScore: 90, reason: '5-star review from verified booking' }
+    ];
+  },
+  getSessionHistory: async (id: string): Promise<import('./types').SessionHistoryEntry[]> => {
+    return [
+      { id: 'S1', date: '2026-08-05', customerName: 'Aarav M.', activity: 'Coffee', durationMins: 120, earnings: 1500 },
+      { id: 'S2', date: '2026-08-02', customerName: 'Karan P.', activity: 'Movie', durationMins: 180, earnings: 3000 }
+    ];
+  },
+  getEarningsBreakdown: async (id: string): Promise<import('./types').EarningsBreakdown> => {
+    return {
+      baseEarnings: 100000,
+      bonusEarnings: 25000,
+      platformFeeDeducted: 12500,
+      totalNet: 112500
+    };
   }
 };

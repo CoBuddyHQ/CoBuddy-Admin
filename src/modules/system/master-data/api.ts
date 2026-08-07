@@ -1,14 +1,14 @@
 import { City, Interest, Language, SystemDefaults } from './types';
 
 const cities: City[] = [
-  { id: 'CITY-1', name: 'Mumbai', state: 'Maharashtra', country: 'India', active: true },
-  { id: 'CITY-2', name: 'Delhi', state: 'Delhi', country: 'India', active: true },
-  { id: 'CITY-3', name: 'Bangalore', state: 'Karnataka', country: 'India', active: false },
+  { id: 'CITY-1', name: { en: 'Mumbai', hi: 'मुंबई' }, state: 'Maharashtra', country: 'India', active: true },
+  { id: 'CITY-2', name: { en: 'Delhi', hi: 'दिल्ली' }, state: 'Delhi', country: 'India', active: true },
+  { id: 'CITY-3', name: { en: 'Bangalore', hi: 'बेंगलुरु' }, state: 'Karnataka', country: 'India', active: false },
 ];
 
 const interests: Interest[] = [
-  { id: 'INT-1', name: 'Italian', type: 'CUISINE', active: true },
-  { id: 'INT-2', name: 'Museums', type: 'ACTIVITY', active: true },
+  { id: 'INT-1', name: { en: 'Italian', hi: 'इटालियन' }, type: 'CUISINE', basePriceMultiplier: 1.0, active: true },
+  { id: 'INT-2', name: { en: 'Museums', hi: 'संग्रहालय' }, type: 'ACTIVITY', basePriceMultiplier: 1.2, active: true },
 ];
 
 const languages: Language[] = [

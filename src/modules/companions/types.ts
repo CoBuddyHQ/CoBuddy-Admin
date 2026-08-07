@@ -10,3 +10,27 @@ export interface CompanionRecord {
   totalSessions: number;
   status: 'ACTIVE' | 'SUSPENDED' | 'BANNED';
 }
+
+export interface TrustScoreHistoryEntry {
+  id: string;
+  date: string;
+  oldScore: number;
+  newScore: number;
+  reason: string;
+}
+
+export interface SessionHistoryEntry {
+  id: string;
+  date: string;
+  customerName: string;
+  activity: string;
+  durationMins: number;
+  earnings: number;
+}
+
+export interface EarningsBreakdown {
+  baseEarnings: number;
+  bonusEarnings: number;
+  platformFeeDeducted: number;
+  totalNet: number;
+}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Edit, PlayCircle } from 'lucide-react';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 
 export default function TrainingPage() {
   const { lessons, quizStats, isLoading, updateStatus, deleteLesson } = useTraining();
@@ -84,7 +85,7 @@ export default function TrainingPage() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <PlayCircle className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{lesson.title}</span>
+                      <span className="font-medium">{getLocalizedText(lesson.title)}</span>
                     </div>
                   </TableCell>
                   <TableCell>

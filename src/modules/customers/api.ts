@@ -43,8 +43,23 @@ export const customersApi = {
   getCustomers: async (): Promise<CustomerRecord[]> => {
     return [...mockCustomers];
   },
-  
+  getCustomerById: async (id: string): Promise<CustomerRecord | undefined> => {
+    return mockCustomers.find(c => c.id === id);
+  },
   updateStatus: async (id: string, status: CustomerRecord['status']): Promise<void> => {
     mockCustomers = mockCustomers.map(c => c.id === id ? { ...c, status } : c);
+  },
+  getBookingHistory: async (id: string): Promise<import('./types').BookingHistoryEntry[]> => {
+    return [
+      { id: 'B1', date: '2026-08-01', companionName: 'Neha Gupta', activity: 'Coffee', venue: 'Starbucks', status: 'COMPLETED', amount: 1500 },
+      { id: 'B2', date: '2026-08-10', companionName: 'Vikram Singh', activity: 'Movie', venue: 'PVR', status: 'UPCOMING', amount: 3000 }
+    ];
+  },
+  getTransactionHistory: async (id: string): Promise<import('./types').TransactionEntry[]> => {
+    return [
+      { id: 'T1', date: '2026-07-28', type: 'CREDIT', amount: 5000, description: 'Wallet top-up' },
+      { id: 'T2', date: '2026-08-01', type: 'DEBIT', amount: 1500, description: 'Payment for booking B1' },
+      { id: 'T3', date: '2026-08-05', type: 'DEBIT', amount: 3000, description: 'Payment for booking B2' }
+    ];
   }
 };

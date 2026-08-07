@@ -3,6 +3,8 @@ import { PolicyDocument, ConsentLog, LegalSettings } from './types';
 let mockPolicies: PolicyDocument[] = [
   {
     id: 'POL-001',
+    title: { en: 'Terms of Service', hi: 'सेवा की शर्तें' },
+    content: { en: 'Terms of Service content...', hi: 'सेवा की शर्तें सामग्री...' },
     type: 'TERMS_OF_SERVICE',
     version: 'v2.1',
     publishStatus: 'PUBLISHED',
@@ -11,6 +13,8 @@ let mockPolicies: PolicyDocument[] = [
   },
   {
     id: 'POL-002',
+    title: { en: 'Privacy Policy', hi: 'गोपनीयता नीति' },
+    content: { en: 'Privacy Policy content...', hi: 'गोपनीयता नीति सामग्री...' },
     type: 'PRIVACY_POLICY',
     version: 'v1.4',
     publishStatus: 'PUBLISHED',
@@ -19,6 +23,8 @@ let mockPolicies: PolicyDocument[] = [
   },
   {
     id: 'POL-003',
+    title: { en: 'Community Guidelines', hi: 'सामुदायिक दिशानिर्देश' },
+    content: { en: 'Community Guidelines content...', hi: 'सामुदायिक दिशानिर्देश सामग्री...' },
     type: 'COMMUNITY_GUIDELINES',
     version: 'v3.0',
     publishStatus: 'DRAFT',

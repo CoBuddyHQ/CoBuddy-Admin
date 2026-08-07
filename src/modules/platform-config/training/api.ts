@@ -3,7 +3,8 @@ import { TrainingLesson, SafetyQuiz } from './types';
 let mockLessons: TrainingLesson[] = [
   {
     id: 'TRN-001',
-    title: 'Recognizing Unsafe Situations',
+    title: { en: 'Recognizing Unsafe Situations', hi: 'असुरक्षित स्थितियों को पहचानना' },
+    content: { en: 'Content for recognizing unsafe situations...', hi: 'असुरक्षित स्थितियों को पहचानने के लिए सामग्री...' },
     category: 'SAFETY',
     status: 'PUBLISHED',
     completionCount: 1542,
@@ -11,7 +12,8 @@ let mockLessons: TrainingLesson[] = [
   },
   {
     id: 'TRN-002',
-    title: 'How to use the SOS Button',
+    title: { en: 'How to use the SOS Button', hi: 'एसओएस बटन का उपयोग कैसे करें' },
+    content: { en: 'Content for SOS button...', hi: 'एसओएस बटन के लिए सामग्री...' },
     category: 'SAFETY',
     status: 'PUBLISHED',
     completionCount: 1890,
@@ -19,7 +21,8 @@ let mockLessons: TrainingLesson[] = [
   },
   {
     id: 'TRN-003',
-    title: 'Engaging Conversation Starters',
+    title: { en: 'Engaging Conversation Starters', hi: 'आकर्षक वार्तालाप शुरुआत' },
+    content: { en: 'Content for conversation starters...', hi: 'वार्तालाप शुरुआत के लिए सामग्री...' },
     category: 'BEST_PRACTICES',
     status: 'DRAFT',
     completionCount: 0,

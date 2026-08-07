@@ -1,6 +1,6 @@
 export interface City {
   id: string;
-  name: string;
+  name: Record<string, string>;
   state: string;
   country: string;
   active: boolean;
@@ -8,9 +8,10 @@ export interface City {
 
 export interface Interest {
   id: string;
-  name: string;
+  name: Record<string, string>;
   type: 'CUISINE' | 'ACTIVITY' | 'LIFESTYLE';
   icon?: string;
+  basePriceMultiplier?: number;
   active: boolean;
 }
 

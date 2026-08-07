@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Trash2, Building2 } from 'lucide-react';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 
 export default function VenuesPage() {
   const { venues, placeTypes, isLoading, toggleVenue, deleteVenue, togglePlaceType } = useVenues();
@@ -51,14 +52,14 @@ export default function VenuesPage() {
                         <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                           <Building2 className="h-5 w-5 text-muted-foreground" />
                         </div>
-                        <div className="font-medium">{venue.name}</div>
+                        <div className="font-medium">{getLocalizedText(venue.name)}</div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">{venue.address}</div>
                       <div className="text-xs text-muted-foreground">{venue.city}</div>
                     </TableCell>
-                    <TableCell><Badge variant="outline">{venue.category}</Badge></TableCell>
+                    <TableCell><Badge variant="outline">{getLocalizedText(venue.category)}</Badge></TableCell>
                     <TableCell>
                       <Badge variant={venue.isActive ? 'default' : 'secondary'}>
                         {venue.isActive ? 'Active' : 'Inactive'}
@@ -99,7 +100,7 @@ export default function VenuesPage() {
               {placeTypes.map((pt) => (
                 <div key={pt.id} className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-sm">{pt.displayName}</div>
+                    <div className="font-medium text-sm">{getLocalizedText(pt.displayName)}</div>
                     <div className="text-xs text-muted-foreground font-mono">{pt.typeName}</div>
                   </div>
                   <div className="flex items-center gap-2">

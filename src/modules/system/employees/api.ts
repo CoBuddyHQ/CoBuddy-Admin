@@ -1,5 +1,15 @@
 import axios from '@/lib/api/client';
-import { Employee, AddEmployeePayload, UpdateEmployeeRolesPayload } from './types';
+import { Employee, AddEmployeePayload, UpdateEmployeeRolesPayload, CustomRole } from './types';
+
+const mockCustomRoles: CustomRole[] = [
+  {
+    id: 'ROLE-1',
+    name: 'Dispute Specialist',
+    permissions: ['READ_DISPUTES', 'RESOLVE_DISPUTES'],
+    description: 'Handles only booking disputes.',
+    createdAt: new Date().toISOString()
+  }
+];
 
 // Mock data for development
 const mockEmployees: Employee[] = [
@@ -59,6 +69,26 @@ export const employeeApi = {
 
   forceLogout: async (id: string): Promise<void> => {
     // return axios.post(`/admin/employees/${id}/force-logout`).then(res => res.data);
+    return Promise.resolve();
+  },
+
+  getCustomRoles: async (): Promise<CustomRole[]> => {
+    return Promise.resolve([...mockCustomRoles]);
+  },
+
+  addCustomRole: async (data: Omit<CustomRole, 'id' | 'createdAt'>): Promise<CustomRole> => {
+    const newRole: CustomRole = {
+      id: `role-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      ...data
+    };
+    mockCustomRoles.push(newRole);
+    return Promise.resolve(newRole);
+  },
+
+  deleteCustomRole: async (id: string): Promise<void> => {
+    const idx = mockCustomRoles.findIndex(r => r.id === id);
+    if (idx > -1) mockCustomRoles.splice(idx, 1);
     return Promise.resolve();
   }
 };

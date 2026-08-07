@@ -1,5 +1,6 @@
 import { City, Interest, Language } from '../types';
 import { Switch } from '@/components/ui/switch';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import {
   Table,
   TableBody,
@@ -24,7 +25,7 @@ export function CityList({ data, onToggle }: CityListProps) {
       <TableBody>
         {data.map(item => (
           <TableRow key={item.id}>
-            <TableCell>{item.name}</TableCell>
+            <TableCell>{getLocalizedText(item.name, 'en')}</TableCell>
             <TableCell>{item.state}</TableCell>
             <TableCell>{item.country}</TableCell>
             <TableCell>
@@ -45,14 +46,16 @@ export function InterestList({ data, onToggle }: InterestListProps) {
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
           <TableHeaderCell>Type</TableHeaderCell>
+          <TableHeaderCell>Price Multiplier</TableHeaderCell>
           <TableHeaderCell>Status</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {data.map(item => (
           <TableRow key={item.id}>
-            <TableCell>{item.name}</TableCell>
+            <TableCell>{getLocalizedText(item.name, 'en')}</TableCell>
             <TableCell>{item.type}</TableCell>
+            <TableCell>{item.basePriceMultiplier ? `${item.basePriceMultiplier}x` : '1.0x'}</TableCell>
             <TableCell>
               <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
             </TableCell>

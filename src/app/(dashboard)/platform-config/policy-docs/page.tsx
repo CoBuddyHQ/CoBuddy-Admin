@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Download, CheckCircle } from 'lucide-react';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -59,6 +60,7 @@ export default function PolicyDocsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Document Type</TableHead>
+                    <TableHead>Title</TableHead>
                     <TableHead>Version</TableHead>
                     <TableHead>Last Updated</TableHead>
                     <TableHead>Consents Logged</TableHead>
@@ -74,6 +76,9 @@ export default function PolicyDocsPage() {
                           <FileText className="h-4 w-4 text-muted-foreground" />
                           <span className="font-medium">{policy.type.replace(/_/g, ' ')}</span>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        {getLocalizedText(policy.title)}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{policy.version}</Badge>

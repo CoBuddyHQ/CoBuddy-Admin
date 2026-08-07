@@ -21,7 +21,16 @@ export interface AddEmployeePayload {
   cityScope?: string;
 }
 
+export interface CustomRole {
+  id: string;
+  name: string;
+  permissions: string[];
+  description?: string;
+  createdAt: string;
+}
+
 export interface UpdateEmployeeRolesPayload {
   roles: StaffRole[];
+  customRoles?: string[];
   cityScope?: string;
 }

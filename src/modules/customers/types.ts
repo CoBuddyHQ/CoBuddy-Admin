@@ -10,3 +10,21 @@ export interface CustomerRecord {
   flags: number;
   status: 'ACTIVE' | 'SUSPENDED' | 'BANNED';
 }
+
+export interface BookingHistoryEntry {
+  id: string;
+  date: string;
+  companionName: string;
+  activity: string;
+  venue: string;
+  status: 'COMPLETED' | 'CANCELLED' | 'UPCOMING';
+  amount: number;
+}
+
+export interface TransactionEntry {
+  id: string;
+  date: string;
+  type: 'CREDIT' | 'DEBIT';
+  amount: number;
+  description: string;
+}

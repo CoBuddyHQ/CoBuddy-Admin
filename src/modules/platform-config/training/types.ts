@@ -1,6 +1,7 @@
 export interface TrainingLesson {
   id: string;
-  title: string;
+  title: Record<string, string>;
+  content?: Record<string, string>;
   category: 'SAFETY' | 'ONBOARDING' | 'BEST_PRACTICES';
   status: 'DRAFT' | 'PUBLISHED';
   completionCount: number;

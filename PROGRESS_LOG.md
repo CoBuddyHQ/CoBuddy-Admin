@@ -75,3 +75,14 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **ESLint & TS Cleanup:** Repaired all remaining repo-wide type issues and ESLint problems (`react-hooks/set-state-in-effect`, `no-explicit-any`, unescaped entities).
 
 **All Part A, Part B, and Follow-up Corrective tasks have been completed successfully. System has been fully type-checked (`npx tsc --noEmit` returns 0 errors) and linted (`npx eslint src` returns 0 errors). Code is ready for final push.**
+
+## Round 3 Corrective Pass
+- **Item 1: Discovery / Ranking Config:** Completed the `ranking-config` module.
+- **Item 2: Companion/Customer Detail Pages:** Implemented tabbed views and rich profile data for both pages.
+- **Item 3: i18n Support:** Added `getLocalizedText` and migrated core types (`City`, `Interest`, `Venue`, `TrainingLesson`, `PolicyDocument`) to use `Record<string, string>`. Propagated to all corresponding UI views.
+- **Item 4: Booking Dispute Module (#24):** Created dispute types, hooks, API, and the `/bookings/disputes` UI with resolution actions (investigate, refund, no refund).
+- **Item 5: Live Sessions Monitor (#23):** Built `/safety/live-sessions` with real-time tracking, SOS alerts summary, and resolution action.
+- **Item 6: Activity Price Multiplier:** Added `basePriceMultiplier` to `Interest` schema in Master Data, integrated it in mock API and UI.
+- **Item 7: Permissions Fix:** Built custom role creation flow at `/system/employees/roles` with full API, hook, and UI for managing granular permissions.
+
+**Full repository has been verified with `npx tsc --noEmit` and `npx eslint src` yielding 0 errors.**

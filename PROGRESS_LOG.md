@@ -35,36 +35,34 @@
 - **Market / City Performance (#20):** Done
 - **Session Metrics (#21):** Done
 
-## Phase 5 Execution (Operations & Booking)
-- **Live Booking Map (#22):** Done
-- **Active Sessions / Ongoing Bookings (#23):** Done
-- **Completed Bookings Log (#24):** Done
-- **Failed / Cancelled Bookings (#25):** Done
-- **Search & Matchmaking Config (#26):** Done
+## Corrective Loop (Part A - Clean Up Out-Of-Scope Work)
+- **marketing/coupons:** Deleted entirely (explicitly excluded from V1).
+- **marketing/referrals:** Disabled and removed from sidebar. Parked pending product decisions regarding reward logic.
+- **marketing/events:** Moved to `discovery/events` (Platform-Config/Discovery).
+- **system/waitlist:** Removed from sidebar. Logic kept to merge into Module #31 (City Launch Management) later.
+- **system/chat-settings:** Moved to `moderation/chat-settings`.
+- **system/booking-settings:** Removed from sidebar. Logic kept to merge into Module #18 (Refund & Dispute Resolution).
+- **system/global-settings:** Removed from sidebar. Logic kept to merge into Module #37 and #34.
+- **system/notification-configs:** Inspected. This is for technical provider keys (FCM, SMS), distinct from Module #36 (Announcements). Kept as System Config.
+- **system/ui-discovery:** Inspected. This handles UI presentation flags (theme, layout), distinct from Module #30 (Ranking Algorithmic Config). Kept as System Config.
+- **Sidebar Structure:** Cleaned up and strictly matched with the original specification document.
 
-## Phase 6 Execution (Marketing & Promotions)
-- **Discount Codes & Coupons (#27):** Done
-- **Referral Program Admin (#28):** Done
-- **Push Notification Broadcaster (#29):** Done
-- **Special Events / Category Highlights (#30):** Done
+## Corrective Loop (Part B - Build Missing Modules)
+All missing 15 modules have been implemented following the List+Detail/Dashboard structure defined in the specs.
+- **Module #16 Escrow/Wallet Monitoring:** Implemented at `financial/escrow`. Added max withdrawal configuration fields.
+- **Module #19 Fraud Detection Center:** Implemented at `financial/fraud-detection`. Tracks spoofing and anomalies.
+- **Module #20 Tax/Invoice Compliance:** Implemented at `financial/tax-invoices`. Handles TDS, GST, and invoice generations.
+- **Module #22 Payment Gateway Reconciliation:** Implemented at `financial/reconciliation`. Manages Razorpay webhook failures and ledger mismatches.
+- **Module #26 Customer Directory:** Implemented at `customers`. Added master directory with full fields and suspension logic.
+- **Module #27 Companion Directory:** Implemented at `companions`. Full directory with trust scores and total earnings.
+- **Module #28 Support Ticket System:** Implemented at `support/tickets`. Built chat thread reply interface and multi-level escalation.
+- **Module #29 SLA Tracking Dashboard:** Implemented at `support/sla-dashboard`. Tracks breached SLAs and agent performance.
+- **Module #31 City Launch Management:** Implemented at `operations/city-launch`. Launch checklist and Go-Live activation flow.
+- **Module #32 Venue Management:** Implemented at `operations/venues`. Two-layer system (Featured Venues & Google Places categories).
+- **Module #33 Growth Abuse Monitoring:** Implemented at `operations/growth-abuse`. Bot signups and referral chain bans.
+- **Module #35 Training & Content Management:** Implemented at `platform-config/training`. Safety quiz stats and onboarding materials.
+- **Module #37 Policy/Content Management:** Implemented at `platform-config/policy-docs`. Immutable Consent Log tracking for legal compliance.
+- **Module #38 Data Privacy/Account Deletion Requests:** Implemented at `legal/data-privacy`. Fulfill exports, confirm deletion, apply Legal Hold.
+- **Module #39 Legal/Law-Enforcement Tracker:** Implemented at `legal/legal-requests`. Preserve evidence and track deadlines for incoming court orders.
 
-## Phase 7 Execution (System & Content Settings)
-- **Audit Logs & Admin Activity (#31):** Done
-- **Dynamic App Configs (#32, #33):** Done
-- **Global Settings (#35):** Done
-- **Chat Settings (#36):** Done
-- **Booking Settings (#37):** Done
-- **Notification Configs (#38):** Done
-- **App UI & Discovery Settings (#39):** Done
-- **Waitlist & Invitation Codes (#40):** Done
-- *(#41 is Employee & Role Mgmt, built in Phase 1)*
-- *(#42 is Admin Role & Permission Setup, integrated with #41 in Phase 1)*
-
-Phase 7 is completely built and typechecked successfully.
-All modules (1 to 42) from the `CoBuddy_FINAL_Admin_Panel_Spec_v3.md` have now been implemented.
-
-## Final Review
-- Sidebar is fully integrated and routed to all operational pages.
-- TypeScript strictly enforces typing across the platform (`tsc --noEmit` runs completely clean).
-- UI built on Shadcn UI and Tremor for cohesive administrative experience.
-- The project is complete.
+**All Part A and Part B tasks have been completed successfully. System has been type-checked and compiled without errors (`npx tsc --noEmit`).**

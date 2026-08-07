@@ -30,9 +30,10 @@ const MENU_GROUPS = [
   {
     title: 'MODERATION',
     items: [
-      { name: 'Flagged Chats', path: '/moderation/flagged-chats', module: 'flagged-chats', icon: MessageSquare },
-      { name: 'Reports & Complaints', path: '/moderation/reports', module: 'reports', icon: AlertTriangle },
-      { name: 'Bans & Restrictions', path: '/moderation/bans', module: 'bans', icon: Ban },
+      { name: 'Reports & Warnings', path: '/moderation/reports', module: 'reports', icon: AlertTriangle },
+      { name: 'Bans & Suspensions', path: '/moderation/bans', module: 'bans', icon: Ban },
+      { name: 'Flagged Chat Review', path: '/moderation/flagged-chats', module: 'flagged-chats', icon: MessageSquare },
+      { name: 'Chat Settings', path: '/moderation/chat-settings', module: 'chat-settings', icon: MessageSquare },
       { name: 'Risk Scoring', path: '/moderation/risk-scoring', module: 'risk-scoring', icon: ShieldAlert },
       { name: 'Reviews Moderation', path: '/moderation/reviews', module: 'reviews', icon: Star },
       { name: 'Appeals', path: '/moderation/appeals', module: 'appeals', icon: RefreshCcw },
@@ -61,19 +62,57 @@ const MENU_GROUPS = [
   {
     title: 'FINANCIAL',
     items: [
-      { name: 'Platform Revenue', path: '/financial/revenue-reports', module: 'revenue-reports', icon: TrendingUp },
-      { name: 'Payouts & Escrow', path: '/financial/payouts', module: 'payouts', icon: ArrowRightLeft },
-      { name: 'Refund Processing', path: '/financial/refunds', module: 'refunds', icon: Undo2 },
       { name: 'Commission & Pricing', path: '/system/config', module: 'config', icon: DollarSign },
+      { name: 'Escrow / Wallets', path: '/financial/escrow', module: 'escrow', icon: Wallet },
+      { name: 'Payouts', path: '/financial/payouts', module: 'payouts', icon: ArrowRightLeft },
+      { name: 'Refunds & Disputes', path: '/financial/refunds', module: 'refunds', icon: Undo2 },
+      { name: 'Fraud Detection', path: '/financial/fraud-detection', module: 'fraud-detection', icon: Shield },
+      { name: 'Tax / Invoices', path: '/financial/tax-invoices', module: 'tax-invoices', icon: FileText },
+      { name: 'Revenue Reports', path: '/financial/revenue-reports', module: 'revenue-reports', icon: TrendingUp },
+      { name: 'Payment Reconciliation', path: '/financial/reconciliation', module: 'reconciliation', icon: RefreshCw },
     ]
   },
   {
-    title: 'MARKETING & PROMOS',
+    title: 'BOOKINGS & USERS',
     items: [
-      { name: 'Coupons & Discounts', path: '/marketing/coupons', module: 'coupons', icon: Ticket },
-      { name: 'Referral Program', path: '/marketing/referrals', module: 'referrals', icon: Users },
-      { name: 'Push Notifications', path: '/marketing/notifications', module: 'notifications', icon: Megaphone },
-      { name: 'Special Events', path: '/marketing/events', module: 'events', icon: Calendar },
+      { name: 'Live Sessions', path: '/operations/active-sessions', module: 'active-sessions', icon: Radio },
+      { name: 'Booking Disputes', path: '/operations/booking-disputes', module: 'booking-disputes', icon: AlertCircle },
+      { name: 'Session Audit Logs', path: '/operations/session-audit', module: 'session-audit', icon: ClipboardList },
+      { name: 'Customer Directory', path: '/customers', module: 'customers', icon: Users },
+      { name: 'Companion Directory', path: '/companions', module: 'companions', icon: UserMinus },
+    ]
+  },
+  {
+    title: 'SUPPORT',
+    items: [
+      { name: 'Tickets', path: '/support/tickets', module: 'tickets', icon: MessageSquare },
+      { name: 'SLA Dashboard', path: '/support/sla-dashboard', module: 'sla-dashboard', icon: Activity },
+    ]
+  },
+  {
+    title: 'DISCOVERY & OPS',
+    items: [
+      { name: 'Discovery Config', path: '/discovery/ranking-config', module: 'ranking-config', icon: LayoutGrid },
+      { name: 'Special Events', path: '/discovery/events', module: 'events', icon: Calendar },
+      { name: 'City Launch Management', path: '/operations/city-launch', module: 'city-launch', icon: Map },
+      { name: 'Venue Management', path: '/operations/venues', module: 'venues', icon: Building2 },
+      { name: 'Growth Abuse Monitoring', path: '/operations/growth-abuse', module: 'growth-abuse', icon: TrendingDown },
+    ]
+  },
+  {
+    title: 'PLATFORM CONFIG',
+    items: [
+      { name: 'Master Data Management', path: '/system/master-data', module: 'master-data', icon: Database },
+      { name: 'Training & Content', path: '/platform-config/training', module: 'training', icon: GraduationCap },
+      { name: 'Announcements', path: '/platform-config/announcements', module: 'announcements', icon: Megaphone },
+      { name: 'Policy & Legal Docs', path: '/platform-config/policy-docs', module: 'policy-docs', icon: Scale },
+    ]
+  },
+  {
+    title: 'PRIVACY & COMPLIANCE',
+    items: [
+      { name: 'Data Privacy Requests', path: '/legal/data-privacy', module: 'data-privacy', icon: ShieldCheck },
+      { name: 'Legal Requests', path: '/legal/legal-requests', module: 'legal-requests', icon: Scale },
     ]
   },
   {
@@ -89,14 +128,9 @@ const MENU_GROUPS = [
     items: [
       { name: 'Audit Logs', path: '/system/audit-logs', module: 'audit-logs', icon: ClipboardList },
       { name: 'Dynamic App Configs', path: '/system/app-configs', module: 'app-configs', icon: Settings },
-      { name: 'Global Settings', path: '/system/global-settings', module: 'global-settings', icon: Globe },
-      { name: 'Chat Settings', path: '/system/chat-settings', module: 'chat-settings', icon: MessageSquare },
-      { name: 'Booking Settings', path: '/system/booking-settings', module: 'booking-settings', icon: Clock },
       { name: 'Notification Configs', path: '/system/notification-configs', module: 'notification-configs', icon: Bell },
       { name: 'UI & Discovery', path: '/system/ui-discovery', module: 'ui-discovery', icon: LayoutGrid },
-      { name: 'Waitlist', path: '/system/waitlist', module: 'waitlist', icon: Clock },
       { name: 'Employee Mgmt', path: '/system/employees', module: 'employees', icon: Users2 },
-      { name: 'Master Data', path: '/system/master-data', module: 'master-data', icon: Database },
     ]
   }
 ];

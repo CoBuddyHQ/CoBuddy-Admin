@@ -7,18 +7,35 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useDisputes } from '@/modules/bookings/disputes/hooks/useDisputes';
 import { formatCurrency } from '@/lib/utils';
-import { AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
+import { AlertCircle, CheckCircle, RotateCcw, PenTool } from 'lucide-react';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function BookingDisputesPage() {
-  const { disputes, isLoading, updateStatus } = useDisputes();
+  const { disputes, isLoading, updateStatus, overridePenalty } = useDisputes();
+  const [overrideId, setOverrideId] = useState<string | null>(null);
+  const [penalty, setPenalty] = useState('');
+  const [reason, setReason] = useState('');
 
   if (isLoading) return <div className="p-6">Loading disputes...</div>;
+
+  const handleOverride = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (overrideId && penalty && reason) {
+      overridePenalty({ id: overrideId, penalty: Number(penalty), reason });
+      setOverrideId(null);
+      setPenalty('');
+      setReason('');
+    }
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Booking Disputes"
-        description="Review and resolve disputes raised by customers or companions."
+        description="Review cancellation disputes, override calculated penalties, or escalate cases."
       />
 
       <Card>
@@ -34,6 +51,8 @@ export default function BookingDisputesPage() {
                 <TableHead>Booking</TableHead>
                 <TableHead>Raised By</TableHead>
                 <TableHead>Reason</TableHead>
+                <TableHead>Notice</TableHead>
+                <TableHead>Penalty</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
@@ -52,30 +71,51 @@ export default function BookingDisputesPage() {
                   <TableCell className="max-w-xs truncate" title={dispute.reason}>
                     {dispute.reason}
                   </TableCell>
+                  <TableCell>{dispute.noticeGivenHours}h</TableCell>
+                  <TableCell>{dispute.calculatedPenaltyPercent}%</TableCell>
                   <TableCell>{formatCurrency(dispute.amount)}</TableCell>
                   <TableCell>
                     <Badge variant={
                       dispute.status === 'OPEN' ? 'destructive' :
                       dispute.status === 'INVESTIGATING' ? 'default' :
+                      dispute.status === 'ESCALATED' ? 'destructive' :
                       'secondary'
                     }>
-                      {dispute.status.replace('_', ' ')}
+                      {dispute.status.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-2">
-                      {dispute.status === 'OPEN' && (
-                        <Button size="sm" variant="outline" onClick={() => updateStatus({ id: dispute.id, status: 'INVESTIGATING' })}>
-                          <AlertCircle className="h-4 w-4 mr-1" /> Investigate
-                        </Button>
-                      )}
                       {(dispute.status === 'OPEN' || dispute.status === 'INVESTIGATING') && (
                         <>
                           <Button size="sm" variant="default" onClick={() => updateStatus({ id: dispute.id, status: 'RESOLVED_REFUND' })}>
-                            <RotateCcw className="h-4 w-4 mr-1" /> Refund
+                            <CheckCircle className="h-4 w-4 mr-1" /> Approve
                           </Button>
-                          <Button size="sm" variant="secondary" onClick={() => updateStatus({ id: dispute.id, status: 'RESOLVED_NO_REFUND' })}>
-                            <CheckCircle className="h-4 w-4 mr-1" /> No Refund
+                          <Dialog open={overrideId === dispute.id} onOpenChange={(open) => !open && setOverrideId(null)}>
+                            <DialogTrigger render={
+                              <Button size="sm" variant="secondary" onClick={() => setOverrideId(dispute.id)}>
+                                <PenTool className="h-4 w-4 mr-1" /> Override
+                              </Button>
+                            } />
+                            <DialogContent>
+                              <DialogHeader><DialogTitle>Override Penalty</DialogTitle></DialogHeader>
+                              <form onSubmit={handleOverride} className="space-y-4 pt-4">
+                                <div className="space-y-2">
+                                  <Label>New Penalty Percentage (0-100)</Label>
+                                  <Input type="number" min="0" max="100" value={penalty} onChange={e => setPenalty(e.target.value)} required />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>Override Reason</Label>
+                                  <Input placeholder="Why are you overriding the calculated penalty?" value={reason} onChange={e => setReason(e.target.value)} required />
+                                </div>
+                                <div className="flex justify-end pt-4">
+                                  <Button type="submit">Submit Override</Button>
+                                </div>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+                          <Button size="sm" variant="outline" className="text-destructive" onClick={() => updateStatus({ id: dispute.id, status: 'ESCALATED' })}>
+                            <AlertCircle className="h-4 w-4 mr-1" /> Escalate
                           </Button>
                         </>
                       )}

@@ -20,10 +20,20 @@ export const useSystemConfig = () => {
     onError: () => toast.error('Failed to save configuration')
   });
 
+  const updateMultiplierMutation = useMutation({
+    mutationFn: ({ id, multiplier }: { id: string, multiplier: number }) => configApi.updateActivityMultiplier(id, multiplier),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interests'] });
+      toast.success('Multiplier updated successfully');
+    },
+    onError: () => toast.error('Failed to update multiplier')
+  });
+
   return {
     config: query.data,
     isLoading: query.isLoading,
     saveConfig: mutation.mutate,
-    isSaving: mutation.isPending
+    isSaving: mutation.isPending,
+    updateActivityMultiplier: updateMultiplierMutation.mutate
   };
 };

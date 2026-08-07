@@ -19,9 +19,18 @@ export const useLiveSessions = () => {
     }
   });
 
+  const { mutate: flagSession } = useMutation({
+    mutationFn: (id: string) => liveSessionsApi.flagSession(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liveSessions'] });
+      toast.success('Session flagged to Safety Ops');
+    }
+  });
+
   return {
     sessions,
     isLoading,
-    resolveSOS
+    resolveSOS,
+    flagSession
   };
 };

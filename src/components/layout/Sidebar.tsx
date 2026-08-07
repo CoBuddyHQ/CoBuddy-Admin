@@ -66,6 +66,7 @@ const MENU_GROUPS = [
       { name: 'Escrow / Wallets', path: '/financial/escrow', module: 'escrow', icon: Wallet },
       { name: 'Payouts', path: '/financial/payouts', module: 'payouts', icon: ArrowRightLeft },
       { name: 'Refunds & Disputes', path: '/financial/refunds', module: 'refunds', icon: Undo2 },
+      { name: 'Booking Disputes', path: '/bookings/disputes', module: 'booking-disputes', icon: Scale },
       { name: 'Fraud Detection', path: '/financial/fraud-detection', module: 'fraud-detection', icon: Shield },
       { name: 'Tax / Invoices', path: '/financial/tax-invoices', module: 'tax-invoices', icon: FileText },
       { name: 'Revenue Reports', path: '/financial/revenue-reports', module: 'revenue-reports', icon: TrendingUp },
@@ -75,7 +76,7 @@ const MENU_GROUPS = [
   {
     title: 'BOOKINGS & USERS',
     items: [
-      { name: 'Live Sessions', path: '/operations/active-sessions', module: 'active-sessions', icon: Radio },
+      { name: 'Live Sessions', path: '/safety/live-sessions', module: 'live-sessions', icon: Radio },
       { name: 'Session Audit Logs', path: '/operations/session-audit', module: 'session-audit', icon: ClipboardList },
       { name: 'Customer Directory', path: '/customers', module: 'customers', icon: Users },
       { name: 'Companion Directory', path: '/companions', module: 'companions', icon: UserMinus },

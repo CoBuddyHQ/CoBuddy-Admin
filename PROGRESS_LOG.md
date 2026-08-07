@@ -85,4 +85,11 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 6: Activity Price Multiplier:** Added `basePriceMultiplier` to `Interest` schema in Master Data, integrated it in mock API and UI.
 - **Item 7: Permissions Fix:** Built custom role creation flow at `/system/employees/roles` with full API, hook, and UI for managing granular permissions.
 
-**Full repository has been verified with `npx tsc --noEmit` and `npx eslint src` yielding 0 errors.**
+## Round 4 Corrective Pass
+- **Item 1: Booking Dispute Module:** Added the `/bookings/disputes` sidebar entry under "FINANCIAL", linked it with the `'booking-disputes'` module permission for Finance, Support, and Super Admins. Extended `BookingDispute` interface and mock API with `noticeGivenHours`, `calculatedPenaltyPercent`, and `overrideReason`. Updated the UI page with new columns and spec'd actions (Approve, Override Penalty with form, and Escalate).
+- **Item 2: Live Sessions Fix:** Repointed "Live Sessions" sidebar item (under "BOOKINGS & USERS") to the new `/safety/live-sessions` route. Added `timerStatus`, `gpsLocation`, and `checkInStatus` fields to `LiveSession` type and API mocks. Updated the UI table to display these fields and ensured the primary action remains "Flag to Ops".
+- **Item 3: Activity Price Multiplier:** Removed `multiplier` state and input from `AddInterestModal` and the price multiplier column from `InterestList` in Master Data. Added a dedicated "Activity Multipliers" section in `/system/config` that loops through all active interests and allows mutating their `basePriceMultiplier` directly via a new `updateActivityMultiplier` API call referencing `masterDataApi`.
+- **Item 4: Missing Permission Entry:** Added `'active-sessions'` to `MODULE_PERMISSIONS` for Safety Operator, City Ops Manager, and Super Admin. Removed unused `'pricing-config'` permission.
+- **Item 5: Re-verify and Report:** Confirmed `npx tsc --noEmit` and `npx eslint src` both pass with 0 errors. Traced every Sidebar path against `src/app/(dashboard)`—all paths resolve. The only unlinked primary route found is `/marketing/referrals`, which was intentionally parked and disabled in an earlier round. Sub-pages (like `/[id]`, `/roles`, `/settings`) correctly exist outside the sidebar.
+
+**Repository is fully verified. Round 4 completed successfully.**

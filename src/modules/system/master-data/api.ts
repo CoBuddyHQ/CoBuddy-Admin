@@ -41,6 +41,11 @@ export const masterDataApi = {
     if (item) item.active = !item.active;
     return Promise.resolve();
   },
+  updateInterestMultiplier: async (id: string, multiplier: number): Promise<void> => {
+    const item = interests.find(i => i.id === id);
+    if (item) item.basePriceMultiplier = multiplier;
+    return Promise.resolve();
+  },
 
   addCity: async (data: Omit<City, 'id'>): Promise<void> => {
     cities.push({ id: `CITY-${Date.now()}`, ...data });

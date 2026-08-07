@@ -5,7 +5,10 @@ export interface BookingDispute {
   companionId: string;
   raisedBy: 'CUSTOMER' | 'COMPANION';
   reason: string;
-  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED_REFUND' | 'RESOLVED_NO_REFUND';
+  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED_REFUND' | 'RESOLVED_NO_REFUND' | 'ESCALATED';
   amount: number;
+  noticeGivenHours: number;
+  calculatedPenaltyPercent: number;
+  overrideReason?: string;
   createdAt: string;
 }

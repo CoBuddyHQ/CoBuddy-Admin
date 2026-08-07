@@ -45,7 +45,6 @@ export function AddInterestModal({ open, onOpenChange, onSubmit }: ModalProps) {
   const [nameEn, setNameEn] = useState('');
   const [nameHi, setNameHi] = useState('');
   const [type, setType] = useState('ACTIVITY');
-  const [multiplier, setMultiplier] = useState('1.0');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,11 +52,11 @@ export function AddInterestModal({ open, onOpenChange, onSubmit }: ModalProps) {
       onSubmit({ 
         name: { en: nameEn, hi: nameHi }, 
         type, 
-        basePriceMultiplier: parseFloat(multiplier) || 1.0,
+        basePriceMultiplier: 1.0,
         active: true 
       });
       onOpenChange(false);
-      setNameEn(''); setNameHi(''); setMultiplier('1.0');
+      setNameEn(''); setNameHi('');
     }
   };
 
@@ -76,14 +75,6 @@ export function AddInterestModal({ open, onOpenChange, onSubmit }: ModalProps) {
               <SelectItem value="LIFESTYLE">Lifestyle</SelectItem>
             </SelectContent>
           </Select>
-          <Input 
-            type="number" 
-            step="0.1" 
-            min="0.1" 
-            placeholder="Price Multiplier (e.g. 1.0)" 
-            value={multiplier} 
-            onChange={e => setMultiplier(e.target.value)} 
-          />
           <div className="flex justify-end"><Button type="submit">Add Interest</Button></div>
         </form>
       </DialogContent>

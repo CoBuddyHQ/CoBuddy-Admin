@@ -5,8 +5,12 @@ import { ConfigFormTemplate } from '@/components/templates/ConfigFormTemplate';
 import { useSystemConfig } from '@/modules/system/config/hooks/useSystemConfig';
 import { Input } from '@/components/ui/input';
 
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
+
 export default function SystemConfigPage() {
-  const { config, isLoading, saveConfig, isSaving } = useSystemConfig();
+  const { config, isLoading, saveConfig, isSaving, updateActivityMultiplier } = useSystemConfig();
+  const { interests } = useMasterData();
   
   const [formData, setFormData] = useState({
     commission: {
@@ -142,6 +146,32 @@ export default function SystemConfigPage() {
                   }))}
                 />
               </div>
+            </div>
+          )
+        },
+        {
+          title: "Activity Multipliers",
+          description: "Set base price multipliers for different activities/interests.",
+          children: (
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4 max-w-2xl">
+              {interests.filter(i => i.active).map(interest => (
+                <div key={interest.id} className="flex items-center justify-between space-y-2 p-2 rounded-md border bg-muted/20">
+                  <label className="text-sm font-medium">{getLocalizedText(interest.name, 'en')} ({interest.type})</label>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      type="number" min="1" max="5" step="0.1" className="w-24 text-right"
+                      defaultValue={interest.basePriceMultiplier || 1.0}
+                      onBlur={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          updateActivityMultiplier({ id: interest.id, multiplier: val });
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-muted-foreground font-mono">x</span>
+                  </div>
+                </div>
+              ))}
             </div>
           )
         }

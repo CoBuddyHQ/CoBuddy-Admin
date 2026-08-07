@@ -19,9 +19,18 @@ export const useDisputes = () => {
     }
   });
 
+  const { mutate: overridePenalty } = useMutation({
+    mutationFn: ({ id, penalty, reason }: { id: string, penalty: number, reason: string }) => disputesApi.overridePenalty(id, penalty, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['disputes'] });
+      toast.success('Penalty overridden successfully');
+    }
+  });
+
   return {
     disputes,
     isLoading,
-    updateStatus
+    updateStatus,
+    overridePenalty
   };
 };

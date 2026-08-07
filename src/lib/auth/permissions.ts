@@ -22,7 +22,6 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   'age-escalation': { roles: [StaffRole.LEGAL_ADMIN, StaffRole.SUPER_ADMIN] },
   'emergency-workflow': { roles: [StaffRole.SAFETY_OPERATOR] },
   
-  'pricing-config': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
   'escrow': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
   'payouts': { roles: [StaffRole.FINANCE_ADMIN] },
   'refunds': { roles: [StaffRole.FINANCE_ADMIN] },
@@ -31,8 +30,9 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   'revenue-reports': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
   'reconciliation': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
   
+  'active-sessions': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
   'live-sessions': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.SUPER_ADMIN] },
-  'disputes': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPPORT_AGENT] },
+  'booking-disputes': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPPORT_AGENT, StaffRole.SUPER_ADMIN] },
   'audit-logs-bookings': { roles: [StaffRole.SUPER_ADMIN, StaffRole.MODERATOR] },
   'customers': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
   'companions': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.MODERATOR, StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },

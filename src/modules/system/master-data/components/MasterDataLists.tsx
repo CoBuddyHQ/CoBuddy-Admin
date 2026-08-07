@@ -46,7 +46,6 @@ export function InterestList({ data, onToggle }: InterestListProps) {
         <TableRow>
           <TableHeaderCell>Name</TableHeaderCell>
           <TableHeaderCell>Type</TableHeaderCell>
-          <TableHeaderCell>Price Multiplier</TableHeaderCell>
           <TableHeaderCell>Status</TableHeaderCell>
         </TableRow>
       </TableHead>
@@ -55,7 +54,6 @@ export function InterestList({ data, onToggle }: InterestListProps) {
           <TableRow key={item.id}>
             <TableCell>{getLocalizedText(item.name, 'en')}</TableCell>
             <TableCell>{item.type}</TableCell>
-            <TableCell>{item.basePriceMultiplier ? `${item.basePriceMultiplier}x` : '1.0x'}</TableCell>
             <TableCell>
               <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
             </TableCell>

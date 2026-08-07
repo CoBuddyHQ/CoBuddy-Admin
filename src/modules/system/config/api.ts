@@ -22,5 +22,11 @@ export const configApi = {
   updateConfig: async (payload: SystemConfig): Promise<SystemConfig> => {
     currentConfig = { ...payload };
     return Promise.resolve(currentConfig);
+  },
+
+  updateActivityMultiplier: async (activityId: string, multiplier: number): Promise<void> => {
+    // Dynamically import masterDataApi to avoid circular dependency if any, or just import it at top.
+    const { masterDataApi } = await import('@/modules/system/master-data/api');
+    return masterDataApi.updateInterestMultiplier(activityId, multiplier);
   }
 };

@@ -129,6 +129,7 @@ const MENU_GROUPS = [
       { name: 'Audit Logs', path: '/system/audit-logs', module: 'audit-logs', icon: ClipboardList },
       { name: 'Dynamic App Configs', path: '/system/app-configs', module: 'app-configs', icon: Settings },
       { name: 'Employee Mgmt', path: '/system/employees', module: 'employees', icon: Users2 },
+      { name: 'Roles & Permissions', path: '/system/employees/roles', module: 'employee-roles', icon: ShieldCheck }
     ]
   }
 ];

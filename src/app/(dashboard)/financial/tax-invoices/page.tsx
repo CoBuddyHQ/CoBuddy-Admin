@@ -21,9 +21,16 @@ export default function TaxInvoicesPage() {
       />
 
       <Card>
-        <CardHeader>
-          <CardTitle>Invoice Directory</CardTitle>
-          <CardDescription>Monthly tax statements and compliance tracking.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Invoice Directory</CardTitle>
+            <CardDescription>Monthly tax statements and compliance tracking.</CardDescription>
+          </div>
+          <Button variant="outline" onClick={() => {
+            import('@/lib/exportCsv').then(m => m.exportToCsv(invoices, `tax-invoices-export-${new Date().toISOString().split('T')[0]}.csv`));
+          }}>
+            <Download className="mr-2 h-4 w-4" /> Export CSV
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>

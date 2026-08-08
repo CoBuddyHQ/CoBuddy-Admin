@@ -55,6 +55,7 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   
   'config': { roles: [StaffRole.SUPER_ADMIN] },
   'employees': { roles: [StaffRole.SUPER_ADMIN] },
+  'employee-roles': { roles: [StaffRole.SUPER_ADMIN] },
   'audit-logs': { roles: [StaffRole.SUPER_ADMIN] },
   'analytics': { roles: [StaffRole.SUPER_ADMIN, StaffRole.FINANCE_ADMIN, StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.MODERATOR, StaffRole.SUPPORT_AGENT] }
 };

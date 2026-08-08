@@ -36,7 +36,9 @@ export default function SessionAuditPage() {
                   className="pl-8 w-64"
                 />
               </div>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => {
+                import('@/lib/exportCsv').then(m => m.exportToCsv(logs, `session-audit-log-${new Date().toISOString().split('T')[0]}.csv`));
+              }}>
                 <Download className="h-4 w-4 mr-2" /> Export
               </Button>
             </div>

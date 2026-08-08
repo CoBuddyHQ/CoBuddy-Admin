@@ -129,7 +129,9 @@ export default function PolicyDocsPage() {
                   <CardTitle>Consent Audit Trail</CardTitle>
                   <CardDescription>Immutable log of user policy acceptances.</CardDescription>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => {
+                  import('@/lib/exportCsv').then(m => m.exportToCsv(consentLogs, `policy-docs-consent-logs-${new Date().toISOString().split('T')[0]}.csv`));
+                }}>
                   <Download className="h-4 w-4 mr-1" /> Export CSV
                 </Button>
               </div>

@@ -14,13 +14,22 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 export default function CityLaunchPage() {
   const { 
-    launches, isLoadingLaunches, updateStatus, toggleTask,
+    launches, isLoadingLaunches, updateStatus, toggleTask, createLaunch,
     config, entries, isLoadingWaitlist, updateConfig, isUpdatingConfig, approveEntry
   } = useCityLaunch();
 
   const [formData, setFormData] = useState<any>(null);
+  const [openLaunch, setOpenLaunch] = useState(false);
+  const [launchData, setLaunchData] = useState({
+    cityName: '',
+    region: '',
+    targetLaunchDate: '',
+    managerName: ''
+  });
 
   useEffect(() => {
     if (config) {
@@ -31,6 +40,13 @@ export default function CityLaunchPage() {
   const handleSubmitConfig = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) updateConfig(formData);
+  };
+
+  const handleCreateLaunch = (e: React.FormEvent) => {
+    e.preventDefault();
+    createLaunch(launchData);
+    setOpenLaunch(false);
+    setLaunchData({ cityName: '', region: '', targetLaunchDate: '', managerName: '' });
   };
 
   if (isLoadingLaunches || isLoadingWaitlist || (config && !formData)) {
@@ -45,10 +61,46 @@ export default function CityLaunchPage() {
       />
 
       <Tabs defaultValue="launches" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="launches">City Launches</TabsTrigger>
-          <TabsTrigger value="waitlist">Waitlist & Invites</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-between items-center">
+          <TabsList>
+            <TabsTrigger value="launches">City Launches</TabsTrigger>
+            <TabsTrigger value="waitlist">Waitlist & Invites</TabsTrigger>
+          </TabsList>
+          
+          <Dialog open={openLaunch} onOpenChange={setOpenLaunch}>
+            <DialogTrigger render={<Button size="sm">New City Launch</Button>} />
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New City Launch</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCreateLaunch} className="space-y-4 pt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>City Name</Label>
+                    <Input required value={launchData.cityName} onChange={e => setLaunchData({ ...launchData, cityName: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Region/State</Label>
+                    <Input required value={launchData.region} onChange={e => setLaunchData({ ...launchData, region: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Target Launch Date</Label>
+                    <Input type="date" required value={launchData.targetLaunchDate} onChange={e => setLaunchData({ ...launchData, targetLaunchDate: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Manager Name</Label>
+                    <Input required value={launchData.managerName} onChange={e => setLaunchData({ ...launchData, managerName: e.target.value })} />
+                  </div>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button type="submit">Create Launch Plan</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
         <TabsContent value="launches" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">

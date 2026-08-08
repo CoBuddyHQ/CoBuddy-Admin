@@ -111,3 +111,12 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 7: Verification & Reporting:** Completed a full repo scan for dead buttons and fixed all identified issues. `npx tsc --noEmit` and `npx eslint src` both pass with 0 errors.
 
 **Repository is fully verified. Round 6 completed successfully.**
+
+## Round 7 Corrective Pass
+- **Item 1: Layout/Scroll Bug on Trust Score Engine:** Removed `h-full flex flex-col` constraint and nested `overflow-auto`/`min-h-0` patterns from `src/app/(dashboard)/trust-score/page.tsx` so both grid columns scroll natively with the page content.
+- **Item 1 Follow-up (Repo Scan):** Scanned the entire `src/app/(dashboard)` directory for the specific split-scroll mismatch pattern. Found no other files suffering from this exact layout combination. (Files like `financial/refunds/page.tsx` were reviewed but correctly used a full-height tabs pattern rather than mismatched siblings).
+- **Item 2: New City Launch Capability:** Added a "New City Launch" button and dialog to `operations/city-launch/page.tsx`. Pre-populated the standard 4 pre-launch checklist tasks automatically in `createLaunch` within `api.ts`, initialized to `PLANNING` status.
+- **Item 3: Link "Go Live" to Master Data:** Updated `updateStatus` in `city-launch/api.ts` to intercept `LIVE` transitions. It dynamically imports `masterDataApi`, checks if the city exists, toggles it to active if it does, or adds it to the master list if missing, syncing operations to global master data. Added success toast feedback in `useCityLaunch` hook.
+- **Item 4: Verification & Reporting:** Completed `npx tsc --noEmit` and `npx eslint src` with 0 errors.
+
+**Repository is fully verified. Round 7 completed successfully.**

@@ -23,21 +23,21 @@ export default function TrustScorePage() {
   if (isLoading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="space-y-6 h-full flex flex-col p-6">
+    <div className="space-y-6 p-6">
       <PageHeader 
         title="Trust Score Engine" 
         description="Monitor companion trust scores, configure safety bonus rules, and manage manual overrides." 
       />
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 flex-1">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
-        <div className="xl:col-span-2 space-y-4 flex flex-col min-h-0">
-          <Card className="flex-1 flex flex-col min-h-0">
+        <div className="xl:col-span-2 space-y-4">
+          <Card>
             <CardHeader className="shrink-0">
               <CardTitle>Companion Trust Scores</CardTitle>
               <CardDescription>Overall scores and statuses for all companions</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 overflow-auto">
+            <CardContent>
               <Table>
                 <TableHead>
                   <TableRow>

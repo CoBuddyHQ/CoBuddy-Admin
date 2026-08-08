@@ -37,6 +37,14 @@ export const usePolicyDocs = () => {
     },
   });
 
+  const createDocumentMutation = useMutation({
+    mutationFn: (data: Omit<PolicyDocument, 'id' | 'publishStatus' | 'lastUpdated' | 'consentCount' | 'version'>) => policyApi.createDocument(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['policy-docs'] });
+      toast.success('Document created successfully');
+    },
+  });
+
   return {
     policies: policiesQuery.data ?? [],
     consentLogs: logsQuery.data ?? [],
@@ -45,5 +53,6 @@ export const usePolicyDocs = () => {
     updateStatus: updateStatusMutation.mutate,
     updateSettings: updateSettingsMutation.mutate,
     isUpdatingSettings: updateSettingsMutation.isPending,
+    createDocument: createDocumentMutation.mutate,
   };
 };

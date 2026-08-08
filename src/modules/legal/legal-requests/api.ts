@@ -32,5 +32,14 @@ export const legalRequestsApi = {
   
   updateStatus: async (id: string, status: LegalRequest['status']): Promise<void> => {
     mockRequests = mockRequests.map(r => r.id === id ? { ...r, status } : r);
+  },
+
+  createRequest: async (data: Omit<LegalRequest, 'id' | 'receivedDate'>): Promise<void> => {
+    const newRequest: LegalRequest = {
+      ...data,
+      id: `LGL-${Date.now()}`,
+      receivedDate: new Date().toISOString()
+    };
+    mockRequests = [newRequest, ...mockRequests];
   }
 };

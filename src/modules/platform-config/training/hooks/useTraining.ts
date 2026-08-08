@@ -32,11 +32,20 @@ export const useTraining = () => {
     },
   });
 
+  const createLessonMutation = useMutation({
+    mutationFn: (data: Omit<TrainingLesson, 'id' | 'status' | 'completionCount' | 'lastUpdated'>) => trainingApi.createLesson(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['training-lessons'] });
+      toast.success('Lesson created successfully');
+    },
+  });
+
   return {
     lessons: lessonsQuery.data ?? [],
     quizStats: quizQuery.data,
     isLoading: lessonsQuery.isLoading || quizQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
     deleteLesson: deleteLessonMutation.mutate,
+    createLesson: createLessonMutation.mutate,
   };
 };

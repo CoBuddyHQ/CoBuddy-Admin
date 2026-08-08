@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { venuesApi } from '../api';
 import { toast } from 'sonner';
-
+import { FeaturedVenue } from '../types';
 export const useVenues = () => {
   const queryClient = useQueryClient();
 
@@ -39,6 +39,14 @@ export const useVenues = () => {
     },
   });
 
+  const createVenueMutation = useMutation({
+    mutationFn: (data: Omit<FeaturedVenue, 'id' | 'isActive'>) => venuesApi.createFeaturedVenue(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['featured-venues'] });
+      toast.success('Venue added successfully');
+    },
+  });
+
   return {
     venues: venuesQuery.data ?? [],
     placeTypes: placeTypesQuery.data ?? [],
@@ -46,5 +54,6 @@ export const useVenues = () => {
     toggleVenue: toggleVenueMutation.mutate,
     deleteVenue: deleteVenueMutation.mutate,
     togglePlaceType: togglePlaceTypeMutation.mutate,
+    createVenue: createVenueMutation.mutate,
   };
 };

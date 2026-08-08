@@ -37,7 +37,7 @@ export default function FlaggedChatDetailPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="p-6 space-y-6">
       <div className="flex items-center gap-4 mb-4 shrink-0">
         <Button variant="ghost" size="icon" onClick={() => router.push('/moderation/flagged-chats')}>
           <ArrowLeft className="h-4 w-4" />
@@ -59,15 +59,15 @@ export default function FlaggedChatDetailPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        <div className="md:col-span-2 flex flex-col h-full min-h-0">
-          <Card className="flex-1 flex flex-col min-h-0">
+        <div className="md:col-span-2 space-y-6">
+          <Card>
             <CardHeader className="shrink-0 border-b">
               <CardTitle>Chat Transcript (Masked)</CardTitle>
               <CardDescription>Flagged for: {detail.flagReason} (Confidence: {(detail.confidenceScore * 100).toFixed(0)}%)</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+            <CardContent className="p-4 space-y-4">
               {detail.messages.map(msg => (
                 <div key={msg.id} className={`flex flex-col ${msg.sender === detail.participants[0] ? 'items-end' : 'items-start'}`}>
                   <span className="text-xs text-muted-foreground mb-1">{msg.sender} • {new Date(msg.timestamp).toLocaleTimeString()}</span>

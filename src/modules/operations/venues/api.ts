@@ -45,6 +45,15 @@ export const venuesApi = {
     mockVenues = mockVenues.filter(v => v.id !== id);
   },
 
+  createFeaturedVenue: async (data: Omit<FeaturedVenue, 'id' | 'isActive'>): Promise<void> => {
+    const newVenue: FeaturedVenue = {
+      ...data,
+      id: `VEN-00${mockVenues.length + 1}`,
+      isActive: true
+    };
+    mockVenues = [newVenue, ...mockVenues];
+  },
+
   getPlaceTypes: async (): Promise<PlaceTypeConfig[]> => {
     return [...mockPlaceTypes];
   },

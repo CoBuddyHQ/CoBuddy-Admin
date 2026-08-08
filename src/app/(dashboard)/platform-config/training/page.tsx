@@ -8,9 +8,33 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Edit, PlayCircle } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function TrainingPage() {
-  const { lessons, quizStats, isLoading, updateStatus, deleteLesson } = useTraining();
+  const { lessons, quizStats, isLoading, updateStatus, deleteLesson, createLesson } = useTraining();
+
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    titleEn: '',
+    category: 'SAFETY' as any,
+    contentEn: ''
+  });
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    createLesson({
+      title: { en: formData.titleEn },
+      content: { en: formData.contentEn },
+      category: formData.category
+    });
+    setOpen(false);
+    setFormData({ titleEn: '', category: 'SAFETY', contentEn: '' });
+  };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
 
@@ -64,7 +88,38 @@ export default function TrainingPage() {
               <CardTitle>Training Modules</CardTitle>
               <CardDescription>Create and manage video or text-based training lessons.</CardDescription>
             </div>
-            <Button size="sm">Create New Lesson</Button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger render={<Button size="sm">Create New Lesson</Button>} />
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Training Lesson</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreate} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>Title (English)</Label>
+                    <Input required value={formData.titleEn} onChange={e => setFormData({ ...formData, titleEn: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <Select value={formData.category} onValueChange={(v: any) => setFormData({ ...formData, category: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SAFETY">Safety</SelectItem>
+                        <SelectItem value="BEST_PRACTICES">Best Practices</SelectItem>
+                        <SelectItem value="GUIDELINES">Guidelines</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Content/Description (English)</Label>
+                    <Textarea required value={formData.contentEn} onChange={e => setFormData({ ...formData, contentEn: e.target.value })} />
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Button type="submit">Create Draft</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent>

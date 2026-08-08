@@ -54,6 +54,18 @@ export const policyApi = {
     mockPolicies = mockPolicies.map(p => p.id === id ? { ...p, publishStatus: status } : p);
   },
 
+  createDocument: async (data: Omit<PolicyDocument, 'id' | 'publishStatus' | 'lastUpdated' | 'consentCount' | 'version'>): Promise<void> => {
+    const newDoc: PolicyDocument = {
+      ...data,
+      id: `POL-00${mockPolicies.length + 1}`,
+      publishStatus: 'DRAFT',
+      lastUpdated: new Date().toISOString().split('T')[0],
+      consentCount: 0,
+      version: 'v1.0'
+    };
+    mockPolicies = [newDoc, ...mockPolicies];
+  },
+
   getConsentLogs: async (): Promise<ConsentLog[]> => {
     return [...mockConsentLogs];
   },

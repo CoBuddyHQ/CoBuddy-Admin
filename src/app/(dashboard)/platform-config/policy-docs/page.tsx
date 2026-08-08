@@ -14,9 +14,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+
 export default function PolicyDocsPage() {
-  const { policies, consentLogs, settings, isLoading, updateStatus, updateSettings, isUpdatingSettings } = usePolicyDocs();
+  const { policies, consentLogs, settings, isLoading, updateStatus, updateSettings, isUpdatingSettings, createDocument } = usePolicyDocs();
   const [formData, setFormData] = useState<any>(null);
+  
+  const [open, setOpen] = useState(false);
+  const [docForm, setDocForm] = useState({
+    titleEn: '',
+    contentEn: '',
+    type: 'TERMS_OF_SERVICE' as any
+  });
 
   useEffect(() => {
     if (settings) {
@@ -29,6 +40,17 @@ export default function PolicyDocsPage() {
   const handleSubmitSettings = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) updateSettings(formData);
+  };
+
+  const handleCreateDocument = (e: React.FormEvent) => {
+    e.preventDefault();
+    createDocument({
+      title: { en: docForm.titleEn },
+      content: { en: docForm.contentEn },
+      type: docForm.type
+    });
+    setOpen(false);
+    setDocForm({ titleEn: '', contentEn: '', type: 'TERMS_OF_SERVICE' });
   };
 
   return (
@@ -52,7 +74,38 @@ export default function PolicyDocsPage() {
                   <CardTitle>Active Documents</CardTitle>
                   <CardDescription>Draft and publish legal platform documents.</CardDescription>
                 </div>
-                <Button size="sm">Create New Document</Button>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger render={<Button size="sm">Create New Document</Button>} />
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create Document</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateDocument} className="space-y-4 pt-4">
+                      <div className="space-y-2">
+                        <Label>Title (English)</Label>
+                        <Input required value={docForm.titleEn} onChange={e => setDocForm({ ...docForm, titleEn: e.target.value })} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Document Type</Label>
+                        <Select value={docForm.type} onValueChange={(v: any) => setDocForm({ ...docForm, type: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TERMS_OF_SERVICE">Terms of Service</SelectItem>
+                            <SelectItem value="PRIVACY_POLICY">Privacy Policy</SelectItem>
+                            <SelectItem value="COMMUNITY_GUIDELINES">Community Guidelines</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Content (English)</Label>
+                        <Textarea required value={docForm.contentEn} onChange={e => setDocForm({ ...docForm, contentEn: e.target.value })} />
+                      </div>
+                      <div className="flex justify-end pt-2">
+                        <Button type="submit">Create Draft</Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardHeader>
             <CardContent>

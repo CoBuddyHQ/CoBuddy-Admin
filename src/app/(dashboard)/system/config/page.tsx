@@ -26,6 +26,8 @@ export default function SystemConfigPage() {
     }
   });
 
+  const [activityValues, setActivityValues] = useState<Record<string, number | string>>({});
+
   useEffect(() => {
     if (config) {
       setFormData(config);
@@ -160,7 +162,11 @@ export default function SystemConfigPage() {
                   <div className="flex items-center gap-2">
                     <Input 
                       type="number" min="1" max="5" step="0.1" className="w-24 text-right"
-                      defaultValue={interest.basePriceMultiplier || 1.0}
+                      value={activityValues[interest.id] !== undefined ? activityValues[interest.id] : (interest.basePriceMultiplier || 1.0)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        setActivityValues(prev => ({ ...prev, [interest.id]: isNaN(val) ? '' : val }));
+                      }}
                       onBlur={(e) => {
                         const val = parseFloat(e.target.value);
                         if (!isNaN(val)) {

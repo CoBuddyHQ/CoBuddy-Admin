@@ -8,9 +8,40 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { FileText, Send, Lock, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function LegalRequestsPage() {
-  const { requests, isLoading, updateStatus } = useLegalRequests();
+  const { requests, isLoading, updateStatus, createRequest } = useLegalRequests();
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    agencyName: '',
+    requestType: 'INFO_REQUEST' as any,
+    associatedUserId: '',
+    associatedUserName: '',
+    deadline: '',
+    internalNotes: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createRequest({
+      ...formData,
+      status: 'OPEN'
+    });
+    setOpen(false);
+    setFormData({
+      agencyName: '',
+      requestType: 'INFO_REQUEST',
+      associatedUserId: '',
+      associatedUserName: '',
+      deadline: '',
+      internalNotes: ''
+    });
+  };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
 
@@ -28,7 +59,53 @@ export default function LegalRequestsPage() {
               <CardTitle>Active Subpoenas & Requests</CardTitle>
               <CardDescription>Track evidence preservation and response deadlines.</CardDescription>
             </div>
-            <Button size="sm">Log New Request</Button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger render={<Button size="sm">Log New Request</Button>} />
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Log Legal Request</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>Agency Name</Label>
+                    <Input required value={formData.agencyName} onChange={e => setFormData({ ...formData, agencyName: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Request Type</Label>
+                    <Select value={formData.requestType} onValueChange={(v: any) => setFormData({ ...formData, requestType: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="INFO_REQUEST">Information Request</SelectItem>
+                        <SelectItem value="SUBPOENA">Subpoena</SelectItem>
+                        <SelectItem value="SUMMONS">Summons</SelectItem>
+                        <SelectItem value="WARRANT">Warrant</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Target User ID</Label>
+                      <Input required value={formData.associatedUserId} onChange={e => setFormData({ ...formData, associatedUserId: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Target User Name</Label>
+                      <Input required value={formData.associatedUserName} onChange={e => setFormData({ ...formData, associatedUserName: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Deadline</Label>
+                    <Input type="datetime-local" required value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Internal Notes</Label>
+                    <Input value={formData.internalNotes} onChange={e => setFormData({ ...formData, internalNotes: e.target.value })} />
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Button type="submit">Submit Request</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent>

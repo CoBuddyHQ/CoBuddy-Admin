@@ -100,3 +100,14 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 3: Re-verify and Report:** Executed `npx tsc --noEmit` and `npx eslint src` with 0 errors. Verified in code that sidebar links and export clicks correctly resolve and download files. 
 
 **Repository is fully verified. Round 5 completed successfully.**
+
+## Round 6 Corrective Pass
+- **Item 1: Legal/Law-Enforcement:** Wired "Log New Request" dialog in `/legal/legal-requests/page.tsx`, mapped to new `createRequest` API method.
+- **Item 2: Policy/Legal Docs:** Wired "Create New Document" dialog in `/platform-config/policy-docs/page.tsx`, mapped to new `createDocument` API method.
+- **Item 3: Training/Lessons:** Wired "Create New Lesson" dialog in `/platform-config/training/page.tsx`, mapped to new `createLesson` API method.
+- **Item 4: Venue Management:** Wired "Add Featured Venue" dialog in `/operations/venues/page.tsx` with Google Places validation, mapped to new `createVenue` API method.
+- **Item 5: Report Detail Page Layout:** Refactored CSS classes in `moderation/reports/[reportId]/page.tsx` to fix fixed-height/overflow-y-auto layout bugs that hid content on small screens. Also fixed identical layout bug in `safety/incidents/[incidentId]/page.tsx` and `moderation/flagged-chats/[chatId]/page.tsx`.
+- **Item 6: Controlled Inputs - Config:** Replaced `defaultValue` with `value` controlled local state bound to `activityValues` in `system/config/page.tsx` for the Activity Multipliers to eliminate uncontrolled input warnings while preserving `onBlur` persistence logic.
+- **Item 7: Verification & Reporting:** Completed a full repo scan for dead buttons and fixed all identified issues. `npx tsc --noEmit` and `npx eslint src` both pass with 0 errors.
+
+**Repository is fully verified. Round 6 completed successfully.**

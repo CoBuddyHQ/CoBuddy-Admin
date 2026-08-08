@@ -19,9 +19,18 @@ export const useLegalRequests = () => {
     },
   });
 
+  const createRequestMutation = useMutation({
+    mutationFn: (data: Omit<LegalRequest, 'id' | 'receivedDate'>) => legalRequestsApi.createRequest(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['legal-requests'] });
+      toast.success('Legal request logged successfully');
+    },
+  });
+
   return {
     requests: requestsQuery.data ?? [],
     isLoading: requestsQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
+    createRequest: createRequestMutation.mutate,
   };
 };

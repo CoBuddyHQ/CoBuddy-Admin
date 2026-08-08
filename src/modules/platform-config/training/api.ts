@@ -45,6 +45,17 @@ export const trainingApi = {
     mockLessons = mockLessons.map(l => l.id === id ? { ...l, status, lastUpdated: new Date().toISOString().split('T')[0] } : l);
   },
 
+  createLesson: async (data: Omit<TrainingLesson, 'id' | 'status' | 'completionCount' | 'lastUpdated'>): Promise<void> => {
+    const newLesson: TrainingLesson = {
+      ...data,
+      id: `TRN-00${mockLessons.length + 1}`,
+      status: 'DRAFT',
+      completionCount: 0,
+      lastUpdated: new Date().toISOString().split('T')[0]
+    };
+    mockLessons = [newLesson, ...mockLessons];
+  },
+
   deleteLesson: async (id: string): Promise<void> => {
     mockLessons = mockLessons.filter(l => l.id !== id);
   },

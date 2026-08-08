@@ -9,11 +9,40 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Trash2, Building2 } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function VenuesPage() {
-  const { venues, placeTypes, isLoading, toggleVenue, deleteVenue, togglePlaceType } = useVenues();
+  const { venues, placeTypes, isLoading, toggleVenue, deleteVenue, togglePlaceType, createVenue } = useVenues();
+
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    nameEn: '',
+    address: '',
+    categoryEn: '',
+    city: '',
+    photoUrl: ''
+  });
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    createVenue({
+      name: { en: formData.nameEn },
+      address: formData.address,
+      category: { en: formData.categoryEn },
+      city: formData.city,
+      photoUrl: formData.photoUrl
+    });
+    setOpen(false);
+    setFormData({ nameEn: '', address: '', categoryEn: '', city: '', photoUrl: '' });
+  };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
+
+  const allowedCategories = placeTypes.filter(pt => pt.isAllowed);
 
   return (
     <div className="space-y-6">
@@ -30,7 +59,50 @@ export default function VenuesPage() {
                 <CardTitle>Featured Venues (Layer 1)</CardTitle>
                 <CardDescription>Hand-picked venues shown as highlights to customers.</CardDescription>
               </div>
-              <Button size="sm">Add Featured Venue</Button>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger render={<Button size="sm">Add Featured Venue</Button>} />
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Featured Venue</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreate} className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                      <Label>Venue Name</Label>
+                      <Input required value={formData.nameEn} onChange={e => setFormData({ ...formData, nameEn: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select value={formData.categoryEn} onValueChange={(v: any) => setFormData({ ...formData, categoryEn: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {allowedCategories.map(pt => (
+                            <SelectItem key={pt.id} value={pt.displayName.en || pt.typeName}>
+                              {getLocalizedText(pt.displayName)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Address</Label>
+                      <Input required value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>City</Label>
+                        <Input required value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Photo URL</Label>
+                        <Input type="url" value={formData.photoUrl} onChange={e => setFormData({ ...formData, photoUrl: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="flex justify-end pt-2">
+                      <Button type="submit">Add Venue</Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardHeader>
           <CardContent>

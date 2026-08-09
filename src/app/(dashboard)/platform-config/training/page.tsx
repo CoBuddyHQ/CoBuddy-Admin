@@ -2,6 +2,7 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useTraining } from '@/modules/platform-config/training/hooks/useTraining';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -14,26 +15,49 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { EmptyState } from '@/components/ui/empty-state';
+import { AppLanguage } from '@/modules/system/master-data/types';
+
+function getMissingLanguages(nameObj: Record<string, string>, appLanguages: AppLanguage[]) {
+  const activeLangs = appLanguages.filter(l => l.active);
+  return activeLangs.filter(l => !nameObj[l.code]).map(l => l.name);
+}
 
 export default function TrainingPage() {
   const { lessons, quizStats, isLoading, updateStatus, deleteLesson, createLesson } = useTraining();
+  const { appLanguages } = useMasterData();
+  const activeLangs = appLanguages?.filter(l => l.active) || [];
 
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    titleEn: '',
-    category: 'SAFETY' as any,
-    contentEn: ''
+    titles: {} as Record<string, string>,
+    contents: {} as Record<string, string>,
+    category: 'SAFETY' as any
   });
+  
+  const [editLesson, setEditLesson] = useState<any>(null);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    createLesson({
-      title: { en: formData.titleEn },
-      content: { en: formData.contentEn },
-      category: formData.category
+    if (formData.titles['en'] && formData.contents['en']) {
+      createLesson({
+        title: formData.titles,
+        content: formData.contents,
+        category: formData.category
+      });
+      setOpen(false);
+      setFormData({ titles: {}, contents: {}, category: 'SAFETY' });
+    }
+  };
+
+  const handleEditTranslations = (lesson: any) => {
+    setFormData({
+      titles: { ...lesson.title },
+      contents: { ...lesson.content },
+      category: lesson.category
     });
-    setOpen(false);
-    setFormData({ titleEn: '', category: 'SAFETY', contentEn: '' });
+    setEditLesson(lesson);
+    setOpen(true);
   };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
@@ -88,17 +112,23 @@ export default function TrainingPage() {
               <CardTitle>Training Modules</CardTitle>
               <CardDescription>Create and manage video or text-based training lessons.</CardDescription>
             </div>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger render={<Button size="sm">Create New Lesson</Button>} />
-              <DialogContent>
+            <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) { setEditLesson(null); setFormData({ titles: {}, contents: {}, category: 'SAFETY' }); } }}>
+              <Button size="sm" onClick={() => setOpen(true)}>Create New Lesson</Button>
+              <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Create Training Lesson</DialogTitle>
+                  <DialogTitle>{editLesson ? 'Edit Training Lesson' : 'Create Training Lesson'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleCreate} className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label>Title (English)</Label>
-                    <Input required value={formData.titleEn} onChange={e => setFormData({ ...formData, titleEn: e.target.value })} />
+                  <div className="space-y-4 border p-4 rounded-md">
+                    <h4 className="text-sm font-medium">Titles</h4>
+                    {activeLangs.map(lang => (
+                      <div key={lang.code} className="space-y-2">
+                        <Label>Title ({lang.name}){lang.code === 'en' ? ' *' : ''}</Label>
+                        <Input required={lang.code === 'en'} value={formData.titles[lang.code] || ''} onChange={e => setFormData({ ...formData, titles: { ...formData.titles, [lang.code]: e.target.value } })} />
+                      </div>
+                    ))}
                   </div>
+                  
                   <div className="space-y-2">
                     <Label>Category</Label>
                     <Select value={formData.category} onValueChange={(v: any) => setFormData({ ...formData, category: v })}>
@@ -110,12 +140,18 @@ export default function TrainingPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Content/Description (English)</Label>
-                    <Textarea required value={formData.contentEn} onChange={e => setFormData({ ...formData, contentEn: e.target.value })} />
+                  
+                  <div className="space-y-4 border p-4 rounded-md">
+                    <h4 className="text-sm font-medium">Content / Descriptions</h4>
+                    {activeLangs.map(lang => (
+                      <div key={lang.code} className="space-y-2">
+                        <Label>Content ({lang.name}){lang.code === 'en' ? ' *' : ''}</Label>
+                        <Textarea required={lang.code === 'en'} value={formData.contents[lang.code] || ''} onChange={e => setFormData({ ...formData, contents: { ...formData.contents, [lang.code]: e.target.value } })} />
+                      </div>
+                    ))}
                   </div>
                   <div className="flex justify-end pt-2">
-                    <Button type="submit">Create Draft</Button>
+                    <Button type="submit">{editLesson ? 'Save Changes' : 'Create Draft'}</Button>
                   </div>
                 </form>
               </DialogContent>
@@ -123,61 +159,76 @@ export default function TrainingPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Lesson Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Completions</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {lessons.map((lesson) => (
-                <TableRow key={lesson.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <PlayCircle className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{getLocalizedText(lesson.title)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{lesson.category}</Badge>
-                  </TableCell>
-                  <TableCell>{lesson.completionCount.toLocaleString()}</TableCell>
-                  <TableCell>{lesson.lastUpdated}</TableCell>
-                  <TableCell>
-                    <Badge variant={lesson.status === 'PUBLISHED' ? 'default' : 'secondary'}>
-                      {lesson.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" title="Edit Content">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant={lesson.status === 'PUBLISHED' ? "secondary" : "default"}
-                        size="sm"
-                        onClick={() => updateStatus({ id: lesson.id, status: lesson.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED' })}
-                      >
-                        {lesson.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => deleteLesson(lesson.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          {lessons.length === 0 ? (
+            <EmptyState title="No lessons found" description="Create a new training lesson to get started." />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Lesson Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Completions</TableHead>
+                  <TableHead>Last Updated</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {lessons.map((lesson) => {
+                  const missing = getMissingLanguages(lesson.title, appLanguages || []);
+                  return (
+                    <TableRow key={lesson.id}>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <PlayCircle className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{getLocalizedText(lesson.title, 'en')}</span>
+                          </div>
+                          {missing.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                              <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => handleEditTranslations(lesson)}>Edit Translations</Button>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{lesson.category}</Badge>
+                      </TableCell>
+                      <TableCell>{lesson.completionCount.toLocaleString()}</TableCell>
+                      <TableCell>{lesson.lastUpdated}</TableCell>
+                      <TableCell>
+                        <Badge variant={lesson.status === 'PUBLISHED' ? 'default' : 'secondary'}>
+                          {lesson.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" title="Edit Content" onClick={() => handleEditTranslations(lesson)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant={lesson.status === 'PUBLISHED' ? "secondary" : "default"}
+                            size="sm"
+                            onClick={() => updateStatus({ id: lesson.id, status: lesson.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED' })}
+                          >
+                            {lesson.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => deleteLesson(lesson.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

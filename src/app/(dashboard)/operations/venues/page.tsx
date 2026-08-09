@@ -2,42 +2,68 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useVenues } from '@/modules/operations/venues/hooks/useVenues';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Trash2, Building2 } from 'lucide-react';
+import { Trash2, Building2, Edit } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { EmptyState } from '@/components/ui/empty-state';
+import { AppLanguage } from '@/modules/system/master-data/types';
+
+function getMissingLanguages(nameObj: Record<string, string>, appLanguages: AppLanguage[]) {
+  const activeLangs = appLanguages.filter(l => l.active);
+  return activeLangs.filter(l => !nameObj[l.code]).map(l => l.name);
+}
 
 export default function VenuesPage() {
   const { venues, placeTypes, isLoading, toggleVenue, deleteVenue, togglePlaceType, createVenue } = useVenues();
+  const { appLanguages } = useMasterData();
+  const activeLangs = appLanguages?.filter(l => l.active) || [];
 
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    nameEn: '',
+    names: {} as Record<string, string>,
     address: '',
-    categoryEn: '',
+    categoryId: '',
     city: '',
     photoUrl: ''
   });
+  const [editVenue, setEditVenue] = useState<any>(null);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    createVenue({
-      name: { en: formData.nameEn },
-      address: formData.address,
-      category: { en: formData.categoryEn },
-      city: formData.city,
-      photoUrl: formData.photoUrl
+    if (formData.names['en']) {
+      const selectedPt = placeTypes.find(pt => pt.id === formData.categoryId);
+      createVenue({
+        name: formData.names,
+        address: formData.address,
+        category: selectedPt ? selectedPt.displayName : { en: formData.categoryId },
+        city: formData.city,
+        photoUrl: formData.photoUrl
+      });
+      setOpen(false);
+      setFormData({ names: {}, address: '', categoryId: '', city: '', photoUrl: '' });
+    }
+  };
+
+  const handleEditTranslations = (venue: any) => {
+    setFormData({
+      names: { ...venue.name },
+      address: venue.address,
+      categoryId: venue.category.en,
+      city: venue.city,
+      photoUrl: venue.photoUrl
     });
-    setOpen(false);
-    setFormData({ nameEn: '', address: '', categoryEn: '', city: '', photoUrl: '' });
+    setEditVenue(venue);
+    setOpen(true);
   };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
@@ -59,24 +85,30 @@ export default function VenuesPage() {
                 <CardTitle>Featured Venues (Layer 1)</CardTitle>
                 <CardDescription>Hand-picked venues shown as highlights to customers.</CardDescription>
               </div>
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger render={<Button size="sm">Add Featured Venue</Button>} />
-                <DialogContent>
+              <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) { setEditVenue(null); setFormData({ names: {}, address: '', categoryId: '', city: '', photoUrl: '' }); } }}>
+                <Button size="sm" onClick={() => setOpen(true)}>Add Featured Venue</Button>
+                <DialogContent className="max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Add Featured Venue</DialogTitle>
+                    <DialogTitle>{editVenue ? 'Edit Venue' : 'Add Featured Venue'}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleCreate} className="space-y-4 pt-4">
-                    <div className="space-y-2">
-                      <Label>Venue Name</Label>
-                      <Input required value={formData.nameEn} onChange={e => setFormData({ ...formData, nameEn: e.target.value })} />
+                    <div className="space-y-4 border p-4 rounded-md">
+                      <h4 className="text-sm font-medium">Names</h4>
+                      {activeLangs.map(lang => (
+                        <div key={lang.code} className="space-y-2">
+                          <Label>Venue Name ({lang.name}){lang.code === 'en' ? ' *' : ''}</Label>
+                          <Input required={lang.code === 'en'} value={formData.names[lang.code] || ''} onChange={e => setFormData({ ...formData, names: { ...formData.names, [lang.code]: e.target.value } })} />
+                        </div>
+                      ))}
                     </div>
+                    
                     <div className="space-y-2">
                       <Label>Category</Label>
-                      <Select value={formData.categoryEn} onValueChange={(v: any) => setFormData({ ...formData, categoryEn: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                      <Select value={formData.categoryId} onValueChange={(v: any) => setFormData({ ...formData, categoryId: v })}>
+                        <SelectTrigger><SelectValue placeholder="Select a Category" /></SelectTrigger>
                         <SelectContent>
                           {allowedCategories.map(pt => (
-                            <SelectItem key={pt.id} value={pt.displayName.en || pt.typeName}>
+                            <SelectItem key={pt.id} value={pt.id}>
                               {getLocalizedText(pt.displayName)}
                             </SelectItem>
                           ))}
@@ -98,7 +130,7 @@ export default function VenuesPage() {
                       </div>
                     </div>
                     <div className="flex justify-end pt-2">
-                      <Button type="submit">Add Venue</Button>
+                      <Button type="submit">{editVenue ? 'Save Changes' : 'Add Venue'}</Button>
                     </div>
                   </form>
                 </DialogContent>
@@ -106,59 +138,77 @@ export default function VenuesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Venue</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {venues.map((venue) => (
-                  <TableRow key={venue.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
-                          <Building2 className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="font-medium">{getLocalizedText(venue.name)}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{venue.address}</div>
-                      <div className="text-xs text-muted-foreground">{venue.city}</div>
-                    </TableCell>
-                    <TableCell><Badge variant="outline">{getLocalizedText(venue.category)}</Badge></TableCell>
-                    <TableCell>
-                      <Badge variant={venue.isActive ? 'default' : 'secondary'}>
-                        {venue.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant={venue.isActive ? "secondary" : "default"}
-                          size="sm"
-                          onClick={() => toggleVenue(venue.id)}
-                        >
-                          {venue.isActive ? 'Hide' : 'Show'}
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => deleteVenue(venue.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            {venues.length === 0 ? (
+              <EmptyState title="No venues found" description="Add a featured venue to get started." />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Venue</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {venues.map((venue) => {
+                    const missing = getMissingLanguages(venue.name, appLanguages || []);
+                    return (
+                      <TableRow key={venue.id}>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
+                                <Building2 className="h-5 w-5 text-muted-foreground" />
+                              </div>
+                              <div className="font-medium">{getLocalizedText(venue.name, 'en')}</div>
+                            </div>
+                            {missing.length > 0 && (
+                              <div className="flex items-center gap-2">
+                                <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                                <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => handleEditTranslations(venue)}>Edit Translations</Button>
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">{venue.address}</div>
+                          <div className="text-xs text-muted-foreground">{venue.city}</div>
+                        </TableCell>
+                        <TableCell><Badge variant="outline">{getLocalizedText(venue.category)}</Badge></TableCell>
+                        <TableCell>
+                          <Badge variant={venue.isActive ? 'default' : 'secondary'}>
+                            {venue.isActive ? 'Active' : 'Inactive'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" title="Edit Content" onClick={() => handleEditTranslations(venue)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant={venue.isActive ? "secondary" : "default"}
+                              size="sm"
+                              onClick={() => toggleVenue(venue.id)}
+                            >
+                              {venue.isActive ? 'Hide' : 'Show'}
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => deleteVenue(venue.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
 

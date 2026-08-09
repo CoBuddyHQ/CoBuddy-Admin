@@ -2,11 +2,12 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { usePolicyDocs } from '@/modules/platform-config/policy-docs/hooks/usePolicyDocs';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Download, CheckCircle } from 'lucide-react';
+import { FileText, Download, CheckCircle, Edit } from 'lucide-react';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 
 import { useState, useEffect } from 'react';
@@ -17,17 +18,28 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { EmptyState } from '@/components/ui/empty-state';
+import { AppLanguage } from '@/modules/system/master-data/types';
+
+function getMissingLanguages(nameObj: Record<string, string>, appLanguages: AppLanguage[]) {
+  const activeLangs = appLanguages.filter(l => l.active);
+  return activeLangs.filter(l => !nameObj[l.code]).map(l => l.name);
+}
 
 export default function PolicyDocsPage() {
   const { policies, consentLogs, settings, isLoading, updateStatus, updateSettings, isUpdatingSettings, createDocument } = usePolicyDocs();
+  const { appLanguages } = useMasterData();
+  const activeLangs = appLanguages?.filter(l => l.active) || [];
+  
   const [formData, setFormData] = useState<any>(null);
   
   const [open, setOpen] = useState(false);
   const [docForm, setDocForm] = useState({
-    titleEn: '',
-    contentEn: '',
+    titles: {} as Record<string, string>,
+    contents: {} as Record<string, string>,
     type: 'TERMS_OF_SERVICE' as any
   });
+  const [editDoc, setEditDoc] = useState<any>(null);
 
   useEffect(() => {
     if (settings) {
@@ -44,13 +56,25 @@ export default function PolicyDocsPage() {
 
   const handleCreateDocument = (e: React.FormEvent) => {
     e.preventDefault();
-    createDocument({
-      title: { en: docForm.titleEn },
-      content: { en: docForm.contentEn },
-      type: docForm.type
+    if (docForm.titles['en'] && docForm.contents['en']) {
+      createDocument({
+        title: docForm.titles,
+        content: docForm.contents,
+        type: docForm.type
+      });
+      setOpen(false);
+      setDocForm({ titles: {}, contents: {}, type: 'TERMS_OF_SERVICE' });
+    }
+  };
+
+  const handleEditTranslations = (doc: any) => {
+    setDocForm({
+      titles: { ...doc.title },
+      contents: { ...doc.content },
+      type: doc.type
     });
-    setOpen(false);
-    setDocForm({ titleEn: '', contentEn: '', type: 'TERMS_OF_SERVICE' });
+    setEditDoc(doc);
+    setOpen(true);
   };
 
   return (
@@ -74,16 +98,21 @@ export default function PolicyDocsPage() {
                   <CardTitle>Active Documents</CardTitle>
                   <CardDescription>Draft and publish legal platform documents.</CardDescription>
                 </div>
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger render={<Button size="sm">Create New Document</Button>} />
-                  <DialogContent>
+                <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) { setEditDoc(null); setDocForm({ titles: {}, contents: {}, type: 'TERMS_OF_SERVICE' }); } }}>
+                  <Button size="sm" onClick={() => setOpen(true)}>Create New Document</Button>
+                  <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Create Document</DialogTitle>
+                      <DialogTitle>{editDoc ? 'Edit Document' : 'Create Document'}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateDocument} className="space-y-4 pt-4">
-                      <div className="space-y-2">
-                        <Label>Title (English)</Label>
-                        <Input required value={docForm.titleEn} onChange={e => setDocForm({ ...docForm, titleEn: e.target.value })} />
+                      <div className="space-y-4 border p-4 rounded-md">
+                        <h4 className="text-sm font-medium">Titles</h4>
+                        {activeLangs.map(lang => (
+                          <div key={lang.code} className="space-y-2">
+                            <Label>Title ({lang.name}){lang.code === 'en' ? ' *' : ''}</Label>
+                            <Input required={lang.code === 'en'} value={docForm.titles[lang.code] || ''} onChange={e => setDocForm({ ...docForm, titles: { ...docForm.titles, [lang.code]: e.target.value } })} />
+                          </div>
+                        ))}
                       </div>
                       <div className="space-y-2">
                         <Label>Document Type</Label>
@@ -96,12 +125,17 @@ export default function PolicyDocsPage() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Content (English)</Label>
-                        <Textarea required value={docForm.contentEn} onChange={e => setDocForm({ ...docForm, contentEn: e.target.value })} />
+                      <div className="space-y-4 border p-4 rounded-md">
+                        <h4 className="text-sm font-medium">Content</h4>
+                        {activeLangs.map(lang => (
+                          <div key={lang.code} className="space-y-2">
+                            <Label>Content ({lang.name}){lang.code === 'en' ? ' *' : ''}</Label>
+                            <Textarea required={lang.code === 'en'} value={docForm.contents[lang.code] || ''} onChange={e => setDocForm({ ...docForm, contents: { ...docForm.contents, [lang.code]: e.target.value } })} />
+                          </div>
+                        ))}
                       </div>
                       <div className="flex justify-end pt-2">
-                        <Button type="submit">Create Draft</Button>
+                        <Button type="submit">{editDoc ? 'Save Changes' : 'Create Draft'}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -109,69 +143,87 @@ export default function PolicyDocsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Document Type</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Version</TableHead>
-                    <TableHead>Last Updated</TableHead>
-                    <TableHead>Consents Logged</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {policies.map((policy) => (
-                    <TableRow key={policy.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{policy.type.replace(/_/g, ' ')}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {getLocalizedText(policy.title)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{policy.version}</Badge>
-                      </TableCell>
-                      <TableCell>{policy.lastUpdated}</TableCell>
-                      <TableCell>{policy.consentCount.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant={
-                          policy.publishStatus === 'PUBLISHED' ? 'default' : 
-                          policy.publishStatus === 'ARCHIVED' ? 'secondary' : 'outline'
-                        }>
-                          {policy.publishStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          {policy.publishStatus === 'DRAFT' && (
-                            <Button 
-                              variant="default" 
-                              size="sm"
-                              onClick={() => updateStatus({ id: policy.id, status: 'PUBLISHED' })}
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" /> Publish
-                            </Button>
-                          )}
-                          {policy.publishStatus === 'PUBLISHED' && (
-                            <Button 
-                              variant="secondary" 
-                              size="sm"
-                              onClick={() => updateStatus({ id: policy.id, status: 'ARCHIVED' })}
-                            >
-                              Archive
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
+              {policies.length === 0 ? (
+                <EmptyState title="No documents found" description="Create a new document to get started." />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Document Type</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Version</TableHead>
+                      <TableHead>Last Updated</TableHead>
+                      <TableHead>Consents Logged</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {policies.map((policy) => {
+                      const missing = getMissingLanguages(policy.title, appLanguages || []);
+                      return (
+                        <TableRow key={policy.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{policy.type.replace(/_/g, ' ')}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              <span>{getLocalizedText(policy.title, 'en')}</span>
+                              {missing.length > 0 && (
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                                  <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => handleEditTranslations(policy)}>Edit Translations</Button>
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{policy.version}</Badge>
+                          </TableCell>
+                          <TableCell>{policy.lastUpdated}</TableCell>
+                          <TableCell>{policy.consentCount.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Badge variant={
+                              policy.publishStatus === 'PUBLISHED' ? 'default' : 
+                              policy.publishStatus === 'ARCHIVED' ? 'secondary' : 'outline'
+                            }>
+                              {policy.publishStatus}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm" title="Edit Content" onClick={() => handleEditTranslations(policy)}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              {policy.publishStatus === 'DRAFT' && (
+                                <Button 
+                                  variant="default" 
+                                  size="sm"
+                                  onClick={() => updateStatus({ id: policy.id, status: 'PUBLISHED' })}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" /> Publish
+                                </Button>
+                              )}
+                              {policy.publishStatus === 'PUBLISHED' && (
+                                <Button 
+                                  variant="secondary" 
+                                  size="sm"
+                                  onClick={() => updateStatus({ id: policy.id, status: 'ARCHIVED' })}
+                                >
+                                  Archive
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
 
@@ -190,30 +242,34 @@ export default function PolicyDocsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Log ID</TableHead>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Document Type</TableHead>
-                    <TableHead>Version</TableHead>
-                    <TableHead>IP Address</TableHead>
-                    <TableHead>Timestamp</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {consentLogs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell className="font-mono text-xs">{log.id}</TableCell>
-                      <TableCell className="font-mono text-xs">{log.userId}</TableCell>
-                      <TableCell>{log.documentType.replace(/_/g, ' ')}</TableCell>
-                      <TableCell><Badge variant="outline">{log.documentVersion}</Badge></TableCell>
-                      <TableCell className="font-mono text-xs text-muted-foreground">{log.ipAddress}</TableCell>
-                      <TableCell className="text-sm">{new Date(log.timestamp).toLocaleString()}</TableCell>
+              {consentLogs.length === 0 ? (
+                <EmptyState title="No logs found" description="No consent logs are available." />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Log ID</TableHead>
+                      <TableHead>User ID</TableHead>
+                      <TableHead>Document Type</TableHead>
+                      <TableHead>Version</TableHead>
+                      <TableHead>IP Address</TableHead>
+                      <TableHead>Timestamp</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {consentLogs.map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell className="font-mono text-xs">{log.id}</TableCell>
+                        <TableCell className="font-mono text-xs">{log.userId}</TableCell>
+                        <TableCell>{log.documentType.replace(/_/g, ' ')}</TableCell>
+                        <TableCell><Badge variant="outline">{log.documentVersion}</Badge></TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{log.ipAddress}</TableCell>
+                        <TableCell className="text-sm">{new Date(log.timestamp).toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

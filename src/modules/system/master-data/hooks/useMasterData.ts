@@ -9,6 +9,7 @@ export const useMasterData = () => {
   const citiesQuery = useQuery({ queryKey: ['cities'], queryFn: masterDataApi.getCities });
   const interestsQuery = useQuery({ queryKey: ['interests'], queryFn: masterDataApi.getInterests });
   const languagesQuery = useQuery({ queryKey: ['languages'], queryFn: masterDataApi.getLanguages });
+  const appLanguagesQuery = useQuery({ queryKey: ['appLanguages'], queryFn: masterDataApi.getAppLanguages });
 
   const toggleCityMutation = useMutation({
     mutationFn: masterDataApi.toggleCity,
@@ -21,6 +22,10 @@ export const useMasterData = () => {
   const toggleLanguageMutation = useMutation({
     mutationFn: masterDataApi.toggleLanguage,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['languages'] }); toast.success('Status updated'); }
+  });
+  const toggleAppLanguageMutation = useMutation({
+    mutationFn: masterDataApi.toggleAppLanguage,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['appLanguages'] }); toast.success('Status updated'); }
   });
 
   const addCityMutation = useMutation({
@@ -35,6 +40,19 @@ export const useMasterData = () => {
     mutationFn: masterDataApi.addLanguage,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['languages'] }); toast.success('Language added'); }
   });
+  const addAppLanguageMutation = useMutation({
+    mutationFn: masterDataApi.addAppLanguage,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['appLanguages'] }); toast.success('App Language added'); }
+  });
+
+  const addAreaToCityMutation = useMutation({
+    mutationFn: ({ cityId, areaName }: { cityId: string, areaName: Record<string, string> }) => masterDataApi.addAreaToCity(cityId, areaName),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cities'] }); toast.success('Area added'); }
+  });
+  const toggleAreaMutation = useMutation({
+    mutationFn: ({ cityId, areaId }: { cityId: string, areaId: string }) => masterDataApi.toggleArea(cityId, areaId),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cities'] }); toast.success('Status updated'); }
+  });
 
   const defaultsQuery = useQuery({ queryKey: ['system-defaults'], queryFn: masterDataApi.getDefaults });
 
@@ -47,16 +65,22 @@ export const useMasterData = () => {
     cities: citiesQuery.data || [],
     interests: interestsQuery.data || [],
     languages: languagesQuery.data || [],
+    appLanguages: appLanguagesQuery.data || [],
     defaults: defaultsQuery.data,
-    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || defaultsQuery.isLoading,
+    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading,
     
     toggleCity: toggleCityMutation.mutate,
     toggleInterest: toggleInterestMutation.mutate,
     toggleLanguage: toggleLanguageMutation.mutate,
+    toggleAppLanguage: toggleAppLanguageMutation.mutate,
     
     addCity: addCityMutation.mutate,
     addInterest: addInterestMutation.mutate,
     addLanguage: addLanguageMutation.mutate,
+    addAppLanguage: addAppLanguageMutation.mutate,
+
+    addAreaToCity: addAreaToCityMutation.mutate,
+    toggleArea: toggleAreaMutation.mutate,
 
     updateDefaults: updateDefaultsMutation.mutate,
     isUpdatingDefaults: updateDefaultsMutation.isPending,

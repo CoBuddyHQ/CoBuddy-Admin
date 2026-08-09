@@ -1,9 +1,16 @@
+export interface Area {
+  id: string;
+  name: Record<string, string>;
+  active: boolean;
+}
+
 export interface City {
   id: string;
   name: Record<string, string>;
   state: string;
   country: string;
   active: boolean;
+  areas?: Area[];
 }
 
 export interface Interest {
@@ -16,6 +23,13 @@ export interface Interest {
 }
 
 export interface Language {
+  id: string;
+  code: string;
+  name: string;
+  active: boolean;
+}
+
+export interface AppLanguage {
   id: string;
   code: string;
   name: string;

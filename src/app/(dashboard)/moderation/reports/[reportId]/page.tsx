@@ -18,7 +18,7 @@ export default function ReportDetailPage() {
   const reportId = params.reportId as string;
   const { user } = useAuthStore();
 
-  const { detail, isLoading, updateStatus, isUpdating } = useReportDetail(reportId);
+  const { detail, isLoading, updateStatus, isUpdating, assignToMe } = useReportDetail(reportId);
 
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'RESOLVED' | 'ESCALATED'>('INVESTIGATING');
@@ -38,6 +38,8 @@ export default function ReportDetailPage() {
     setIsNoteOpen(true);
   };
 
+  const isAssignedToMe = detail.assignedTo === user?.name;
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4 mb-4 shrink-0">
@@ -48,15 +50,27 @@ export default function ReportDetailPage() {
           title={`Report: ${detail.id}`} 
           description={`Category: ${detail.category}`} 
           action={
-            detail.status !== 'RESOLVED' ? (
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => openNoteDialog('INVESTIGATING')}>Mark Investigating</Button>
-                <Button variant="secondary" onClick={() => openNoteDialog('ESCALATED')}>Escalate</Button>
-                <Button variant="default" onClick={() => openNoteDialog('RESOLVED')}>Resolve</Button>
-              </div>
-            ) : (
-              <Badge variant="secondary">Resolved</Badge>
-            )
+            <div className="flex items-center gap-4">
+              {!detail.assignedTo ? (
+                <Button variant="outline" size="sm" onClick={() => assignToMe({ id: detail.id, staffName: user?.name || 'Unknown Staff' })}>
+                  Assign to Me
+                </Button>
+              ) : (
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Assigned to: </span>
+                  <span className="font-medium">{isAssignedToMe ? 'You' : detail.assignedTo}</span>
+                </div>
+              )}
+              {detail.status !== 'RESOLVED' ? (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => openNoteDialog('INVESTIGATING')}>Mark Investigating</Button>
+                  <Button variant="secondary" onClick={() => openNoteDialog('ESCALATED')}>Escalate</Button>
+                  <Button variant="default" onClick={() => openNoteDialog('RESOLVED')}>Resolve</Button>
+                </div>
+              ) : (
+                <Badge variant="secondary">Resolved</Badge>
+              )}
+            </div>
           }
         />
       </div>

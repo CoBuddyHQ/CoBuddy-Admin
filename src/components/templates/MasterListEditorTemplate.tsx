@@ -15,6 +15,7 @@ interface MasterListEditorTemplateProps {
   onAddClick: () => void;
   activeTab?: string;
   onTabChange?: (val: string) => void;
+  hideAddButton?: boolean;
 }
 
 export function MasterListEditorTemplate({
@@ -23,7 +24,8 @@ export function MasterListEditorTemplate({
   tabs,
   onAddClick,
   activeTab,
-  onTabChange
+  onTabChange,
+  hideAddButton
 }: MasterListEditorTemplateProps) {
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -31,10 +33,12 @@ export function MasterListEditorTemplate({
         title={title} 
         description={description} 
         action={
-          <Button onClick={onAddClick}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Entry
-          </Button>
+          !hideAddButton && (
+            <Button onClick={onAddClick}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Entry
+            </Button>
+          )
         }
       />
       

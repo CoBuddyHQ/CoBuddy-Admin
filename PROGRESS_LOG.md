@@ -134,3 +134,12 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 3: HR_ADMIN Role:** Created the `HR_ADMIN` enum in `role.types.ts`. Granted this role exclusive access alongside `SUPER_ADMIN` to the `employees` module. Added "HR" to the list of selectable departments in `AddStaffModal` and `Employee` type constraints.
 - **Item 4: Planned - Login History/Attendance:** V1 scope does not include active timesheet logging or attendance management. This remains a planned future feature.
 - **Item 5: Verification & Reporting:** Completed `npx tsc --noEmit` and `npx eslint src` with 0 errors. Verified role-based conditionals safely default to strict paths.
+
+## Round 10 Corrective Pass (Full Frontend Completeness Sweep)
+- **Item 1: Language Dynamic Fields:** Added `AppLanguage` selection list in `MasterDataPage` and dynamically mapped form fields (`nameObj[lang.code]`) to Modal form arrays inside `MasterDataModals.tsx` and `VenuesPage.tsx`. Handled dynamic empty translation states natively across lists and tables.
+- **Item 2: Global Setting Default `<select>` Fix:** Adjusted the "Default Language" dropdown inside Global Defaults to display localized dynamic names and populate with active `AppLanguage` items properly.
+- **Item 3: Complete Area management:** Wired up City's `Manage Areas` popup action (`CityList` in `MasterDataLists.tsx`) connecting UI state to backend mutation hooks (`onAddArea`, `onToggleArea`) fixing the disconnected actions.
+- **Item 4: "Assign to Me" in ReportDetail:** Migrated `assignToMe` logic from `useReports` to single item hook and surfaced unassigned states onto `src/app/(dashboard)/moderation/reports/[reportId]/page.tsx` directly into the `PageHeader` action list.
+- **Item 5: Staff Role Edits (`EditRolesModal`):** Added a new component (`EditRolesModal.tsx`) exposing granular RBAC checklist UI mapping direct to `useEmployees().updateRoles` hook and added an "onEdit" trigger handler in the staff list.
+- **Item 6: System Empty States Audit:** Did a pass evaluating blank arrays rendering lists blindly and wrapped them into reusable `EmptyState` shell across Employee table, Venues, and Document Managers.
+- **Item 7: Final Type Verification & Push:** Passed `npx tsc --noEmit` & `npx eslint src` clean runs with 0 errors and pushed to origin/main on GitHub.

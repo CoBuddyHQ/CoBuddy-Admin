@@ -49,6 +49,7 @@ export default function ReconciliationPage() {
                     <Badge variant={
                       record.status === 'RECONCILED' ? 'default' : 
                       record.status === 'MISMATCH' ? 'destructive' : 
+                      record.status === 'FLAGGED' ? 'destructive' : 
                       record.status === 'FAILED' ? 'secondary' : 'outline'
                     }>
                       {record.status}
@@ -82,6 +83,7 @@ export default function ReconciliationPage() {
                           <Button 
                             variant="destructive" 
                             size="sm"
+                            onClick={() => updateStatus({ id: record.id, status: 'FLAGGED' })}
                             title="Flag Issue"
                           >
                             <AlertTriangle className="h-4 w-4" />

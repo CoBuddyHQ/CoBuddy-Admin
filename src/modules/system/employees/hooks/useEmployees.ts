@@ -49,6 +49,7 @@ export const useEmployees = () => {
     addEmployee: addMutation.mutate,
     isAdding: addMutation.isPending,
     updateRoles: updateRolesMutation.mutate,
+    isUpdatingRoles: updateRolesMutation.isPending,
     toggleStatus: toggleStatusMutation.mutate,
     forceLogout: forceLogoutMutation.mutate
   };

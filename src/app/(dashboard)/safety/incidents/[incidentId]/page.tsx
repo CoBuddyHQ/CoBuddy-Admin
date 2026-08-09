@@ -23,6 +23,7 @@ export default function IncidentDetailPage() {
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'ESCALATED_LEGAL' | 'CLOSED'>('INVESTIGATING');
   const [note, setNote] = useState('');
+  const [selectedEvidence, setSelectedEvidence] = useState<string | null>(null);
 
   if (isLoading || !detail) return <div className="p-6">Loading details...</div>;
 
@@ -136,7 +137,7 @@ export default function IncidentDetailPage() {
                     <div key={i} className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent transition-colors">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium truncate flex-1">{url}</span>
-                      <Button variant="ghost" size="sm">View</Button>
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedEvidence(url)}>View</Button>
                     </div>
                   ))}
                 </div>
@@ -171,6 +172,22 @@ export default function IncidentDetailPage() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={selectedEvidence !== null} onOpenChange={(open) => !open && setSelectedEvidence(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>View Evidence</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {selectedEvidence && (
+              <div className="flex flex-col gap-4">
+                <span className="text-sm font-medium break-all">{selectedEvidence.split('/').pop()}</span>
+                <a href={selectedEvidence} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline text-sm">Open in new tab</a>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

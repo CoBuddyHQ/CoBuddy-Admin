@@ -43,6 +43,8 @@ export default function LegalRequestsPage() {
     });
   };
 
+  const [selectedDocs, setSelectedDocs] = useState<string[] | null>(null);
+
   if (isLoading) return <div className="p-6">Loading...</div>;
 
   return (
@@ -185,7 +187,7 @@ export default function LegalRequestsPage() {
                         </Button>
                       )}
                       
-                      <Button variant="outline" size="sm" title="View Docs">
+                      <Button variant="outline" size="sm" title="View Docs" onClick={() => setSelectedDocs(req.documentUrls || [])}>
                         <FileText className="h-4 w-4" />
                       </Button>
                     </div>
@@ -196,6 +198,28 @@ export default function LegalRequestsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={selectedDocs !== null} onOpenChange={(open) => !open && setSelectedDocs(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Document Attachments</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {!selectedDocs || selectedDocs.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No documents attached.</p>
+            ) : (
+              <ul className="space-y-2">
+                {selectedDocs.map((url, i) => (
+                  <li key={i} className="flex items-center justify-between p-2 border rounded text-sm">
+                    <span className="truncate max-w-[250px]">{url.split('/').pop()}</span>
+                    <a href={url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

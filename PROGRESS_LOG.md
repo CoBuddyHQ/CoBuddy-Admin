@@ -143,3 +143,12 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 5: Staff Role Edits (`EditRolesModal`):** Added a new component (`EditRolesModal.tsx`) exposing granular RBAC checklist UI mapping direct to `useEmployees().updateRoles` hook and added an "onEdit" trigger handler in the staff list.
 - **Item 6: System Empty States Audit:** Did a pass evaluating blank arrays rendering lists blindly and wrapped them into reusable `EmptyState` shell across Employee table, Venues, and Document Managers.
 - **Item 7: Final Type Verification & Push:** Passed `npx tsc --noEmit` & `npx eslint src` clean runs with 0 errors and pushed to origin/main on GitHub.
+
+## Round 11 Corrective Pass
+- **Item 1: Tax Invoices & Reconciliation Downloads:** Wired "Download PDF" in `/financial/tax-invoices` using a Blob-based download mock, mapping to `handleDownloadPdf` which triggers a mock file download.
+- **Item 2: Reconciliation "Flag Issue":** Extended `WebhookStatus` enum in `/financial/reconciliation/types.ts` to include `FLAGGED`. Wired the "Flag Issue" button in `/financial/reconciliation/page.tsx` to update status via `updateStatus` and rendered the `FLAGGED` state as a red Badge.
+- **Item 3: View Docs in Legal Requests:** Added `documentUrls?: string[]` to `LegalRequest` and populated mock data. Added `selectedDocs` state and a `Dialog` to `/legal/legal-requests/page.tsx` to display attached documents when clicking "View Docs".
+- **Item 4: Evidence View in Reports & Incidents:** Added `selectedEvidence` state and `Dialog` to both `/moderation/reports/[reportId]/page.tsx` and `/safety/incidents/[incidentId]/page.tsx` to show the attachment's filename and a link to open it when clicking "View".
+- **Item 5: View Map & Listen Live in SOS Dashboard:** Added `selectedMapAlert` and `selectedAudioUrl` states and `Dialog`s in `/safety/sos-dashboard/page.tsx`. "View Map" displays coordinates and a placeholder, while "Listen Live" renders an HTML5 `<audio>` player pointing to `alert.audioCaptureUrl`.
+- **Item 6: Missing Loading State in Edit Roles Modal:** Pulled `isUpdatingRoles` from the `updateRolesMutation` in `useEmployees.ts` and passed it down as `isUpdating` to `EditRolesModal` in `employees/page.tsx`.
+- **Item 7: Final Type Verification & Push:** Executed `npx tsc --noEmit` and `npx eslint src`, fixing two minor TS typing errors in `legal-requests` (removed unused `asChild`) and `sos-dashboard` (handled undefined `audioCaptureUrl`). Verified 0 errors and pushed to origin/main on GitHub.

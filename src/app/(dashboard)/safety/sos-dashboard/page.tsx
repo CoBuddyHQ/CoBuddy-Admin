@@ -7,10 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Siren, MapPin, Phone, Volume2, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function SosDashboardPage() {
   const { alerts, isLoading, updateStatus } = useSosAlerts();
   const router = useRouter();
+  const [selectedMapAlert, setSelectedMapAlert] = useState<any>(null);
+  const [selectedAudioUrl, setSelectedAudioUrl] = useState<string | null>(null);
 
   if (isLoading) return <div className="p-6">Loading Live SOS Dashboard...</div>;
 
@@ -59,11 +63,11 @@ export default function SosDashboardPage() {
                         Acknowledge
                       </Button>
                     )}
-                    <Button variant="outline" className="gap-2">
+                    <Button variant="outline" className="gap-2" onClick={() => setSelectedMapAlert(alert)}>
                       <MapPin className="h-4 w-4" /> View Map
                     </Button>
                     {alert.audioCaptureUrl && (
-                      <Button variant="secondary" className="gap-2">
+                      <Button variant="secondary" className="gap-2" onClick={() => setSelectedAudioUrl(alert.audioCaptureUrl || null)}>
                         <Volume2 className="h-4 w-4" /> Listen Live
                       </Button>
                     )}
@@ -107,6 +111,39 @@ export default function SosDashboardPage() {
         </Card>
 
       </div>
+
+      <Dialog open={selectedMapAlert !== null} onOpenChange={(open) => !open && setSelectedMapAlert(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Live Location: {selectedMapAlert?.userName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4 text-sm">
+            <p><strong>Coordinates:</strong> {selectedMapAlert?.location.lat}, {selectedMapAlert?.location.lng}</p>
+            <div className="h-[200px] bg-muted flex items-center justify-center border rounded-md">
+              <MapPin className="h-8 w-8 text-muted-foreground mr-2" />
+              <span className="text-muted-foreground">Map placeholder</span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={selectedAudioUrl !== null} onOpenChange={(open) => !open && setSelectedAudioUrl(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Live Audio Stream</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4 flex flex-col items-center">
+            {selectedAudioUrl && (
+              <audio controls src={selectedAudioUrl} className="w-full" autoPlay>
+                Your browser does not support the audio element.
+              </audio>
+            )}
+            <p className="text-xs text-muted-foreground text-center">
+              Note: This plays the mock URL capture stream.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

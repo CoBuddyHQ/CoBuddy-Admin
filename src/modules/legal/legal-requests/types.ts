@@ -8,4 +8,5 @@ export interface LegalRequest {
   deadline: string;
   receivedDate: string;
   internalNotes: string;
+  documentUrls?: string[];
 }

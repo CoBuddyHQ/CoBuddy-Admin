@@ -10,7 +10,8 @@ let mockRequests: LegalRequest[] = [
     status: 'OPEN',
     receivedDate: '2023-10-20T10:00:00Z',
     deadline: '2023-11-20T10:00:00Z',
-    internalNotes: 'Requesting login IPs for the last 30 days.'
+    internalNotes: 'Requesting login IPs for the last 30 days.',
+    documentUrls: ['https://mock-storage.cobuddy.com/docs/notice_789.pdf']
   },
   {
     id: 'LGL-002',
@@ -21,7 +22,8 @@ let mockRequests: LegalRequest[] = [
     status: 'EVIDENCE_PRESERVED',
     receivedDate: '2023-10-25T14:30:00Z',
     deadline: '2023-11-05T14:30:00Z',
-    internalNotes: 'Subpoena for chat records related to Incident INC-554.'
+    internalNotes: 'Subpoena for chat records related to Incident INC-554.',
+    documentUrls: ['https://mock-storage.cobuddy.com/docs/subpoena_112.pdf', 'https://mock-storage.cobuddy.com/docs/warrant_554.pdf']
   }
 ];
 

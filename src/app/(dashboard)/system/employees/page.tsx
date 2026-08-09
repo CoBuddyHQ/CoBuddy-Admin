@@ -9,11 +9,8 @@ import { EditRolesModal } from '@/modules/system/employees/components/EditRolesM
 import { Employee } from '@/modules/system/employees/types';
 
 export default function EmployeesPage() {
-  const { employees, addEmployee, isAdding, toggleStatus, forceLogout, updateRoles } = useEmployees();
+  const { employees, addEmployee, isAdding, toggleStatus, forceLogout, updateRoles, isUpdatingRoles } = useEmployees();
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-
-  // We reuse addMutation's isPending state or just rely on global loading. Since useEmployees doesn't expose isUpdating for updateRoles, we can just pass false or add it to hook.
-  // We'll just pass false for isUpdating since useEmployees doesn't expose it, or we could add it to useEmployees. For now, it's fast enough.
 
   return (
     <>
@@ -35,7 +32,7 @@ export default function EmployeesPage() {
         employee={editingEmployee} 
         onClose={() => setEditingEmployee(null)} 
         onSave={(id, data) => updateRoles({ id, data })}
-        isUpdating={false} 
+        isUpdating={isUpdatingRoles} 
       />
     </>
   );

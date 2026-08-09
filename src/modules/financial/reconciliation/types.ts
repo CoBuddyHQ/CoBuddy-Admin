@@ -1,4 +1,4 @@
-export type WebhookStatus = 'FAILED' | 'RECONCILED' | 'PENDING' | 'MISMATCH';
+export type WebhookStatus = 'FAILED' | 'RECONCILED' | 'PENDING' | 'MISMATCH' | 'FLAGGED';
 
 export interface ReconciliationRecord {
   id: string; // Razorpay Txn ID

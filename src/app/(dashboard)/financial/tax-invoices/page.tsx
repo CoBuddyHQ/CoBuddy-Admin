@@ -13,6 +13,19 @@ export default function TaxInvoicesPage() {
 
   if (isLoading) return <div className="p-6">Loading...</div>;
 
+  const handleDownloadPdf = (invoice: any) => {
+    const text = `Invoice ID: ${invoice.id}\nCompanion: ${invoice.companionName}\nPeriod: ${invoice.period}\nEarnings: ₹${invoice.totalEarnings}\nTDS: ₹${invoice.tdsDeducted}\nGST: ₹${invoice.gstCollected}\nStatus: ${invoice.status}`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoice-${invoice.id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -77,7 +90,7 @@ export default function TaxInvoicesPage() {
                       )}
                       {invoice.status === 'GENERATED' && (
                         <>
-                          <Button variant="outline" size="sm" title="Download PDF">
+                          <Button variant="outline" size="sm" title="Download PDF" onClick={() => handleDownloadPdf(invoice)}>
                             <Download className="h-4 w-4" />
                           </Button>
                           <Button 
@@ -91,7 +104,7 @@ export default function TaxInvoicesPage() {
                         </>
                       )}
                       {invoice.status === 'COMPLIANT' && (
-                        <Button variant="outline" size="sm" title="Download PDF">
+                        <Button variant="outline" size="sm" title="Download PDF" onClick={() => handleDownloadPdf(invoice)}>
                           <Download className="h-4 w-4" />
                         </Button>
                       )}

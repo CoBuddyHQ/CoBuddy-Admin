@@ -32,13 +32,13 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   
   'active-sessions': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
   'live-sessions': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.SUPER_ADMIN] },
-  'booking-disputes': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPPORT_AGENT, StaffRole.SUPER_ADMIN] },
+  'booking-disputes': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.SUPER_ADMIN] },
   'audit-logs-bookings': { roles: [StaffRole.SUPER_ADMIN, StaffRole.MODERATOR] },
-  'customers': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
-  'companions': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.MODERATOR, StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
+  'customers': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
+  'companions': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.MODERATOR, StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
   
-  'tickets': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
-  'sla-dashboard': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPER_ADMIN] },
+  'tickets': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
+  'sla-dashboard': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.SUPER_ADMIN] },
   
   'ranking-config': { roles: [StaffRole.SUPER_ADMIN, StaffRole.CITY_OPS_MANAGER] },
   'city-launch': { roles: [StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
@@ -54,10 +54,9 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   'legal-requests': { roles: [StaffRole.LEGAL_ADMIN, StaffRole.SUPER_ADMIN] },
   
   'config': { roles: [StaffRole.SUPER_ADMIN] },
-  'employees': { roles: [StaffRole.SUPER_ADMIN] },
-  'employee-roles': { roles: [StaffRole.SUPER_ADMIN] },
+  'employees': { roles: [StaffRole.SUPER_ADMIN, StaffRole.HR_ADMIN] },
   'audit-logs': { roles: [StaffRole.SUPER_ADMIN] },
-  'analytics': { roles: [StaffRole.SUPER_ADMIN, StaffRole.FINANCE_ADMIN, StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.MODERATOR, StaffRole.SUPPORT_AGENT] }
+  'analytics': { roles: [StaffRole.SUPER_ADMIN, StaffRole.FINANCE_ADMIN, StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.MODERATOR, StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD] }
 };
 
 export const hasPermission = (userRoles: StaffRole[], moduleKey: string): boolean => {

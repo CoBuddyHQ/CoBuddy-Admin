@@ -35,11 +35,29 @@ export const useTickets = () => {
     },
   });
 
+  const assignMutation = useMutation({
+    mutationFn: ({ id, staffName }: { id: string; staffName: string }) => ticketsApi.assignToMe(id, staffName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      toast.success('Ticket assigned to you');
+    },
+  });
+
+  const reassignMutation = useMutation({
+    mutationFn: ({ id, newStaffName }: { id: string; newStaffName: string }) => ticketsApi.reassignTicket(id, newStaffName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      toast.success('Ticket reassigned');
+    },
+  });
+
   return {
     tickets: ticketsQuery.data ?? [],
     isLoading: ticketsQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
     escalateTicket: escalateMutation.mutate,
     addReply: replyMutation.mutate,
+    assignToMe: assignMutation.mutate,
+    reassignTicket: reassignMutation.mutate,
   };
 };

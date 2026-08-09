@@ -6,6 +6,7 @@ export interface ReportSummary {
   status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'ESCALATED';
   timestamp: string;
   bookingId?: string;
+  assignedTo?: string;
 }
 
 export interface ReportDetail extends ReportSummary {

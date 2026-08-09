@@ -2,9 +2,13 @@ import { StaffRole } from '@/types/role.types';
 
 export interface Employee {
   id: string;
+  employeeId: string;
   name: string;
   email: string;
   phone: string;
+  designation: string;
+  department: 'Trust & Safety' | 'Support' | 'Finance' | 'Legal' | 'Operations' | 'Engineering' | 'Management' | 'HR';
+  reportingManagerId?: string;
   roles: StaffRole[];
   cityScope?: string;
   status: 'active' | 'suspended';
@@ -17,20 +21,14 @@ export interface AddEmployeePayload {
   name: string;
   email: string;
   phone: string;
+  designation: string;
+  department: Employee['department'];
+  reportingManagerId?: string;
   roles: StaffRole[];
   cityScope?: string;
 }
 
-export interface CustomRole {
-  id: string;
-  name: string;
-  permissions: string[];
-  description?: string;
-  createdAt: string;
-}
-
 export interface UpdateEmployeeRolesPayload {
   roles: StaffRole[];
-  customRoles?: string[];
   cityScope?: string;
 }

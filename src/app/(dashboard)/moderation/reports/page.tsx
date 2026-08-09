@@ -13,10 +13,15 @@ import {
   TableHeaderCell,
   TableRow,
 } from '@tremor/react';
+import { UserPlus } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ReportsPage() {
-  const { reports, isLoading } = useReports();
+  const { user } = useAuthStore();
+  const { reports, isLoading, assignToMe } = useReports();
   const router = useRouter();
+
+  if (!user) return null;
 
   const listContent = (
     <div className="p-4">
@@ -31,6 +36,7 @@ export default function ReportsPage() {
               <TableHeaderCell>Reporter</TableHeaderCell>
               <TableHeaderCell>Reported User</TableHeaderCell>
               <TableHeaderCell>Date</TableHeaderCell>
+              <TableHeaderCell>Assignment</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Action</TableHeaderCell>
             </TableRow>
@@ -43,6 +49,19 @@ export default function ReportsPage() {
                 <TableCell>{rep.reporterId}</TableCell>
                 <TableCell>{rep.reportedUserId}</TableCell>
                 <TableCell>{new Date(rep.timestamp).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  {rep.assignedTo ? (
+                    <span className="text-sm font-medium">{rep.assignedTo}</span>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => assignToMe({ id: rep.id, staffName: user.name || 'Admin' })}
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" /> Assign to Me
+                    </Button>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge variant={
                     rep.status === 'OPEN' ? 'destructive' : 

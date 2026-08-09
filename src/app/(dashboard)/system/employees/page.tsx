@@ -12,7 +12,7 @@ export default function EmployeesPage() {
     <ListDetailTemplate
       title="Employee & Role Management"
       description="Manage staff access, RBAC roles, and security policies."
-      headerAction={<AddStaffModal onAdd={addEmployee} isAdding={isAdding} />}
+      headerAction={<AddStaffModal onAdd={addEmployee} isAdding={isAdding} employees={employees} />}
       isDetailOpen={false}
       listContent={
         <EmployeesTable 

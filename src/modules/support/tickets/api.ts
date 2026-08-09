@@ -32,6 +32,7 @@ let mockTickets: SupportTicket[] = [
     ],
     slaDeadline: new Date(Date.now() + 86400000).toISOString(),
     escalationLevel: 'L2',
+    assignedTo: 'Admin User',
     createdAt: new Date(Date.now() - 86400000).toISOString()
   }
 ];
@@ -63,6 +64,24 @@ export const ticketsApi = {
           thread: [...t.thread, { sender: 'SUPPORT', message, timestamp: new Date().toISOString() }],
           status: 'IN_PROGRESS' 
         };
+      }
+      return t;
+    });
+  },
+
+  assignToMe: async (id: string, staffName: string): Promise<void> => {
+    mockTickets = mockTickets.map(t => {
+      if (t.id === id) {
+        return { ...t, assignedTo: staffName };
+      }
+      return t;
+    });
+  },
+
+  reassignTicket: async (id: string, newStaffName: string): Promise<void> => {
+    mockTickets = mockTickets.map(t => {
+      if (t.id === id) {
+        return { ...t, assignedTo: newStaffName };
       }
       return t;
     });

@@ -120,3 +120,17 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 4: Verification & Reporting:** Completed `npx tsc --noEmit` and `npx eslint src` with 0 errors.
 
 **Repository is fully verified. Round 7 completed successfully.**
+
+### Round 8 Corrective Pass
+- Added HR/Org-Hierarchy Fields to Employee Management (employeeId, designation, department, reportingManagerId).
+- Updated AddStaffModal to use MasterData for City Scope.
+- Added Department Filter and HR fields in EmployeesTable.
+- Removed Custom Role Builder (useRoles hook, mock roles API, roles route folder, and sidebar entry).
+- Passed `npx tsc --noEmit` and `npx eslint src` with 0 errors.
+
+## Round 9 Corrective Pass
+- **Item 1: Assign to Me / Claim Mechanism:** Implemented `assignedTo` and `assignToMe` across `support/tickets` and `moderation/reports`. Reused the existing pattern from `companion-applications` with API updates, custom hooks extensions, and UI additions featuring a dedicated "Assignment" column and an interactive "Assign to Me" button.
+- **Item 2: SUPPORT_LEAD Role & Team View:** Created the `SUPPORT_LEAD` enum in `role.types.ts`. Granted this role all `SUPPORT_AGENT` module permissions plus `analytics` access in `permissions.ts`. Updated the `support/tickets/page.tsx` with conditional filtering logic enabling `SUPPORT_LEAD` to see a "Team View" toggle to view all tickets, and provided them a dropdown to reassign tickets to other support staff.
+- **Item 3: HR_ADMIN Role:** Created the `HR_ADMIN` enum in `role.types.ts`. Granted this role exclusive access alongside `SUPER_ADMIN` to the `employees` module. Added "HR" to the list of selectable departments in `AddStaffModal` and `Employee` type constraints.
+- **Item 4: Planned - Login History/Attendance:** V1 scope does not include active timesheet logging or attendance management. This remains a planned future feature.
+- **Item 5: Verification & Reporting:** Completed `npx tsc --noEmit` and `npx eslint src` with 0 errors. Verified role-based conditionals safely default to strict paths.

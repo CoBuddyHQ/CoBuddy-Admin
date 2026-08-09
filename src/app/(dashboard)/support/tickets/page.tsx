@@ -6,18 +6,39 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpCircle, CheckCircle, MessageSquare } from 'lucide-react';
+import { ArrowUpCircle, CheckCircle, MessageSquare, UserPlus, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { SupportTicket } from '@/modules/support/tickets/types';
+import { useAuthStore } from '@/store/authStore';
+import { StaffRole } from '@/types/role.types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useEmployees } from '@/modules/system/employees/hooks/useEmployees';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 export default function TicketsPage() {
-  const { tickets, isLoading, updateStatus, escalateTicket, addReply } = useTickets();
+  const { user } = useAuthStore();
+  const { tickets, isLoading, updateStatus, escalateTicket, addReply, assignToMe, reassignTicket } = useTickets();
+  const { employees } = useEmployees();
+  
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [teamView, setTeamView] = useState(false);
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading || !user) return <div className="p-6">Loading...</div>;
+
+  const isLead = user.roles.includes(StaffRole.SUPPORT_LEAD);
+  
+  const filteredTickets = tickets.filter(ticket => {
+    if (isLead && teamView) return true;
+    return !ticket.assignedTo || ticket.assignedTo === user.name;
+  });
+
+  const supportStaff = employees.filter(e => 
+    e.roles.includes(StaffRole.SUPPORT_AGENT) || e.roles.includes(StaffRole.SUPPORT_LEAD)
+  );
 
   const handleReply = () => {
     if (selectedTicket && replyText.trim()) {
@@ -32,6 +53,12 @@ export default function TicketsPage() {
       <PageHeader
         title="Support Tickets"
         description="Manage customer and companion support inquiries, routing, and escalation."
+        action={isLead ? (
+          <div className="flex items-center space-x-2 bg-background p-2 border rounded-md">
+            <Switch id="team-view" checked={teamView} onCheckedChange={setTeamView} />
+            <Label htmlFor="team-view">Team View (All Tickets)</Label>
+          </div>
+        ) : undefined}
       />
 
       <Card>
@@ -46,15 +73,14 @@ export default function TicketsPage() {
                 <TableHead>Ticket ID</TableHead>
                 <TableHead>User</TableHead>
                 <TableHead>Subject</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>Assignment</TableHead>
                 <TableHead>Priority</TableHead>
-                <TableHead>Level</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tickets.map((ticket) => (
+              {filteredTickets.map((ticket) => (
                 <TableRow key={ticket.id}>
                   <TableCell className="font-medium text-xs font-mono">{ticket.id}</TableCell>
                   <TableCell>
@@ -63,8 +89,40 @@ export default function TicketsPage() {
                       {ticket.userType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate">{ticket.subject}</TableCell>
-                  <TableCell><Badge variant="outline">{ticket.category}</Badge></TableCell>
+                  <TableCell className="max-w-[200px]">
+                    <div className="truncate font-medium">{ticket.subject}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Cat: {ticket.category} | Lvl: {ticket.escalationLevel}</div>
+                  </TableCell>
+                  <TableCell>
+                    {ticket.assignedTo ? (
+                      <div className="text-sm font-medium">{ticket.assignedTo}</div>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => assignToMe({ id: ticket.id, staffName: user.name || 'Admin' })}
+                      >
+                        <UserPlus className="h-4 w-4 mr-1" /> Assign to Me
+                      </Button>
+                    )}
+                    {isLead && ticket.assignedTo && (
+                      <div className="mt-2">
+                        <Select 
+                          value={ticket.assignedTo} 
+                          onValueChange={(val) => reassignTicket({ id: ticket.id, newStaffName: val || '' })}
+                        >
+                          <SelectTrigger className="h-7 text-xs">
+                            <SelectValue placeholder="Reassign" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {supportStaff.map(staff => (
+                              <SelectItem key={staff.id} value={staff.name}>{staff.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={
                       ticket.priority === 'URGENT' || ticket.priority === 'HIGH' ? 'destructive' : 
@@ -72,9 +130,6 @@ export default function TicketsPage() {
                     }>
                       {ticket.priority}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{ticket.escalationLevel}</Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={
@@ -119,6 +174,13 @@ export default function TicketsPage() {
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredTickets.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    No tickets found in this view.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

@@ -15,5 +15,6 @@ export interface SupportTicket {
   thread: { sender: string; message: string; timestamp: string }[];
   slaDeadline: string;
   escalationLevel: EscalationLevel;
+  assignedTo?: string; // Staff name
   createdAt: string;
 }

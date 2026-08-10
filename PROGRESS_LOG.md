@@ -163,3 +163,14 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **ITEM 7:** Restructured Analytics into Safety, Financial, Operational, and Growth categories with granular RBAC permissions in the sidebar.
 - **ITEM 8:** Verified all types with tsc and linting.
 
+
+## Round 13 Corrective Pass
+
+- **ITEM 1:** Fixed the Broken City Filter on the Revenue Dashboard. Changed the <Select> to use c.name (localized via getLocalizedText) as the value instead of c.id. Traced the filter logic: selecting a specific city like 'Mumbai' sets cityFilter to 'Mumbai'. The predicate d.city !== cityFilter now evaluates 'Mumbai' !== 'Mumbai' as false, keeping the correctly matched records, returning a non-empty, correctly-filtered ilteredChartData.
+- **ITEM 2:** Wired Booking Disputes to the Real Cancellation-Refund Tier Table. Imported efundsApi.getSettings() in disputes/api.ts and created getRefundPercentForNotice() to dynamically compute calculatedPenaltyPercent from the live tier table based on 
+oticeGivenHours. Updated mockDisputes to include notice times spanning 1h, 12h, 36h, and 50h, which now reflect dynamic tier-based percentages (e.g. 50h -> 100%, 36h -> 50%, 12h -> 0%) instead of hardcoded values.
+- **ITEM 3:** Built the 3 Missing Operational-Analytics Charts & Fixed Missing Role Permissions. 1) Booking Funnel chart uses existing 	otalSessionsToday and cancellationRate from sessionMetrics mock data to compute 'Requested', 'Accepted', and 'Completed' stages. 2) Support Ticket Volume & SLA Breach % uses real ticket and SLA data from useTickets and useSLA hooks. 3) Discovery Distribution uses 	otalSessions from the companion useCompanions mock array, dynamically sorting and computing the top 10% vs the remaining 90%. Added StaffRole.MODERATOR to nalytics-safety and StaffRole.SUPPORT_AGENT / StaffRole.SUPPORT_LEAD to nalytics-operational in permissions.ts.
+- **ITEM 4:** Verification completed. Ran 
+px tsc --noEmit and 
+px eslint src which resulted in 0 errors. Pushing all changes to origin/main.
+

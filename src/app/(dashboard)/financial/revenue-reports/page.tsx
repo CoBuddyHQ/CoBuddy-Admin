@@ -53,9 +53,10 @@ export default function RevenueDashboardPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Cities</SelectItem>
-              {cities.map(c => (
-                <SelectItem key={c.id} value={c.id}>{getLocalizedText(c.name, 'en')}</SelectItem>
-              ))}
+              {cities.map(c => {
+                const cityName = getLocalizedText(c.name, 'en');
+                return <SelectItem key={c.id} value={cityName}>{cityName}</SelectItem>;
+              })}
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm" className="h-8 text-xs" onClick={handleExport}>

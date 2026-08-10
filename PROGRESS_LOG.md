@@ -174,3 +174,11 @@ oticeGivenHours. Updated mockDisputes to include notice times spanning 1h, 12h, 
 px tsc --noEmit and 
 px eslint src which resulted in 0 errors. Pushing all changes to origin/main.
 
+
+## Round 14 Corrective Pass
+
+- **ITEM 1:** Added suppressHydrationWarning to the <body> element in src/app/layout.tsx to safely silence the hydration-mismatch console warning caused by browser extensions injecting the cz-shortcut-listen attribute.
+- **ITEM 2:** Re-verified with 
+px tsc --noEmit and 
+px eslint src (0 errors). Pushed successfully to origin/main.
+

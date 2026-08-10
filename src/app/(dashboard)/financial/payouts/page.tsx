@@ -37,6 +37,7 @@ export default function PayoutsPage() {
                 <TableHeaderCell>Payout ID</TableHeaderCell>
                 <TableHeaderCell>Companion</TableHeaderCell>
                 <TableHeaderCell>Period</TableHeaderCell>
+                <TableHeaderCell>Destination Account</TableHeaderCell>
                 <TableHeaderCell>Amount</TableHeaderCell>
                 <TableHeaderCell>Due Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
@@ -53,6 +54,18 @@ export default function PayoutsPage() {
                   </TableCell>
                   <TableCell>
                     <span className="text-sm">{new Date(p.periodStart).toLocaleDateString()} - {new Date(p.periodEnd).toLocaleDateString()}</span>
+                  </TableCell>
+                  <TableCell>
+                    {p.payoutMethod ? (
+                      <div>
+                        <div className="font-medium text-sm">{p.payoutMethod.accountDetails}</div>
+                        <Badge variant={p.payoutMethod.verified ? 'outline' : 'destructive'} className="mt-1 text-[10px] h-4">
+                          {p.payoutMethod.verified ? 'Verified' : 'Unverified'}
+                        </Badge>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Not Setup</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <span className="font-bold">{formatCurrency(p.amount)}</span>

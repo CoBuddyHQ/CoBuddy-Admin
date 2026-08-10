@@ -152,3 +152,14 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 5: View Map & Listen Live in SOS Dashboard:** Added `selectedMapAlert` and `selectedAudioUrl` states and `Dialog`s in `/safety/sos-dashboard/page.tsx`. "View Map" displays coordinates and a placeholder, while "Listen Live" renders an HTML5 `<audio>` player pointing to `alert.audioCaptureUrl`.
 - **Item 6: Missing Loading State in Edit Roles Modal:** Pulled `isUpdatingRoles` from the `updateRolesMutation` in `useEmployees.ts` and passed it down as `isUpdating` to `EditRolesModal` in `employees/page.tsx`.
 - **Item 7: Final Type Verification & Push:** Executed `npx tsc --noEmit` and `npx eslint src`, fixing two minor TS typing errors in `legal-requests` (removed unused `asChild`) and `sos-dashboard` (handled undefined `audioCaptureUrl`). Verified 0 errors and pushed to origin/main on GitHub.
+
+## Round 12 Corrective Pass
+
+- **ITEM 1:** Added 'Close' and 'Reopen' status mutations for Support Tickets.
+- **ITEM 2 & 3:** Enriched SOS Session Details (Venue, Sub-category, Contact Info) and added 'Contact User' dialog with tel/sms links.
+- **ITEM 4:** Added PayoutMethod interface, populated mock data for Bank/UPI, and displayed on Payout table. Added minimumPayoutThreshold to config page.
+- **ITEM 5:** Added Tiered Cancellation-Refund Percentage Table to booking settings in the Refunds module.
+- **ITEM 6:** Added City Filter, Date-Range Filter, Export (CSV), and Revenue by City chart to the Revenue Dashboard.
+- **ITEM 7:** Restructured Analytics into Safety, Financial, Operational, and Growth categories with granular RBAC permissions in the sidebar.
+- **ITEM 8:** Verified all types with tsc and linting.
+

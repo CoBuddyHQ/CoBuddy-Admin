@@ -2,6 +2,7 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useMarketPerformance } from '@/modules/analytics/market/hooks/useMarketPerformance';
+import { useRevenueStats } from '@/modules/financials/revenue/hooks/useRevenueStats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, DonutChart } from '@tremor/react';
 import {
@@ -13,10 +14,11 @@ import {
   TableRow,
 } from '@tremor/react';
 
-export default function MarketPerformancePage() {
-  const { performance, isLoading } = useMarketPerformance();
+export default function FinancialAnalyticsPage() {
+  const { performance, isLoading: marketLoading } = useMarketPerformance();
+  const { stats: revenueStats, isLoading: revLoading } = useRevenueStats();
 
-  if (isLoading) return <div className="p-6">Loading Analytics Data...</div>;
+  if (marketLoading || revLoading || !revenueStats) return <div className="p-6">Loading Analytics Data...</div>;
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
   const chartData = performance.map(p => ({
@@ -28,9 +30,28 @@ export default function MarketPerformancePage() {
   return (
     <div className="p-6 space-y-6 h-full flex flex-col">
       <PageHeader 
-        title="Market & City Performance" 
-        description="Analyze revenue, bookings, and growth by geographical location."
+        title="Financial Analytics" 
+        description="Analyze revenue, customer acquisition cost (CAC), LTV, and market performance."
       />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Average CAC</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{formatCurrency(450)}</div><p className="text-xs text-muted-foreground mt-1">-5% from last month</p></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Average LTV</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{formatCurrency(12500)}</div><p className="text-xs text-muted-foreground mt-1">+12% from last month</p></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold text-green-600">{formatCurrency(revenueStats.totalRevenue)}</div><p className="text-xs text-muted-foreground mt-1">YTD Gross Revenue</p></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Escrow Balance</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{formatCurrency(revenueStats.escrowBalance)}</div><p className="text-xs text-muted-foreground mt-1">Currently Held</p></CardContent>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>

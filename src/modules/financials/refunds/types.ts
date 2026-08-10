@@ -15,4 +15,5 @@ export interface BookingSettings {
   maxBookingDurationMins: number;
   cancellationGracePeriodMins: number;
   autoCancelUnacceptedMins: number;
+  cancellationRefundTiers: { id: string; noticeHoursMin: number; noticeHoursMax: number | null; refundPercent: number }[];
 }

@@ -9,4 +9,9 @@ export interface SosAlert {
   timestamp: string;
   status: 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED';
   audioCaptureUrl?: string;
+  phone: string;
+  otherPartyName: string;
+  otherPartyType: 'CUSTOMER' | 'COMPANION';
+  venue: string;
+  activity: string;
 }

@@ -18,6 +18,7 @@ export default function SystemConfigPage() {
       minimumWithdrawalAmount: 1000,
       paymentGatewayFeePercentage: 2,
       taxPercentage: 18,
+      minimumPayoutThreshold: 100,
     },
     pricing: {
       baseHourlyRateLimit: { min: 200, max: 2000 },
@@ -93,6 +94,17 @@ export default function SystemConfigPage() {
                   onChange={(e) => setFormData(p => ({ 
                     ...p, 
                     commission: { ...p.commission, minimumWithdrawalAmount: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Minimum Payout Threshold (₹)</label>
+                <Input 
+                  type="number" min="100"
+                  value={formData.commission.minimumPayoutThreshold}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    commission: { ...p.commission, minimumPayoutThreshold: Number(e.target.value) } 
                   }))}
                 />
               </div>

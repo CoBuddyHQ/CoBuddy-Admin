@@ -6,6 +6,7 @@ let currentConfig: SystemConfig = {
     minimumWithdrawalAmount: 1000,
     paymentGatewayFeePercentage: 2,
     taxPercentage: 18,
+    minimumPayoutThreshold: 100,
   },
   pricing: {
     baseHourlyRateLimit: { min: 200, max: 2000 },

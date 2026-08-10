@@ -3,6 +3,7 @@ export interface CommissionConfig {
   minimumWithdrawalAmount: number;
   paymentGatewayFeePercentage: number;
   taxPercentage: number;
+  minimumPayoutThreshold: number;
 }
 
 export interface PricingConfig {

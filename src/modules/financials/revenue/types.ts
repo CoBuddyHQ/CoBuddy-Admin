@@ -8,5 +8,10 @@ export interface RevenueStats {
     grossBookingValue: number;
     platformFee: number;
     taxes: number;
+    city?: string;
   }[];
+  revenueByCity: { city: string; gmv: number; commission: number }[];
+  netRevenue: number;
+  payoutLiability: number;
+  refundRatio: number;
 }

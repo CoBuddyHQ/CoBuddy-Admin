@@ -118,9 +118,10 @@ const MENU_GROUPS = [
   {
     title: 'ANALYTICS',
     items: [
-      { name: 'User Growth', path: '/analytics/growth', module: 'growth', icon: TrendingUp },
-      { name: 'Market Performance', path: '/analytics/market', module: 'market', icon: PieChart },
-      { name: 'Session Metrics', path: '/analytics/sessions', module: 'sessions', icon: Activity },
+      { name: 'Safety & Trust', path: '/analytics/safety', module: 'analytics-safety', icon: ShieldAlert },
+      { name: 'Financial', path: '/analytics/financial', module: 'analytics-financial', icon: PieChart },
+      { name: 'Operational', path: '/analytics/operational', module: 'analytics-operational', icon: Activity },
+      { name: 'Growth', path: '/analytics/growth', module: 'analytics-growth', icon: TrendingUp },
     ]
   },
   {

@@ -11,6 +11,7 @@ let mockDisputes: BookingDispute[] = [
     status: 'OPEN',
     amount: 1500,
     noticeGivenHours: 1,
+    // Note: In real backend, calculatedPenaltyPercent is computed from cancellationRefundTiers in financial/refunds
     calculatedPenaltyPercent: 100,
     createdAt: '2026-08-05T14:30:00Z'
   },

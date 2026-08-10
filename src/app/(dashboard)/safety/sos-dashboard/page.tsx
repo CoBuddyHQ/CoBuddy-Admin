@@ -15,6 +15,7 @@ export default function SosDashboardPage() {
   const router = useRouter();
   const [selectedMapAlert, setSelectedMapAlert] = useState<any>(null);
   const [selectedAudioUrl, setSelectedAudioUrl] = useState<string | null>(null);
+  const [selectedContactAlert, setSelectedContactAlert] = useState<any>(null);
 
   if (isLoading) return <div className="p-6">Loading Live SOS Dashboard...</div>;
 
@@ -52,7 +53,14 @@ export default function SosDashboardPage() {
                         {alert.userName} ({alert.userType})
                         <Badge variant={alert.status === 'ACTIVE' ? 'destructive' : 'secondary'}>{alert.status}</Badge>
                       </CardTitle>
-                      <CardDescription>Session ID: {alert.sessionId} | Time: {new Date(alert.timestamp).toLocaleTimeString()}</CardDescription>
+                      <CardDescription>
+                        Session ID: {alert.sessionId} | Time: {new Date(alert.timestamp).toLocaleTimeString()}
+                        <div className="mt-1 text-xs">
+                          {alert.otherPartyName && `With: ${alert.otherPartyName} (${alert.otherPartyType}) | `}
+                          {alert.venue && `${alert.venue} | `}
+                          {alert.activity && `Activity: ${alert.activity}`}
+                        </div>
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -63,6 +71,9 @@ export default function SosDashboardPage() {
                         Acknowledge
                       </Button>
                     )}
+                    <Button variant="outline" className="gap-2" onClick={() => setSelectedContactAlert(alert)}>
+                      <Phone className="h-4 w-4" /> Contact
+                    </Button>
                     <Button variant="outline" className="gap-2" onClick={() => setSelectedMapAlert(alert)}>
                       <MapPin className="h-4 w-4" /> View Map
                     </Button>
@@ -118,7 +129,7 @@ export default function SosDashboardPage() {
             <DialogTitle>Live Location: {selectedMapAlert?.userName}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4 text-sm">
-            <p><strong>Coordinates:</strong> {selectedMapAlert?.location.lat}, {selectedMapAlert?.location.lng}</p>
+            <p><strong>Coordinates:</strong> {selectedMapAlert?.location?.lat ?? selectedMapAlert?.latitude}, {selectedMapAlert?.location?.lng ?? selectedMapAlert?.longitude}</p>
             <div className="h-[200px] bg-muted flex items-center justify-center border rounded-md">
               <MapPin className="h-8 w-8 text-muted-foreground mr-2" />
               <span className="text-muted-foreground">Map placeholder</span>
@@ -141,6 +152,26 @@ export default function SosDashboardPage() {
             <p className="text-xs text-muted-foreground text-center">
               Note: This plays the mock URL capture stream.
             </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={selectedContactAlert !== null} onOpenChange={(open) => !open && setSelectedContactAlert(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Contact User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <p><strong>Name:</strong> {selectedContactAlert?.userName}</p>
+            <p><strong>Phone:</strong> {selectedContactAlert?.phone}</p>
+            <div className="flex gap-4">
+              <Button onClick={() => window.open(`tel:${selectedContactAlert?.phone}`)}>
+                Call User
+              </Button>
+              <Button variant="outline" onClick={() => window.open(`sms:${selectedContactAlert?.phone}`)}>
+                Send Message
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

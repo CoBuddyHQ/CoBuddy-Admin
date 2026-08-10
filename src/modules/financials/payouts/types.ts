@@ -7,4 +7,5 @@ export interface PayoutItem {
   periodEnd: string;
   status: 'PENDING' | 'PROCESSING' | 'PAID' | 'FAILED' | 'ON_HOLD';
   dueDate: string;
+  payoutMethod?: { type: 'BANK' | 'UPI'; accountDetails: string; verified: boolean };
 }

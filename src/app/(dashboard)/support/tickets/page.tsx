@@ -149,7 +149,7 @@ export default function TicketsPage() {
                       >
                         <MessageSquare className="h-4 w-4 mr-1" /> View
                       </Button>
-                      {ticket.status !== 'CLOSED' && ticket.status !== 'RESOLVED' && (
+                      {ticket.status !== 'CLOSED' && ticket.status !== 'RESOLVED' ? (
                         <>
                           <Button 
                             variant="secondary" 
@@ -168,7 +168,24 @@ export default function TicketsPage() {
                           >
                             <CheckCircle className="h-4 w-4" />
                           </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => updateStatus({ id: ticket.id, status: 'CLOSED' })}
+                            title="Close Ticket"
+                          >
+                            Close
+                          </Button>
                         </>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateStatus({ id: ticket.id, status: 'OPEN' })}
+                          title="Reopen Ticket"
+                        >
+                          <RefreshCw className="h-4 w-4 mr-1" /> Reopen
+                        </Button>
                       )}
                     </div>
                   </TableCell>

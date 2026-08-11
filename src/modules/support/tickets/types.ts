@@ -1,6 +1,6 @@
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
-export type TicketCategory = 'BILLING' | 'TECHNICAL' | 'ACCOUNT' | 'REPORT' | 'OTHER';
+export type TicketCategory = string;
 export type EscalationLevel = 'L1' | 'L2' | 'L3';
 
 export interface SupportTicket {

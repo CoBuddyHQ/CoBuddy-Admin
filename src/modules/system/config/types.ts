@@ -13,9 +13,16 @@ export interface PricingConfig {
   };
   specialEventMultiplierLimit: number;
   cancellationFeePercentage: number;
+  flatServiceFeeAmount: number;
+}
+
+export interface SafetyBonusRuleConfig {
+  incidentFreeMonths: number;
+  bonusAmount: number;
 }
 
 export interface SystemConfig {
   commission: CommissionConfig;
   pricing: PricingConfig;
+  safetyBonusRule: SafetyBonusRuleConfig;
 }

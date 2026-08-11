@@ -280,3 +280,98 @@ export function AppLanguageList({ data, onToggle }: AppLanguageListProps) {
     </Table>
   );
 }
+
+interface GenericCodeLabelListProps<T extends { id: string; code: string; label: Record<string, string>; active: boolean }> { 
+  data: T[]; 
+  appLanguages: AppLanguage[];
+  onToggle: (id: string) => void; 
+  onEditTranslations: (item: T) => void;
+  codeLabel?: string;
+}
+
+export function GenericCodeLabelList<T extends { id: string; code: string; label: Record<string, string>; active: boolean }>({ data, appLanguages, onToggle, onEditTranslations, codeLabel = "Code" }: GenericCodeLabelListProps<T>) {
+  if (!data.length) return <EmptyState title="No items configured" />;
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>{codeLabel}</TableHeaderCell>
+          <TableHeaderCell>Name</TableHeaderCell>
+          <TableHeaderCell>Status</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map(item => {
+          const missing = getMissingLanguages(item.label, appLanguages);
+          return (
+            <TableRow key={item.id}>
+              <TableCell className="font-mono text-xs">{item.code}</TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  <span>{getLocalizedText(item.label, 'en')}</span>
+                  {missing.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                      <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => onEditTranslations(item)}>Edit Translations</Button>
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
+  );
+}
+
+interface SessionDurationListProps { 
+  data: any[]; 
+  appLanguages: AppLanguage[];
+  onToggle: (id: string) => void; 
+  onEditTranslations: (item: any) => void;
+}
+
+export function SessionDurationList({ data, appLanguages, onToggle, onEditTranslations }: SessionDurationListProps) {
+  if (!data.length) return <EmptyState title="No items configured" />;
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Minutes</TableHeaderCell>
+          <TableHeaderCell>Label</TableHeaderCell>
+          <TableHeaderCell>Status</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map(item => {
+          const missing = getMissingLanguages(item.label, appLanguages);
+          return (
+            <TableRow key={item.id}>
+              <TableCell>{item.minutes} mins</TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  <span>{getLocalizedText(item.label, 'en')}</span>
+                  {missing.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                      <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => onEditTranslations(item)}>Edit Translations</Button>
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
+  );
+}

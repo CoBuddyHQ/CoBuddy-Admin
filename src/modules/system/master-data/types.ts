@@ -42,3 +42,45 @@ export interface SystemDefaults {
   defaultCurrency: string;
   defaultLanguage: string;
 }
+
+export interface TicketCategory {
+  id: string;
+  code: string;
+  label: Record<string, string>;
+  active: boolean;
+}
+
+export interface IncidentType {
+  id: string;
+  code: string;
+  label: Record<string, string>;
+  active: boolean;
+}
+
+export interface CommunicationStyleOption {
+  id: string;
+  code: string;
+  label: Record<string, string>;
+  active: boolean;
+}
+
+export interface ActivityPaceOption {
+  id: string;
+  code: string;
+  label: Record<string, string>;
+  active: boolean;
+}
+
+export interface SessionDurationOption {
+  id: string;
+  minutes: number;
+  label: Record<string, string>;
+  active: boolean;
+}
+
+export interface NotificationCategoryOption {
+  id: string;
+  code: string;
+  label: Record<string, string>;
+  active: boolean;
+}

@@ -24,6 +24,11 @@ export default function SystemConfigPage() {
       baseHourlyRateLimit: { min: 200, max: 2000 },
       specialEventMultiplierLimit: 2.0,
       cancellationFeePercentage: 10,
+      flatServiceFeeAmount: 50,
+    },
+    safetyBonusRule: {
+      incidentFreeMonths: 1,
+      bonusAmount: 100,
     }
   });
 
@@ -157,6 +162,47 @@ export default function SystemConfigPage() {
                   onChange={(e) => setFormData(p => ({ 
                     ...p, 
                     pricing: { ...p.pricing, cancellationFeePercentage: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Customer Service Fee (Flat ₹)</label>
+                <Input 
+                  type="number" min="0"
+                  value={formData.pricing.flatServiceFeeAmount}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    pricing: { ...p.pricing, flatServiceFeeAmount: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+            </div>
+          )
+        },
+        {
+          title: "Safety Bonus Trigger Rule",
+          description: "Define the rules for companion safety bonuses.",
+          children: (
+            <div className="grid grid-cols-2 gap-4 max-w-xl">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Incident-Free Months</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.safetyBonusRule?.incidentFreeMonths || 1}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    safetyBonusRule: { ...p.safetyBonusRule, incidentFreeMonths: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Bonus Amount (₹)</label>
+                <Input 
+                  type="number" min="0"
+                  value={formData.safetyBonusRule?.bonusAmount || 0}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    safetyBonusRule: { ...p.safetyBonusRule, bonusAmount: Number(e.target.value) } 
                   }))}
                 />
               </div>

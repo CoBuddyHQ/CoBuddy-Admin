@@ -12,6 +12,11 @@ let currentConfig: SystemConfig = {
     baseHourlyRateLimit: { min: 200, max: 2000 },
     specialEventMultiplierLimit: 2.0,
     cancellationFeePercentage: 10,
+    flatServiceFeeAmount: 50,
+  },
+  safetyBonusRule: {
+    incidentFreeMonths: 1,
+    bonusAmount: 100,
   }
 };
 

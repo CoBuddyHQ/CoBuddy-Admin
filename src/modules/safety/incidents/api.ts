@@ -1,8 +1,8 @@
 import { IncidentSummary, IncidentDetail } from './types';
 
 const mockIncidents: IncidentSummary[] = [
-  { id: 'INC-001', type: 'Physical Harassment', involvedParties: ['UserA', 'CompB'], status: 'ESCALATED_LEGAL', legalEscalation: true, timestamp: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'INC-002', type: 'Verbal Abuse', involvedParties: ['CompC', 'UserD'], status: 'OPEN', legalEscalation: false, timestamp: new Date().toISOString() },
+  { id: 'INC-001', type: 'harassment', involvedParties: ['UserA', 'CompB'], status: 'ESCALATED_LEGAL', legalEscalation: true, timestamp: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'INC-002', type: 'inappropriate_behavior', involvedParties: ['CompC', 'UserD'], status: 'OPEN', legalEscalation: false, timestamp: new Date().toISOString() },
 ];
 
 const mockDetail: IncidentDetail = {

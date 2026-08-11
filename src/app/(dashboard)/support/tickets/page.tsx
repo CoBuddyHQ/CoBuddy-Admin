@@ -15,6 +15,8 @@ import { useAuthStore } from '@/store/authStore';
 import { StaffRole } from '@/types/role.types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEmployees } from '@/modules/system/employees/hooks/useEmployees';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
@@ -22,16 +24,19 @@ export default function TicketsPage() {
   const { user } = useAuthStore();
   const { tickets, isLoading, updateStatus, escalateTicket, addReply, assignToMe, reassignTicket } = useTickets();
   const { employees } = useEmployees();
+  const { ticketCategories } = useMasterData();
   
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [replyText, setReplyText] = useState('');
   const [teamView, setTeamView] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
 
   if (isLoading || !user) return <div className="p-6">Loading...</div>;
 
   const isLead = user.roles.includes(StaffRole.SUPPORT_LEAD);
   
   const filteredTickets = tickets.filter(ticket => {
+    if (categoryFilter !== 'ALL' && ticket.category !== categoryFilter) return false;
     if (isLead && teamView) return true;
     return !ticket.assignedTo || ticket.assignedTo === user.name;
   });
@@ -53,12 +58,29 @@ export default function TicketsPage() {
       <PageHeader
         title="Support Tickets"
         description="Manage customer and companion support inquiries, routing, and escalation."
-        action={isLead ? (
-          <div className="flex items-center space-x-2 bg-background p-2 border rounded-md">
-            <Switch id="team-view" checked={teamView} onCheckedChange={setTeamView} />
-            <Label htmlFor="team-view">Team View (All Tickets)</Label>
+        action={
+          <div className="flex items-center gap-4">
+            <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val || 'ALL')}>
+              <SelectTrigger className="w-[180px] bg-background">
+                <SelectValue placeholder="Category Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Categories</SelectItem>
+                {ticketCategories.filter(c => c.active).map(cat => (
+                  <SelectItem key={cat.id} value={cat.code}>
+                    {getLocalizedText(cat.label, 'en')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {isLead && (
+              <div className="flex items-center space-x-2 bg-background p-2 border rounded-md">
+                <Switch id="team-view" checked={teamView} onCheckedChange={setTeamView} />
+                <Label htmlFor="team-view">Team View (All Tickets)</Label>
+              </div>
+            )}
           </div>
-        ) : undefined}
+        }
       />
 
       <Card>
@@ -91,7 +113,9 @@ export default function TicketsPage() {
                   </TableCell>
                   <TableCell className="max-w-[200px]">
                     <div className="truncate font-medium">{ticket.subject}</div>
-                    <div className="text-xs text-muted-foreground mt-1">Cat: {ticket.category} | Lvl: {ticket.escalationLevel}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Cat: {ticketCategories.find(c => c.code === ticket.category) ? getLocalizedText(ticketCategories.find(c => c.code === ticket.category)!.label, 'en') : ticket.category} | Lvl: {ticket.escalationLevel}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {ticket.assignedTo ? (

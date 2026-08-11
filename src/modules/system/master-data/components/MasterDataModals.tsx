@@ -181,3 +181,108 @@ export function AddAppLanguageModal({ open, onOpenChange, onSubmit }: ModalProps
     </Dialog>
   );
 }
+
+interface GenericCodeLabelModalProps extends ModalProps {
+  title: string;
+  codePlaceholder?: string;
+}
+
+export function GenericCodeLabelModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData, title, codePlaceholder = "Code" }: GenericCodeLabelModalProps) {
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [code, setCode] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      setNames(initialData?.label || {});
+      setCode(initialData?.code || '');
+    }
+  }, [open, initialData]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (names['en'] && code) {
+      if (initialData) {
+        onSubmit({ ...initialData, label: names, code });
+      } else {
+        onSubmit({ label: names, code, active: true });
+      }
+      onOpenChange(false);
+    }
+  };
+
+  const activeLangs = appLanguages.filter(l => l.active);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{initialData ? `Edit ${title}` : `Add New ${title}`}</DialogTitle></DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Names</h4>
+            {activeLangs.map(lang => (
+              <Input 
+                key={lang.code}
+                placeholder={`Name (${lang.name})`} 
+                value={names[lang.code] || ''} 
+                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
+                required={lang.code === 'en'} 
+              />
+            ))}
+          </div>
+          <Input placeholder={codePlaceholder} value={code} onChange={e => setCode(e.target.value)} required />
+          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : `Add ${title}`}</Button></div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function AddSessionDurationModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [minutes, setMinutes] = useState<string>('');
+
+  useEffect(() => {
+    if (open) {
+      setNames(initialData?.label || {});
+      setMinutes(initialData?.minutes ? initialData.minutes.toString() : '');
+    }
+  }, [open, initialData]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (names['en'] && minutes && !isNaN(Number(minutes))) {
+      if (initialData) {
+        onSubmit({ ...initialData, label: names, minutes: Number(minutes) });
+      } else {
+        onSubmit({ label: names, minutes: Number(minutes), active: true });
+      }
+      onOpenChange(false);
+    }
+  };
+
+  const activeLangs = appLanguages.filter(l => l.active);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{initialData ? 'Edit Session Duration' : 'Add New Session Duration'}</DialogTitle></DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Names</h4>
+            {activeLangs.map(lang => (
+              <Input 
+                key={lang.code}
+                placeholder={`Name (${lang.name})`} 
+                value={names[lang.code] || ''} 
+                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
+                required={lang.code === 'en'} 
+              />
+            ))}
+          </div>
+          <Input placeholder="Duration in minutes (e.g. 60)" type="number" value={minutes} onChange={e => setMinutes(e.target.value)} required />
+          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Session Duration'}</Button></div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

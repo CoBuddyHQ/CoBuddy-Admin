@@ -10,6 +10,13 @@ export const useMasterData = () => {
   const interestsQuery = useQuery({ queryKey: ['interests'], queryFn: masterDataApi.getInterests });
   const languagesQuery = useQuery({ queryKey: ['languages'], queryFn: masterDataApi.getLanguages });
   const appLanguagesQuery = useQuery({ queryKey: ['appLanguages'], queryFn: masterDataApi.getAppLanguages });
+  
+  const ticketCategoriesQuery = useQuery({ queryKey: ['ticketCategories'], queryFn: masterDataApi.getTicketCategories });
+  const incidentTypesQuery = useQuery({ queryKey: ['incidentTypes'], queryFn: masterDataApi.getIncidentTypes });
+  const communicationStylesQuery = useQuery({ queryKey: ['communicationStyles'], queryFn: masterDataApi.getCommunicationStyles });
+  const activityPacesQuery = useQuery({ queryKey: ['activityPaces'], queryFn: masterDataApi.getActivityPaces });
+  const sessionDurationsQuery = useQuery({ queryKey: ['sessionDurations'], queryFn: masterDataApi.getSessionDurations });
+  const notificationCategoriesQuery = useQuery({ queryKey: ['notificationCategories'], queryFn: masterDataApi.getNotificationCategories });
 
   const toggleCityMutation = useMutation({
     mutationFn: masterDataApi.toggleCity,
@@ -27,6 +34,31 @@ export const useMasterData = () => {
     mutationFn: masterDataApi.toggleAppLanguage,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['appLanguages'] }); toast.success('Status updated'); }
   });
+  
+  const toggleTicketCategoryMutation = useMutation({
+    mutationFn: masterDataApi.toggleTicketCategory,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['ticketCategories'] }); toast.success('Status updated'); }
+  });
+  const toggleIncidentTypeMutation = useMutation({
+    mutationFn: masterDataApi.toggleIncidentType,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['incidentTypes'] }); toast.success('Status updated'); }
+  });
+  const toggleCommunicationStyleMutation = useMutation({
+    mutationFn: masterDataApi.toggleCommunicationStyle,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['communicationStyles'] }); toast.success('Status updated'); }
+  });
+  const toggleActivityPaceMutation = useMutation({
+    mutationFn: masterDataApi.toggleActivityPace,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['activityPaces'] }); toast.success('Status updated'); }
+  });
+  const toggleSessionDurationMutation = useMutation({
+    mutationFn: masterDataApi.toggleSessionDuration,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['sessionDurations'] }); toast.success('Status updated'); }
+  });
+  const toggleNotificationCategoryMutation = useMutation({
+    mutationFn: masterDataApi.toggleNotificationCategory,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notificationCategories'] }); toast.success('Status updated'); }
+  });
 
   const addCityMutation = useMutation({
     mutationFn: masterDataApi.addCity,
@@ -43,6 +75,31 @@ export const useMasterData = () => {
   const addAppLanguageMutation = useMutation({
     mutationFn: masterDataApi.addAppLanguage,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['appLanguages'] }); toast.success('App Language added'); }
+  });
+  
+  const addTicketCategoryMutation = useMutation({
+    mutationFn: masterDataApi.addTicketCategory,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['ticketCategories'] }); toast.success('Ticket Category added'); }
+  });
+  const addIncidentTypeMutation = useMutation({
+    mutationFn: masterDataApi.addIncidentType,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['incidentTypes'] }); toast.success('Incident Type added'); }
+  });
+  const addCommunicationStyleMutation = useMutation({
+    mutationFn: masterDataApi.addCommunicationStyle,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['communicationStyles'] }); toast.success('Communication Style added'); }
+  });
+  const addActivityPaceMutation = useMutation({
+    mutationFn: masterDataApi.addActivityPace,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['activityPaces'] }); toast.success('Activity Pace added'); }
+  });
+  const addSessionDurationMutation = useMutation({
+    mutationFn: masterDataApi.addSessionDuration,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['sessionDurations'] }); toast.success('Session Duration added'); }
+  });
+  const addNotificationCategoryMutation = useMutation({
+    mutationFn: masterDataApi.addNotificationCategory,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notificationCategories'] }); toast.success('Notification Category added'); }
   });
 
   const addAreaToCityMutation = useMutation({
@@ -66,18 +123,36 @@ export const useMasterData = () => {
     interests: interestsQuery.data || [],
     languages: languagesQuery.data || [],
     appLanguages: appLanguagesQuery.data || [],
+    ticketCategories: ticketCategoriesQuery.data || [],
+    incidentTypes: incidentTypesQuery.data || [],
+    communicationStyles: communicationStylesQuery.data || [],
+    activityPaces: activityPacesQuery.data || [],
+    sessionDurations: sessionDurationsQuery.data || [],
+    notificationCategories: notificationCategoriesQuery.data || [],
     defaults: defaultsQuery.data,
-    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading,
+    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading || ticketCategoriesQuery.isLoading || incidentTypesQuery.isLoading || communicationStylesQuery.isLoading || activityPacesQuery.isLoading || sessionDurationsQuery.isLoading || notificationCategoriesQuery.isLoading,
     
     toggleCity: toggleCityMutation.mutate,
     toggleInterest: toggleInterestMutation.mutate,
     toggleLanguage: toggleLanguageMutation.mutate,
     toggleAppLanguage: toggleAppLanguageMutation.mutate,
+    toggleTicketCategory: toggleTicketCategoryMutation.mutate,
+    toggleIncidentType: toggleIncidentTypeMutation.mutate,
+    toggleCommunicationStyle: toggleCommunicationStyleMutation.mutate,
+    toggleActivityPace: toggleActivityPaceMutation.mutate,
+    toggleSessionDuration: toggleSessionDurationMutation.mutate,
+    toggleNotificationCategory: toggleNotificationCategoryMutation.mutate,
     
     addCity: addCityMutation.mutate,
     addInterest: addInterestMutation.mutate,
     addLanguage: addLanguageMutation.mutate,
     addAppLanguage: addAppLanguageMutation.mutate,
+    addTicketCategory: addTicketCategoryMutation.mutate,
+    addIncidentType: addIncidentTypeMutation.mutate,
+    addCommunicationStyle: addCommunicationStyleMutation.mutate,
+    addActivityPace: addActivityPaceMutation.mutate,
+    addSessionDuration: addSessionDurationMutation.mutate,
+    addNotificationCategory: addNotificationCategoryMutation.mutate,
 
     addAreaToCity: addAreaToCityMutation.mutate,
     toggleArea: toggleAreaMutation.mutate,

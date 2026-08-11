@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react';
 import { MasterListEditorTemplate } from '@/components/templates/MasterListEditorTemplate';
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
-import { CityList, InterestList, LanguageList, AppLanguageList } from '@/modules/system/master-data/components/MasterDataLists';
-import { AddCityModal, AddInterestModal, AddLanguageModal, AddAppLanguageModal } from '@/modules/system/master-data/components/MasterDataModals';
+import { CityList, InterestList, LanguageList, AppLanguageList, GenericCodeLabelList, SessionDurationList } from '@/modules/system/master-data/components/MasterDataLists';
+import { AddCityModal, AddInterestModal, AddLanguageModal, AddAppLanguageModal, GenericCodeLabelModal, AddSessionDurationModal } from '@/modules/system/master-data/components/MasterDataModals';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { City, Interest } from '@/modules/system/master-data/types';
+import { City, Interest, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption } from '@/modules/system/master-data/types';
 
 export default function MasterDataPage() {
   const { 
     cities, interests, languages, appLanguages, isLoading, defaults, isUpdatingDefaults,
+    ticketCategories, incidentTypes, communicationStyles, activityPaces, sessionDurations, notificationCategories,
     toggleCity, toggleInterest, toggleLanguage, toggleAppLanguage,
+    toggleTicketCategory, toggleIncidentType, toggleCommunicationStyle, toggleActivityPace, toggleSessionDuration, toggleNotificationCategory,
     addCity, addInterest, addLanguage, addAppLanguage, 
+    addTicketCategory, addIncidentType, addCommunicationStyle, addActivityPace, addSessionDuration, addNotificationCategory,
     addAreaToCity, toggleArea,
     updateDefaults
   } = useMasterData();
@@ -23,9 +26,21 @@ export default function MasterDataPage() {
   const [isInterestModalOpen, setIsInterestModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isAppLanguageModalOpen, setIsAppLanguageModalOpen] = useState(false);
+  const [isTicketCategoryModalOpen, setIsTicketCategoryModalOpen] = useState(false);
+  const [isIncidentTypeModalOpen, setIsIncidentTypeModalOpen] = useState(false);
+  const [isCommunicationStyleModalOpen, setIsCommunicationStyleModalOpen] = useState(false);
+  const [isActivityPaceModalOpen, setIsActivityPaceModalOpen] = useState(false);
+  const [isSessionDurationModalOpen, setIsSessionDurationModalOpen] = useState(false);
+  const [isNotificationCategoryModalOpen, setIsNotificationCategoryModalOpen] = useState(false);
 
   const [editCity, setEditCity] = useState<City | undefined>();
   const [editInterest, setEditInterest] = useState<Interest | undefined>();
+  const [editTicketCategory, setEditTicketCategory] = useState<TicketCategory | undefined>();
+  const [editIncidentType, setEditIncidentType] = useState<IncidentType | undefined>();
+  const [editCommunicationStyle, setEditCommunicationStyle] = useState<CommunicationStyleOption | undefined>();
+  const [editActivityPace, setEditActivityPace] = useState<ActivityPaceOption | undefined>();
+  const [editSessionDuration, setEditSessionDuration] = useState<SessionDurationOption | undefined>();
+  const [editNotificationCategory, setEditNotificationCategory] = useState<NotificationCategoryOption | undefined>();
 
   const [formData, setFormData] = useState<any>(null);
 
@@ -47,6 +62,12 @@ export default function MasterDataPage() {
     else if (activeTab === 'interests') { setEditInterest(undefined); setIsInterestModalOpen(true); }
     else if (activeTab === 'languages') setIsLanguageModalOpen(true);
     else if (activeTab === 'app-languages') setIsAppLanguageModalOpen(true);
+    else if (activeTab === 'ticket-categories') { setEditTicketCategory(undefined); setIsTicketCategoryModalOpen(true); }
+    else if (activeTab === 'incident-types') { setEditIncidentType(undefined); setIsIncidentTypeModalOpen(true); }
+    else if (activeTab === 'communication-styles') { setEditCommunicationStyle(undefined); setIsCommunicationStyleModalOpen(true); }
+    else if (activeTab === 'activity-paces') { setEditActivityPace(undefined); setIsActivityPaceModalOpen(true); }
+    else if (activeTab === 'session-durations') { setEditSessionDuration(undefined); setIsSessionDurationModalOpen(true); }
+    else if (activeTab === 'notification-categories') { setEditNotificationCategory(undefined); setIsNotificationCategoryModalOpen(true); }
   };
 
   const handleEditCity = (city: City) => {
@@ -57,6 +78,36 @@ export default function MasterDataPage() {
   const handleEditInterest = (interest: Interest) => {
     setEditInterest(interest);
     setIsInterestModalOpen(true);
+  };
+
+  const handleEditTicketCategory = (item: TicketCategory) => {
+    setEditTicketCategory(item);
+    setIsTicketCategoryModalOpen(true);
+  };
+
+  const handleEditIncidentType = (item: IncidentType) => {
+    setEditIncidentType(item);
+    setIsIncidentTypeModalOpen(true);
+  };
+
+  const handleEditCommunicationStyle = (item: CommunicationStyleOption) => {
+    setEditCommunicationStyle(item);
+    setIsCommunicationStyleModalOpen(true);
+  };
+
+  const handleEditActivityPace = (item: ActivityPaceOption) => {
+    setEditActivityPace(item);
+    setIsActivityPaceModalOpen(true);
+  };
+
+  const handleEditSessionDuration = (item: SessionDurationOption) => {
+    setEditSessionDuration(item);
+    setIsSessionDurationModalOpen(true);
+  };
+
+  const handleEditNotificationCategory = (item: NotificationCategoryOption) => {
+    setEditNotificationCategory(item);
+    setIsNotificationCategoryModalOpen(true);
   };
 
   return (
@@ -88,6 +139,36 @@ export default function MasterDataPage() {
             id: 'app-languages',
             label: 'App Languages',
             content: <AppLanguageList data={appLanguages} onToggle={toggleAppLanguage} />
+          },
+          {
+            id: 'ticket-categories',
+            label: 'Ticket Categories',
+            content: <GenericCodeLabelList data={ticketCategories} appLanguages={appLanguages} onToggle={toggleTicketCategory} onEditTranslations={handleEditTicketCategory} codeLabel="Code" />
+          },
+          {
+            id: 'incident-types',
+            label: 'Incident Types',
+            content: <GenericCodeLabelList data={incidentTypes} appLanguages={appLanguages} onToggle={toggleIncidentType} onEditTranslations={handleEditIncidentType} codeLabel="Code" />
+          },
+          {
+            id: 'communication-styles',
+            label: 'Communication Styles',
+            content: <GenericCodeLabelList data={communicationStyles} appLanguages={appLanguages} onToggle={toggleCommunicationStyle} onEditTranslations={handleEditCommunicationStyle} codeLabel="Code" />
+          },
+          {
+            id: 'activity-paces',
+            label: 'Activity Paces',
+            content: <GenericCodeLabelList data={activityPaces} appLanguages={appLanguages} onToggle={toggleActivityPace} onEditTranslations={handleEditActivityPace} codeLabel="Code" />
+          },
+          {
+            id: 'session-durations',
+            label: 'Session Durations',
+            content: <SessionDurationList data={sessionDurations} appLanguages={appLanguages} onToggle={toggleSessionDuration} onEditTranslations={handleEditSessionDuration} />
+          },
+          {
+            id: 'notification-categories',
+            label: 'Notification Categories',
+            content: <GenericCodeLabelList data={notificationCategories} appLanguages={appLanguages} onToggle={toggleNotificationCategory} onEditTranslations={handleEditNotificationCategory} codeLabel="Code" />
           },
           {
             id: 'defaults',
@@ -166,6 +247,53 @@ export default function MasterDataPage() {
         open={isAppLanguageModalOpen} 
         onOpenChange={setIsAppLanguageModalOpen} 
         onSubmit={addAppLanguage} 
+      />
+      <GenericCodeLabelModal
+        open={isTicketCategoryModalOpen}
+        onOpenChange={setIsTicketCategoryModalOpen}
+        onSubmit={addTicketCategory}
+        appLanguages={appLanguages}
+        initialData={editTicketCategory}
+        title="Ticket Category"
+      />
+      <GenericCodeLabelModal
+        open={isIncidentTypeModalOpen}
+        onOpenChange={setIsIncidentTypeModalOpen}
+        onSubmit={addIncidentType}
+        appLanguages={appLanguages}
+        initialData={editIncidentType}
+        title="Incident Type"
+      />
+      <GenericCodeLabelModal
+        open={isCommunicationStyleModalOpen}
+        onOpenChange={setIsCommunicationStyleModalOpen}
+        onSubmit={addCommunicationStyle}
+        appLanguages={appLanguages}
+        initialData={editCommunicationStyle}
+        title="Communication Style"
+      />
+      <GenericCodeLabelModal
+        open={isActivityPaceModalOpen}
+        onOpenChange={setIsActivityPaceModalOpen}
+        onSubmit={addActivityPace}
+        appLanguages={appLanguages}
+        initialData={editActivityPace}
+        title="Activity Pace"
+      />
+      <AddSessionDurationModal
+        open={isSessionDurationModalOpen}
+        onOpenChange={setIsSessionDurationModalOpen}
+        onSubmit={addSessionDuration}
+        appLanguages={appLanguages}
+        initialData={editSessionDuration}
+      />
+      <GenericCodeLabelModal
+        open={isNotificationCategoryModalOpen}
+        onOpenChange={setIsNotificationCategoryModalOpen}
+        onSubmit={addNotificationCategory}
+        appLanguages={appLanguages}
+        initialData={editNotificationCategory}
+        title="Notification Category"
       />
     </>
   );

@@ -2,9 +2,12 @@
 
 import { ListDetailTemplate } from '@/components/templates/ListDetailTemplate';
 import { useIncidents } from '@/modules/safety/incidents/hooks/useIncidents';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import { ShieldAlert } from 'lucide-react';
 import {
   Table,
@@ -17,6 +20,7 @@ import {
 
 export default function IncidentsPage() {
   const { incidents, isLoading } = useIncidents();
+  const { incidentTypes } = useMasterData();
   const router = useRouter();
 
   const listContent = (
@@ -40,7 +44,9 @@ export default function IncidentsPage() {
             {incidents.map(inc => (
               <TableRow key={inc.id}>
                 <TableCell>{inc.id}</TableCell>
-                <TableCell>{inc.type}</TableCell>
+                <TableCell>
+                  {incidentTypes.find(t => t.code === inc.type) ? getLocalizedText(incidentTypes.find(t => t.code === inc.type)!.label, 'en') : inc.type}
+                </TableCell>
                 <TableCell>{inc.involvedParties.join(' & ')}</TableCell>
                 <TableCell>{new Date(inc.timestamp).toLocaleDateString()}</TableCell>
                 <TableCell>

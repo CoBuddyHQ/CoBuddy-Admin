@@ -11,12 +11,15 @@ import { ArrowLeft, User, FileText, Image as ImageIcon, ShieldAlert } from 'luci
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/store/authStore';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 
 export default function IncidentDetailPage() {
   const params = useParams();
   const router = useRouter();
   const incidentId = params.incidentId as string;
   const { user } = useAuthStore();
+  const { incidentTypes } = useMasterData();
 
   const { detail, isLoading, updateStatus, isUpdating } = useIncidentDetail(incidentId);
 
@@ -47,7 +50,7 @@ export default function IncidentDetailPage() {
         </Button>
         <PageHeader 
           title={`Incident: ${detail.id}`} 
-          description={`Type: ${detail.type}`} 
+          description={`Type: ${incidentTypes.find(t => t.code === detail.type) ? getLocalizedText(incidentTypes.find(t => t.code === detail.type)!.label, 'en') : detail.type}`} 
           action={
             detail.status !== 'CLOSED' ? (
               <div className="flex gap-2">

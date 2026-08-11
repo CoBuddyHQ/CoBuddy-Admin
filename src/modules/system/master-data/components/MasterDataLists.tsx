@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from 'lucide-react';
 
+import { useSystemConfig } from '@/modules/system/config/hooks/useSystemConfig';
+import { Input } from '@/components/ui/input';
+
 function getMissingLanguages(nameObj: Record<string, string>, appLanguages: AppLanguage[]) {
   const activeLangs = appLanguages.filter(l => l.active);
   return activeLangs.filter(l => !nameObj[l.code]).map(l => l.name);
@@ -34,13 +37,17 @@ interface CityListProps {
   onAddArea: (cityId: string, areaName: Record<string, string>, lat?: number, lng?: number) => void;
   onToggleArea: (cityId: string, areaId: string) => void;
   onEditTranslations: (city: City) => void;
+  onUpdateServiceHours: (cityId: string, hours: { openTime: string; closeTime: string } | null) => void;
 }
-export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea, onEditTranslations }: CityListProps) {
+export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea, onEditTranslations, onUpdateServiceHours }: CityListProps) {
   const [manageCity, setManageCity] = useState<City | null>(null);
   const [newAreaName, setNewAreaName] = useState<Record<string, string>>({});
   const [suggestions, setSuggestions] = useState<{ name: string; lat: number; lng: number }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{ lat?: number; lng?: number }>({});
+
+  const { config } = useSystemConfig();
+  const defaultHours = config?.serviceHours || { openTime: '06:00', closeTime: '23:00' };
 
   useEffect(() => {
     if (!manageCity || !newAreaName['en']) {
@@ -59,11 +66,6 @@ export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea
   const handleAddArea = (e: React.FormEvent) => {
     e.preventDefault();
     if (manageCity && newAreaName['en']) {
-      // Pass the lat/lng along with the name. We need to cast it or modify onAddArea to accept it.
-      // The prompt says "optional to store returned lat/lng on the Area type" and "reasonable to add lat?: number; lng?: number to Area".
-      // We'll pass it as part of a modified area object, but onAddArea signature takes Record<string, string>.
-      // Wait, the signature is `onAddArea: (cityId: string, areaName: Record<string, string>) => void`.
-      // Let's modify the props interface to allow passing lat/lng.
       onAddArea(manageCity.id, newAreaName, selectedLocation.lat, selectedLocation.lng);
       setNewAreaName({});
       setSelectedLocation({});
@@ -81,6 +83,7 @@ export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>State</TableHeaderCell>
             <TableHeaderCell>Country</TableHeaderCell>
+            <TableHeaderCell>Service Hours</TableHeaderCell>
             <TableHeaderCell>Status</TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableRow>
@@ -104,10 +107,22 @@ export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea
                 <TableCell>{item.state}</TableCell>
                 <TableCell>{item.country}</TableCell>
                 <TableCell>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-medium text-sm">
+                      {item.serviceHoursOverride ? `${item.serviceHoursOverride.openTime} - ${item.serviceHoursOverride.closeTime}` : `${defaultHours.openTime} - ${defaultHours.closeTime}`}
+                    </span>
+                    {item.serviceHoursOverride ? (
+                      <Badge variant="outline" className="w-fit text-[10px]">Custom</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="w-fit text-[10px]">Default</Badge>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
                   <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => setManageCity(item)}>Manage Areas ({item.areas?.length || 0})</Button>
+                  <Button variant="outline" size="sm" onClick={() => setManageCity(item)}>Manage City</Button>
                 </TableCell>
               </TableRow>
             );
@@ -118,12 +133,71 @@ export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea
       <Dialog open={!!manageCity} onOpenChange={(open) => !open && setManageCity(null)}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Manage Areas for {manageCity ? getLocalizedText(manageCity.name, 'en') : ''}</DialogTitle>
+            <DialogTitle>Manage Settings for {manageCity ? getLocalizedText(manageCity.name, 'en') : ''}</DialogTitle>
           </DialogHeader>
           <div className="space-y-6 pt-4">
-            {(!manageCity?.areas || manageCity.areas.length === 0) ? (
-              <EmptyState title="No areas yet" description="Add areas or localities to this city." icon={<></>} />
-            ) : (
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold">Service Hours</h4>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Custom hours for this city</span>
+                <Switch 
+                  checked={!!manageCity?.serviceHoursOverride} 
+                  onCheckedChange={(checked) => {
+                    if (manageCity) {
+                      if (checked) {
+                        onUpdateServiceHours(manageCity.id, { ...defaultHours });
+                        setManageCity({ ...manageCity, serviceHoursOverride: { ...defaultHours } });
+                      } else {
+                        onUpdateServiceHours(manageCity.id, null);
+                        setManageCity({ ...manageCity, serviceHoursOverride: null });
+                      }
+                    }
+                  }} 
+                />
+              </div>
+              {manageCity?.serviceHoursOverride && (
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium">Opening Time</label>
+                    <Input 
+                      type="time" 
+                      value={manageCity.serviceHoursOverride.openTime}
+                      onChange={(e) => {
+                        const newOpen = e.target.value;
+                        const close = manageCity.serviceHoursOverride!.closeTime;
+                        if (newOpen && newOpen < close) {
+                          const newHours = { ...manageCity.serviceHoursOverride!, openTime: newOpen };
+                          onUpdateServiceHours(manageCity.id, newHours);
+                          setManageCity({ ...manageCity, serviceHoursOverride: newHours });
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium">Closing Time</label>
+                    <Input 
+                      type="time" 
+                      value={manageCity.serviceHoursOverride.closeTime}
+                      onChange={(e) => {
+                        const newClose = e.target.value;
+                        const open = manageCity.serviceHoursOverride!.openTime;
+                        if (newClose && newClose > open) {
+                          const newHours = { ...manageCity.serviceHoursOverride!, closeTime: newClose };
+                          onUpdateServiceHours(manageCity.id, newHours);
+                          setManageCity({ ...manageCity, serviceHoursOverride: newHours });
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="text-sm font-semibold mb-4">Areas ({manageCity?.areas?.length || 0})</h4>
+              {(!manageCity?.areas || manageCity.areas.length === 0) ? (
+                <EmptyState title="No areas yet" description="Add areas or localities to this city." icon={<></>} />
+              ) : (
               <div className="space-y-2 border rounded-md p-4 bg-muted/20">
                 {manageCity.areas.map(area => (
                   <div key={area.id} className="flex items-center justify-between p-2 bg-background border rounded-md">
@@ -172,6 +246,7 @@ export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea
                 <Plus className="h-4 w-4 mr-2" /> Add Area
               </Button>
             </form>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

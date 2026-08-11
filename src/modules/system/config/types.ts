@@ -21,8 +21,14 @@ export interface SafetyBonusRuleConfig {
   bonusAmount: number;
 }
 
+export interface ServiceHoursConfig {
+  openTime: string;
+  closeTime: string;
+}
+
 export interface SystemConfig {
   commission: CommissionConfig;
   pricing: PricingConfig;
   safetyBonusRule: SafetyBonusRuleConfig;
+  serviceHours: ServiceHoursConfig;
 }

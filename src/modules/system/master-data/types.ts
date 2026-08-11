@@ -13,6 +13,10 @@ export interface City {
   country: string;
   active: boolean;
   areas?: Area[];
+  serviceHoursOverride?: {
+    openTime: string;
+    closeTime: string;
+  } | null;
 }
 
 export interface Interest {

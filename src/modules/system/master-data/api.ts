@@ -1,5 +1,10 @@
 import { City, Interest, Language, AppLanguage, SystemDefaults, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption } from './types';
 
+// Note: Mobile apps should use systemConfig.serviceHours (from system/config/api.ts) to determine 
+// the allowed time-range for bookings and availability. If a city has a serviceHoursOverride, 
+// that should be used instead for any bookings/availability in that city.
+// Effective hours = `city.serviceHoursOverride ?? systemConfig.serviceHours`.
+
 const cities: City[] = [
   { 
     id: 'CITY-1', 
@@ -27,6 +32,18 @@ const cities: City[] = [
     country: 'India', 
     active: false,
     areas: []
+  },
+  { 
+    id: 'CITY-4', 
+    name: { en: 'Pune', hi: 'पुणे' }, 
+    state: 'Maharashtra', 
+    country: 'India', 
+    active: true,
+    areas: [],
+    serviceHoursOverride: {
+      openTime: '08:00',
+      closeTime: '20:00'
+    }
   },
 ];
 
@@ -224,6 +241,17 @@ export const masterDataApi = {
     if (city && city.areas) {
       const area = city.areas.find(a => a.id === areaId);
       if (area) area.active = !area.active;
+    }
+    return Promise.resolve();
+  },
+  updateCityServiceHours: async (cityId: string, hours: { openTime: string; closeTime: string } | null): Promise<void> => {
+    const city = cities.find(c => c.id === cityId);
+    if (city) {
+      if (hours) {
+        city.serviceHoursOverride = hours;
+      } else {
+        city.serviceHoursOverride = null;
+      }
     }
     return Promise.resolve();
   },

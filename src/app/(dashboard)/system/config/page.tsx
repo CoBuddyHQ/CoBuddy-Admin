@@ -29,6 +29,10 @@ export default function SystemConfigPage() {
     safetyBonusRule: {
       incidentFreeMonths: 1,
       bonusAmount: 100,
+    },
+    serviceHours: {
+      openTime: "06:00",
+      closeTime: "23:00"
     }
   });
 
@@ -204,6 +208,42 @@ export default function SystemConfigPage() {
                     ...p, 
                     safetyBonusRule: { ...p.safetyBonusRule, bonusAmount: Number(e.target.value) } 
                   }))}
+                />
+              </div>
+            </div>
+          )
+        },
+        {
+          title: "Platform-Wide Service Hours",
+          description: "Define the default daily time-window during which the service is available globally.",
+          children: (
+            <div className="grid grid-cols-2 gap-4 max-w-xl">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Opening Time</label>
+                <Input 
+                  type="time" 
+                  value={formData.serviceHours?.openTime || "06:00"}
+                  onChange={(e) => {
+                    const newOpen = e.target.value;
+                    const close = formData.serviceHours?.closeTime || "23:00";
+                    if (newOpen && newOpen < close) {
+                      setFormData(p => ({ ...p, serviceHours: { ...p.serviceHours, openTime: newOpen } }));
+                    }
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Closing Time</label>
+                <Input 
+                  type="time" 
+                  value={formData.serviceHours?.closeTime || "23:00"}
+                  onChange={(e) => {
+                    const newClose = e.target.value;
+                    const open = formData.serviceHours?.openTime || "06:00";
+                    if (newClose && newClose > open) {
+                      setFormData(p => ({ ...p, serviceHours: { ...p.serviceHours, closeTime: newClose } }));
+                    }
+                  }}
                 />
               </div>
             </div>

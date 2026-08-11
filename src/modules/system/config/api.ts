@@ -1,5 +1,8 @@
 import { SystemConfig } from './types';
 
+// Note: Mobile apps should use this config to determine the allowed time-range for bookings and availability.
+// Both Companion's availability-slot picker and Customer's booking-time picker should fetch their allowed time-range from this config.
+// They should resolve effective hours as `city.serviceHoursOverride ?? systemConfig.serviceHours`.
 let currentConfig: SystemConfig = {
   commission: {
     platformFeePercentage: 15,
@@ -17,6 +20,10 @@ let currentConfig: SystemConfig = {
   safetyBonusRule: {
     incidentFreeMonths: 1,
     bonusAmount: 100,
+  },
+  serviceHours: {
+    openTime: "06:00",
+    closeTime: "23:00"
   }
 };
 

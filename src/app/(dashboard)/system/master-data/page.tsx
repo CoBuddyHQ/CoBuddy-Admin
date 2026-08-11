@@ -17,6 +17,7 @@ export default function MasterDataPage() {
     addCity, addInterest, addLanguage, addAppLanguage, 
     addTicketCategory, addIncidentType, addCommunicationStyle, addActivityPace, addSessionDuration, addNotificationCategory,
     addAreaToCity, toggleArea,
+    updateCityServiceHours,
     updateDefaults
   } = useMasterData();
 
@@ -123,7 +124,7 @@ export default function MasterDataPage() {
           {
             id: 'cities',
             label: 'Cities',
-            content: <CityList data={cities} appLanguages={appLanguages} onToggle={toggleCity} onAddArea={(cityId, areaName) => addAreaToCity({ cityId, areaName })} onToggleArea={(cityId, areaId) => toggleArea({ cityId, areaId })} onEditTranslations={handleEditCity} />
+            content: <CityList data={cities} appLanguages={appLanguages} onToggle={toggleCity} onAddArea={(cityId, areaName) => addAreaToCity({ cityId, areaName })} onToggleArea={(cityId, areaId) => toggleArea({ cityId, areaId })} onEditTranslations={handleEditCity} onUpdateServiceHours={(cityId, hours) => updateCityServiceHours({ cityId, hours })} />
           },
           {
             id: 'interests',

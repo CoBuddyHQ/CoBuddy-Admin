@@ -215,3 +215,11 @@ pm run build and confirmed a successful production build with 0 errors. Pushing 
 - **Item 8:** Completed final type verification (tsc) and linting with 0 errors.
 
 **Repository is fully verified. Round 18 completed successfully.**
+
+
+## Round 20 Corrective Pass
+
+- **Item 1:** Added serviceHours config to global System Config. Wired UI to manage it. Mobile app contract documented.
+- **Item 2:** Added serviceHoursOverride to City type. Implemented UI toggle and input fields in the Master Data list to define custom hours per city, resolving fallback to systemConfig.serviceHours.
+- **Item 3:** The mobile app data contract logic is successfully established and documented in pi.ts (both config and master-data) to guide companion/customer integration.
+- **Item 4:** Ran 	sc --noEmit and eslint src post-implementation and confirmed zero real errors.

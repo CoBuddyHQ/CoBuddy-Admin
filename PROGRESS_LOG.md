@@ -192,3 +192,14 @@ px eslint src (0 errors). Pushed successfully to origin/main.
 px tsc --noEmit and 
 px eslint src which resulted in 0 errors. Pushing all changes to origin/main.
 
+
+## Round 17 Corrective Pass
+
+- **ITEM 1:** Fixed Nested <button> inside <button> HTML nesting and hydration issue in TopBar.tsx. The DropdownMenuTrigger in the UI components library natively renders as a <button>. By nesting <Button variant="...> inside it, we were creating invalid HTML structure (nested buttons), triggering hydration errors. We fixed this by moving the uttonVariants(...) Tailwind classes directly onto DropdownMenuTrigger and replacing the nested <Button> component with plain child elements. Also verified there are no other instances of this bug in the codebase. This fully resolves the two 'cannot be a descendant of' console errors and the hydration-mismatch error without touching the known 
+ext-themes third-party library warning.
+- **ITEM 2:** Executed missed Round 15 tasks. (A) Wrote a concise and practical README.md containing the project overview, the module structure convention, backend integration instructions (replacing mock pi.ts), shared master data overview, and standard commands. (B) Found and replaced a realistic fake credential 	w_live_mock_key in src/modules/marketing/notifications/api.ts with MOCK_SMS_KEY_NOT_REAL to ensure no live-looking keys exist. Also grep-checked the entire src/ tree for other patterns (sk_live, pk_live, etc.) and confirmed zero other instances.
+- **ITEM 3:** Verification completed. Ran 
+px tsc --noEmit and 
+px eslint src which resulted in 0 errors. Ran 
+pm run build and confirmed a successful production build with 0 errors. Pushing all changes to origin/main.
+

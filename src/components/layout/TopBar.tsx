@@ -4,7 +4,7 @@ import { Bell, Search, User as UserIcon } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useStaffNotifications } from '@/modules/system/staff-notifications/hooks/useStaffNotifications';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,13 +40,11 @@ export function TopBar() {
         </Button>
         
         <DropdownMenu>
-          <DropdownMenuTrigger className="relative outline-none">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              {notifications.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive"></span>
-              )}
-            </Button>
+          <DropdownMenuTrigger className={`${buttonVariants({ variant: 'ghost', size: 'icon' })} relative outline-none cursor-pointer`}>
+            <Bell className="h-5 w-5" />
+            {notifications.length > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive"></span>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-80" align="end">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>

@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CoBuddy Admin Panel
 
-## Getting Started
+This project is the CoBuddy Admin Panel, currently functioning as a 100% complete **mock-data frontend prototype** covering all 42 specification modules.
 
-First, run the development server:
+## Module Structure Convention
+
+Every feature lives under `src/modules/{area}/{module}/` and generally contains:
+- `types.ts`: Data shapes and interfaces.
+- `api.ts`: Currently mock/in-memory, meant to be swapped for real API calls.
+- `hooks/`: React Query hooks that the components actually use.
+
+The corresponding Next.js page lives at `src/app/(dashboard)/{route}/page.tsx`.
+
+## Backend Integration Guide
+
+To connect a real backend, **replace the contents of a module's `api.ts` functions with real `fetch` or API calls** returning the exact same shapes already defined in that module's `types.ts`.
+- **Nothing else in the module should need to change.** The frontend state, components, and workflows are already wired correctly.
+- **Shared Master Data**: Data that is cross-module (like Cities, Interests, App Languages, Spoken Languages) lives in `system/master-data`. Since many other modules read from this, it is recommended to wire this up early.
+
+## Development
+
+Standard commands for this project:
 
 ```bash
+# Install dependencies (use legacy-peer-deps due to @tremor/react React 19 conflict)
+npm install --legacy-peer-deps
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Run linter
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Progress History
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `PROGRESS_LOG.md` for the full history of what has been built and verified across all prior rounds of development.

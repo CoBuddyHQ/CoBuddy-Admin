@@ -12,7 +12,7 @@ let mockConfig: NotificationConfig = {
   apnsTopic: 'com.cobuddy.app',
   enableSmsFallback: true,
   smsProvider: 'TWILIO',
-  smsApiKey: 'tw_live_mock_key',
+  smsApiKey: 'MOCK_SMS_KEY_NOT_REAL',
 };
 
 export const notificationsApi = {

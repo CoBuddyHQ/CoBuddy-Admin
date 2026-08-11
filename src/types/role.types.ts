@@ -16,4 +16,5 @@ export interface StaffUser {
   email: string;
   roles: StaffRole[];
   cityScope?: string[]; // Used for CITY_OPS_MANAGER
+  twoFactorEnabled?: boolean;
 }

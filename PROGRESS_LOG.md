@@ -182,3 +182,13 @@ px eslint src which resulted in 0 errors. Pushing all changes to origin/main.
 px tsc --noEmit and 
 px eslint src (0 errors). Pushed successfully to origin/main.
 
+
+## Round 16 Corrective Pass
+
+- **ITEM 1:** Wired the TopBar Notification Bell to real aggregated signals. Created useStaffNotifications hook inside src/modules/system/staff-notifications/ that aggregates active SOS alerts, assigned tickets, SLA breaches, and pending verifications using existing hooks (useSosAlerts, useTickets, useSLA, useVerificationQueue) and role-based permissions (hasPermission). Updated TopBar.tsx to display a dropdown with a dot badge only if notifications exist.
+- **ITEM 2:** Enriched the Profile Dropdown Menu in TopBar.tsx. Added user role badges inside the dropdown. Added a 'My Profile' menu item that links to a new self-view page at src/app/(dashboard)/profile/page.tsx, displaying name, email, roles, 2FA status, and a disabled 'Change Password' button (with a backend-integration note). Re-used existing role display logic. Note: The /profile page intentionally has no sidebar entry.
+- **ITEM 3:** Added simulated autocomplete for City Areas. Created src/lib/mockPlacesAutocomplete.ts with a mock function searchAreaSuggestions (and a clear comment for future real Google Places API integration). Added lat and lng to the Area type and updated pi.addAreaToCity and useMasterData. Updated the 'Add Area' form in MasterDataLists.tsx to use a debounced autocomplete input for English names, allowing selection of suggestions while keeping free-text entry as a fallback.
+- **ITEM 4:** Verification completed. Ran 
+px tsc --noEmit and 
+px eslint src which resulted in 0 errors. Pushing all changes to origin/main.
+

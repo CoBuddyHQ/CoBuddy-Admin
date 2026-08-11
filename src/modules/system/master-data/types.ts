@@ -2,6 +2,8 @@ export interface Area {
   id: string;
   name: Record<string, string>;
   active: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 export interface City {

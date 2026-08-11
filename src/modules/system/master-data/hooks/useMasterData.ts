@@ -46,7 +46,7 @@ export const useMasterData = () => {
   });
 
   const addAreaToCityMutation = useMutation({
-    mutationFn: ({ cityId, areaName }: { cityId: string, areaName: Record<string, string> }) => masterDataApi.addAreaToCity(cityId, areaName),
+    mutationFn: ({ cityId, areaName, lat, lng }: { cityId: string, areaName: Record<string, string>, lat?: number, lng?: number }) => masterDataApi.addAreaToCity(cityId, areaName, lat, lng),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cities'] }); toast.success('Area added'); }
   });
   const toggleAreaMutation = useMutation({

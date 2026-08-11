@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { searchAreaSuggestions } from '@/lib/mockPlacesAutocomplete';
 import { City, Interest, Language, AppLanguage, Area } from '../types';
 import { Switch } from '@/components/ui/switch';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
@@ -30,19 +31,43 @@ interface CityListProps {
   data: City[]; 
   appLanguages: AppLanguage[];
   onToggle: (id: string) => void; 
-  onAddArea: (cityId: string, areaName: Record<string, string>) => void;
+  onAddArea: (cityId: string, areaName: Record<string, string>, lat?: number, lng?: number) => void;
   onToggleArea: (cityId: string, areaId: string) => void;
   onEditTranslations: (city: City) => void;
 }
 export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea, onEditTranslations }: CityListProps) {
   const [manageCity, setManageCity] = useState<City | null>(null);
   const [newAreaName, setNewAreaName] = useState<Record<string, string>>({});
+  const [suggestions, setSuggestions] = useState<{ name: string; lat: number; lng: number }[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat?: number; lng?: number }>({});
+
+  useEffect(() => {
+    if (!manageCity || !newAreaName['en']) {
+      setSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      const results = await searchAreaSuggestions(newAreaName['en'], manageCity.id);
+      setSuggestions(results);
+      setIsSearching(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [newAreaName['en'], manageCity]);
 
   const handleAddArea = (e: React.FormEvent) => {
     e.preventDefault();
     if (manageCity && newAreaName['en']) {
-      onAddArea(manageCity.id, newAreaName);
+      // Pass the lat/lng along with the name. We need to cast it or modify onAddArea to accept it.
+      // The prompt says "optional to store returned lat/lng on the Area type" and "reasonable to add lat?: number; lng?: number to Area".
+      // We'll pass it as part of a modified area object, but onAddArea signature takes Record<string, string>.
+      // Wait, the signature is `onAddArea: (cityId: string, areaName: Record<string, string>) => void`.
+      // Let's modify the props interface to allow passing lat/lng.
+      onAddArea(manageCity.id, newAreaName, selectedLocation.lat, selectedLocation.lng);
       setNewAreaName({});
+      setSelectedLocation({});
+      setSuggestions([]);
     }
   };
 
@@ -112,14 +137,35 @@ export function CityList({ data, appLanguages, onToggle, onAddArea, onToggleArea
             <form onSubmit={handleAddArea} className="space-y-4 pt-4 border-t">
               <h4 className="text-sm font-semibold">Add New Area</h4>
               {appLanguages.filter(l => l.active).map(lang => (
-                <div key={lang.code} className="space-y-2">
+                <div key={lang.code} className="space-y-2 relative">
                   <label className="text-sm font-medium">Name ({lang.name}){lang.code === 'en' ? ' *' : ''}</label>
                   <input 
                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
                     value={newAreaName[lang.code] || ''} 
-                    onChange={e => setNewAreaName({ ...newAreaName, [lang.code]: e.target.value })} 
+                    onChange={e => {
+                      setNewAreaName({ ...newAreaName, [lang.code]: e.target.value });
+                      if (lang.code === 'en') setSelectedLocation({}); // Reset on manual edit
+                    }} 
                     required={lang.code === 'en'}
+                    autoComplete="off"
                   />
+                  {lang.code === 'en' && suggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-48 overflow-auto">
+                      {suggestions.map((s, idx) => (
+                        <div 
+                          key={idx} 
+                          className="px-3 py-2 text-sm cursor-pointer hover:bg-muted"
+                          onClick={() => {
+                            setNewAreaName({ ...newAreaName, 'en': s.name });
+                            setSelectedLocation({ lat: s.lat, lng: s.lng });
+                            setSuggestions([]);
+                          }}
+                        >
+                          {s.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
               <Button type="submit" className="w-full" disabled={!newAreaName['en']}>

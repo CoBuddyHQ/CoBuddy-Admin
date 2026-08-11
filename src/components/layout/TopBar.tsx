@@ -1,7 +1,9 @@
 'use client';
 
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, User as UserIcon } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { useStaffNotifications } from '@/modules/system/staff-notifications/hooks/useStaffNotifications';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -19,6 +21,7 @@ import { Moon, Sun } from 'lucide-react';
 export function TopBar() {
   const { user, logout } = useAuthStore();
   const { setTheme, theme } = useTheme();
+  const { notifications } = useStaffNotifications();
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-6">
@@ -36,10 +39,34 @@ export function TopBar() {
           <span className="sr-only">Toggle theme</span>
         </Button>
         
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive"></span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="relative outline-none">
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              {notifications.length > 0 && (
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive"></span>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-80" align="end">
+            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {notifications.length === 0 ? (
+              <div className="p-4 text-sm text-center text-muted-foreground">No new notifications</div>
+            ) : (
+              <DropdownMenuGroup>
+                {notifications.map((notif) => (
+                  <DropdownMenuItem key={notif.id} className="cursor-pointer p-0">
+                    <Link href={notif.href} className="flex flex-col items-start gap-1 p-3 w-full">
+                      <span className="text-sm font-medium">{notif.title}</span>
+                      <span className="text-xs text-muted-foreground">{notif.description}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         <DropdownMenu>
           <DropdownMenuTrigger className="relative h-8 w-8 rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
@@ -53,8 +80,26 @@ export function TopBar() {
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{user?.name}</p>
                   <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                  {user?.roles && user.roles.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {user.roles.map(role => (
+                        <span key={role} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                          {role.replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </DropdownMenuLabel>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="p-0">
+                <Link href="/profile" className="cursor-pointer flex w-full px-2 py-1.5">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>My Profile</span>
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>

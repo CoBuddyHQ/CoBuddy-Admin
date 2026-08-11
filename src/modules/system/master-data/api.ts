@@ -100,11 +100,11 @@ export const masterDataApi = {
     return Promise.resolve();
   },
 
-  addAreaToCity: async (cityId: string, areaName: Record<string, string>): Promise<void> => {
+  addAreaToCity: async (cityId: string, areaName: Record<string, string>, lat?: number, lng?: number): Promise<void> => {
     const city = cities.find(c => c.id === cityId);
     if (city) {
       if (!city.areas) city.areas = [];
-      city.areas.push({ id: `AREA-${Date.now()}`, name: areaName, active: true });
+      city.areas.push({ id: `AREA-${Date.now()}`, name: areaName, active: true, lat, lng });
     }
     return Promise.resolve();
   },

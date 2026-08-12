@@ -24,7 +24,13 @@ let currentConfig: SystemConfig = {
   serviceHours: {
     openTime: "06:00",
     closeTime: "23:00"
-  }
+  },
+  safety: {
+    sosHoldToTriggerSeconds: 3
+  },
+  customerInterestSelectionLimits: { min: 3, max: 10 },
+  companionCategorySelectionLimits: { min: 1, max: 3 },
+  companionServiceAreaLimits: { min: 1, max: 8 }
 };
 
 export const configApi = {

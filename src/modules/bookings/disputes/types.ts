@@ -4,7 +4,8 @@ export interface BookingDispute {
   customerId: string;
   companionId: string;
   raisedBy: 'CUSTOMER' | 'COMPANION';
-  reason: string;
+  reasonCode: string;
+  reasonDetails?: string;
   status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED_REFUND' | 'RESOLVED_NO_REFUND' | 'ESCALATED';
   amount: number;
   noticeGivenHours: number;

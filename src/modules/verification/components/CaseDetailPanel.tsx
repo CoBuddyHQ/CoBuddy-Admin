@@ -12,7 +12,17 @@ interface Props {
   onClose: () => void;
 }
 
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
+
 export function CaseDetailPanel({ caseData, onClose }: Props) {
+  const { kycDocumentTypes } = useMasterData();
+  
+  const getDocTypeLabel = (code: string) => {
+    const r = kycDocumentTypes.find(x => x.code === code);
+    return r ? getLocalizedText(r.label, 'en') : code;
+  };
+
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="flex items-center gap-2 p-4 border-b shrink-0 sticky top-0 bg-background z-10">
@@ -29,6 +39,7 @@ export function CaseDetailPanel({ caseData, onClose }: Props) {
           <h3 className="font-semibold mb-2">{caseData.applicantName}</h3>
           <div className="text-sm text-muted-foreground space-y-1">
             <p>Type: {caseData.applicantType}</p>
+            <p>Doc Type: {getDocTypeLabel(caseData.documentType)}</p>
             <p>Submitted: {formatDate(caseData.submittedAt)}</p>
             {caseData.applicantType === 'COMPANION' && caseData.backgroundDeclarationUrl && (
               <p className="mt-2">

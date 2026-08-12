@@ -4,7 +4,8 @@ export interface CancelledBooking {
   companionName: string;
   userName: string;
   cancelledBy: 'CUSTOMER' | 'COMPANION' | 'SYSTEM';
-  reason: string;
+  reasonCode: string;
+  reasonDetails?: string;
   penaltyApplied: number;
   refundAmount: number;
   dateCancelled: string;

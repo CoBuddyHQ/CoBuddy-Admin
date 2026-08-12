@@ -12,14 +12,23 @@ import {
   TableRow,
 } from '@tremor/react';
 
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
+
 export default function CancelledBookingsPage() {
-  const { bookings, isLoading } = useCancelledBookings();
+  const { bookings, isLoading: bookingsLoading } = useCancelledBookings();
+  const { cancellationReasons, isLoading: masterDataLoading } = useMasterData();
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
+  const getReasonLabel = (code: string) => {
+    const r = cancellationReasons.find(x => x.code === code);
+    return r ? getLocalizedText(r.label, 'en') : code;
+  };
+
   const listContent = (
     <div className="p-4">
-      {isLoading ? (
+      {bookingsLoading || masterDataLoading ? (
         <div>Loading...</div>
       ) : (
         <Table>
@@ -46,7 +55,10 @@ export default function CancelledBookingsPage() {
                     {b.cancelledBy}
                   </Badge>
                 </TableCell>
-                <TableCell>{b.reason}</TableCell>
+                <TableCell>
+                  <div className="font-medium text-sm">{getReasonLabel(b.reasonCode)}</div>
+                  {b.reasonDetails && <div className="text-xs text-muted-foreground">{b.reasonDetails}</div>}
+                </TableCell>
                 <TableCell className="text-destructive font-medium">{formatCurrency(b.penaltyApplied)}</TableCell>
                 <TableCell className="text-green-600 font-medium">{formatCurrency(b.refundAmount)}</TableCell>
                 <TableCell>{new Date(b.dateCancelled).toLocaleDateString()}</TableCell>

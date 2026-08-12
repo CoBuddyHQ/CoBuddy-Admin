@@ -17,6 +17,10 @@ export const useMasterData = () => {
   const activityPacesQuery = useQuery({ queryKey: ['activityPaces'], queryFn: masterDataApi.getActivityPaces });
   const sessionDurationsQuery = useQuery({ queryKey: ['sessionDurations'], queryFn: masterDataApi.getSessionDurations });
   const notificationCategoriesQuery = useQuery({ queryKey: ['notificationCategories'], queryFn: masterDataApi.getNotificationCategories });
+  const reviewTagsQuery = useQuery({ queryKey: ['reviewTags'], queryFn: masterDataApi.getReviewTags });
+  const disputeReasonsQuery = useQuery({ queryKey: ['disputeReasons'], queryFn: masterDataApi.getDisputeReasons });
+  const cancellationReasonsQuery = useQuery({ queryKey: ['cancellationReasons'], queryFn: masterDataApi.getCancellationReasons });
+  const kycDocumentTypesQuery = useQuery({ queryKey: ['kycDocumentTypes'], queryFn: masterDataApi.getKYCDocumentTypes });
 
   const toggleCityMutation = useMutation({
     mutationFn: masterDataApi.toggleCity,
@@ -58,6 +62,22 @@ export const useMasterData = () => {
   const toggleNotificationCategoryMutation = useMutation({
     mutationFn: masterDataApi.toggleNotificationCategory,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notificationCategories'] }); toast.success('Status updated'); }
+  });
+  const toggleReviewTagMutation = useMutation({
+    mutationFn: masterDataApi.toggleReviewTag,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reviewTags'] }); toast.success('Status updated'); }
+  });
+  const toggleDisputeReasonMutation = useMutation({
+    mutationFn: masterDataApi.toggleDisputeReason,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['disputeReasons'] }); toast.success('Status updated'); }
+  });
+  const toggleCancellationReasonMutation = useMutation({
+    mutationFn: masterDataApi.toggleCancellationReason,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cancellationReasons'] }); toast.success('Status updated'); }
+  });
+  const toggleKYCDocumentTypeMutation = useMutation({
+    mutationFn: masterDataApi.toggleKYCDocumentType,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['kycDocumentTypes'] }); toast.success('Status updated'); }
   });
 
   const addCityMutation = useMutation({
@@ -101,6 +121,22 @@ export const useMasterData = () => {
     mutationFn: masterDataApi.addNotificationCategory,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notificationCategories'] }); toast.success('Notification Category added'); }
   });
+  const addReviewTagMutation = useMutation({
+    mutationFn: masterDataApi.addReviewTag,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reviewTags'] }); toast.success('Review Tag added'); }
+  });
+  const addDisputeReasonMutation = useMutation({
+    mutationFn: masterDataApi.addDisputeReason,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['disputeReasons'] }); toast.success('Dispute Reason added'); }
+  });
+  const addCancellationReasonMutation = useMutation({
+    mutationFn: masterDataApi.addCancellationReason,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cancellationReasons'] }); toast.success('Cancellation Reason added'); }
+  });
+  const addKYCDocumentTypeMutation = useMutation({
+    mutationFn: masterDataApi.addKYCDocumentType,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['kycDocumentTypes'] }); toast.success('KYC Document Type added'); }
+  });
 
   const addAreaToCityMutation = useMutation({
     mutationFn: ({ cityId, areaName, lat, lng }: { cityId: string, areaName: Record<string, string>, lat?: number, lng?: number }) => masterDataApi.addAreaToCity(cityId, areaName, lat, lng),
@@ -129,8 +165,12 @@ export const useMasterData = () => {
     activityPaces: activityPacesQuery.data || [],
     sessionDurations: sessionDurationsQuery.data || [],
     notificationCategories: notificationCategoriesQuery.data || [],
+    reviewTags: reviewTagsQuery.data || [],
+    disputeReasons: disputeReasonsQuery.data || [],
+    cancellationReasons: cancellationReasonsQuery.data || [],
+    kycDocumentTypes: kycDocumentTypesQuery.data || [],
     defaults: defaultsQuery.data,
-    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading || ticketCategoriesQuery.isLoading || incidentTypesQuery.isLoading || communicationStylesQuery.isLoading || activityPacesQuery.isLoading || sessionDurationsQuery.isLoading || notificationCategoriesQuery.isLoading,
+    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading || ticketCategoriesQuery.isLoading || incidentTypesQuery.isLoading || communicationStylesQuery.isLoading || activityPacesQuery.isLoading || sessionDurationsQuery.isLoading || notificationCategoriesQuery.isLoading || reviewTagsQuery.isLoading || disputeReasonsQuery.isLoading || cancellationReasonsQuery.isLoading || kycDocumentTypesQuery.isLoading,
     
     toggleCity: toggleCityMutation.mutate,
     toggleInterest: toggleInterestMutation.mutate,
@@ -142,6 +182,10 @@ export const useMasterData = () => {
     toggleActivityPace: toggleActivityPaceMutation.mutate,
     toggleSessionDuration: toggleSessionDurationMutation.mutate,
     toggleNotificationCategory: toggleNotificationCategoryMutation.mutate,
+    toggleReviewTag: toggleReviewTagMutation.mutate,
+    toggleDisputeReason: toggleDisputeReasonMutation.mutate,
+    toggleCancellationReason: toggleCancellationReasonMutation.mutate,
+    toggleKYCDocumentType: toggleKYCDocumentTypeMutation.mutate,
     
     addCity: addCityMutation.mutate,
     addInterest: addInterestMutation.mutate,
@@ -153,6 +197,10 @@ export const useMasterData = () => {
     addActivityPace: addActivityPaceMutation.mutate,
     addSessionDuration: addSessionDurationMutation.mutate,
     addNotificationCategory: addNotificationCategoryMutation.mutate,
+    addReviewTag: addReviewTagMutation.mutate,
+    addDisputeReason: addDisputeReasonMutation.mutate,
+    addCancellationReason: addCancellationReasonMutation.mutate,
+    addKYCDocumentType: addKYCDocumentTypeMutation.mutate,
 
     addAreaToCity: addAreaToCityMutation.mutate,
     toggleArea: toggleAreaMutation.mutate,

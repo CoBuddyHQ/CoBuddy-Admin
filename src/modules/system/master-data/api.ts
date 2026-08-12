@@ -1,4 +1,4 @@
-import { City, Interest, Language, AppLanguage, SystemDefaults, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption } from './types';
+import { City, Interest, Language, AppLanguage, SystemDefaults, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption, ReviewTagOption, DisputeReason, CancellationReason, KYCDocumentType } from './types';
 
 // Note: Mobile apps should use systemConfig.serviceHours (from system/config/api.ts) to determine 
 // the allowed time-range for bookings and availability. If a city has a serviceHoursOverride, 
@@ -53,14 +53,29 @@ const interests: Interest[] = [
 ];
 
 const languages: Language[] = [
-  { id: 'LANG-1', code: 'EN', name: 'English', active: true },
-  { id: 'LANG-2', code: 'HI', name: 'Hindi', active: true },
-  { id: 'LANG-3', code: 'MR', name: 'Marathi', active: true },
+  { id: 'LANG-1', code: 'HI', name: 'Hindi', active: true },
+  { id: 'LANG-2', code: 'EN', name: 'English', active: true },
+  { id: 'LANG-3', code: 'HING', name: 'Hinglish', active: true },
+  { id: 'LANG-4', code: 'BN', name: 'Bengali', active: true },
+  { id: 'LANG-5', code: 'MR', name: 'Marathi', active: true },
+  { id: 'LANG-6', code: 'TE', name: 'Telugu', active: true },
+  { id: 'LANG-7', code: 'TA', name: 'Tamil', active: true },
+  { id: 'LANG-8', code: 'GU', name: 'Gujarati', active: true },
+  { id: 'LANG-9', code: 'UR', name: 'Urdu', active: true },
+  { id: 'LANG-10', code: 'KN', name: 'Kannada', active: true },
+  { id: 'LANG-11', code: 'OR', name: 'Odia', active: true },
+  { id: 'LANG-12', code: 'ML', name: 'Malayalam', active: true },
+  { id: 'LANG-13', code: 'PA', name: 'Punjabi', active: true },
+  { id: 'LANG-14', code: 'FR', name: 'French', active: true },
+  { id: 'LANG-15', code: 'ES', name: 'Spanish', active: true },
 ];
 
 const appLanguages: AppLanguage[] = [
   { id: 'ALANG-1', code: 'en', name: 'English', active: true },
   { id: 'ALANG-2', code: 'hi', name: 'Hindi', active: true },
+  { id: 'ALANG-3', code: 'mr', name: 'Marathi', active: true },
+  { id: 'ALANG-4', code: 'gu', name: 'Gujarati', active: true },
+  { id: 'ALANG-5', code: 'bn', name: 'Bengali', active: true },
 ];
 
 const ticketCategories: TicketCategory[] = [
@@ -113,6 +128,33 @@ const notificationCategories: NotificationCategoryOption[] = [
   { id: 'NC-8', code: 'system', label: { en: 'System', hi: 'प्रणाली' }, active: true }
 ];
 
+const reviewTags: ReviewTagOption[] = [
+  { id: 'RT-1', code: 'friendly', label: { en: 'Friendly & Polite', hi: 'विनम्र' }, polarity: 'PRAISE', appliesTo: 'BOTH', active: true },
+  { id: 'RT-2', code: 'punctual', label: { en: 'On Time', hi: 'समय पर' }, polarity: 'PRAISE', appliesTo: 'BOTH', active: true },
+  { id: 'RT-3', code: 'late', label: { en: 'Arrived Late', hi: 'देर से आए' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true },
+  { id: 'RT-4', code: 'inappropriate', label: { en: 'Inappropriate Behavior', hi: 'अनुचित व्यवहार' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true }
+];
+
+const disputeReasons: DisputeReason[] = [
+  { id: 'DR-1', code: 'no_show', label: { en: 'Companion did not show up', hi: 'साथी नहीं आया' }, active: true },
+  { id: 'DR-2', code: 'early_end', label: { en: 'Session ended much earlier', hi: 'सत्र बहुत पहले समाप्त हो गया' }, active: true },
+  { id: 'DR-3', code: 'behavior', label: { en: 'Unprofessional behavior', hi: 'अव्यावसायिक व्यवहार' }, active: true }
+];
+
+const cancellationReasons: CancellationReason[] = [
+  { id: 'CR-1', code: 'change_plans', label: { en: 'Plans changed', hi: 'योजनाएँ बदल गईं' }, appliesTo: 'CUSTOMER_CANCEL', active: true },
+  { id: 'CR-2', code: 'emergency', label: { en: 'Personal emergency', hi: 'व्यक्तिगत आपातकाल' }, appliesTo: 'ANY', active: true },
+  { id: 'CR-3', code: 'unreachable', label: { en: 'Could not reach other party', hi: 'संपर्क नहीं हो सका' }, appliesTo: 'ANY', active: true },
+  { id: 'CR-4', code: 'uncomfortable', label: { en: 'Felt uncomfortable', hi: 'असहज महसूस किया' }, appliesTo: 'COMPANION_EARLY_END', active: true }
+];
+
+const kycDocumentTypes: KYCDocumentType[] = [
+  { id: 'KYC-1', code: 'AADHAAR', label: { en: 'Aadhaar Card', hi: 'आधार कार्ड' }, active: true },
+  { id: 'KYC-2', code: 'PAN', label: { en: 'PAN Card', hi: 'पैन कार्ड' }, active: true },
+  { id: 'KYC-3', code: 'PASSPORT', label: { en: 'Passport', hi: 'पासपोर्ट' }, active: true },
+  { id: 'KYC-4', code: 'DRIVING_LICENSE', label: { en: 'Driving License', hi: 'ड्राइविंग लाइसेंस' }, active: true }
+];
+
 let mockDefaults: SystemDefaults = {
   defaultCurrency: 'INR',
   defaultLanguage: 'en',
@@ -129,6 +171,10 @@ export const masterDataApi = {
   getActivityPaces: async (): Promise<ActivityPaceOption[]> => Promise.resolve([...activityPaces]),
   getSessionDurations: async (): Promise<SessionDurationOption[]> => Promise.resolve([...sessionDurations]),
   getNotificationCategories: async (): Promise<NotificationCategoryOption[]> => Promise.resolve([...notificationCategories]),
+  getReviewTags: async (): Promise<ReviewTagOption[]> => Promise.resolve([...reviewTags]),
+  getDisputeReasons: async (): Promise<DisputeReason[]> => Promise.resolve([...disputeReasons]),
+  getCancellationReasons: async (): Promise<CancellationReason[]> => Promise.resolve([...cancellationReasons]),
+  getKYCDocumentTypes: async (): Promise<KYCDocumentType[]> => Promise.resolve([...kycDocumentTypes]),
 
   toggleCity: async (id: string): Promise<void> => {
     const item = cities.find(i => i.id === id);
@@ -180,6 +226,26 @@ export const masterDataApi = {
     if (item) item.active = !item.active;
     return Promise.resolve();
   },
+  toggleReviewTag: async (id: string): Promise<void> => {
+    const item = reviewTags.find(i => i.id === id);
+    if (item) item.active = !item.active;
+    return Promise.resolve();
+  },
+  toggleDisputeReason: async (id: string): Promise<void> => {
+    const item = disputeReasons.find(i => i.id === id);
+    if (item) item.active = !item.active;
+    return Promise.resolve();
+  },
+  toggleCancellationReason: async (id: string): Promise<void> => {
+    const item = cancellationReasons.find(i => i.id === id);
+    if (item) item.active = !item.active;
+    return Promise.resolve();
+  },
+  toggleKYCDocumentType: async (id: string): Promise<void> => {
+    const item = kycDocumentTypes.find(i => i.id === id);
+    if (item) item.active = !item.active;
+    return Promise.resolve();
+  },
   updateInterestMultiplier: async (id: string, multiplier: number): Promise<void> => {
     const item = interests.find(i => i.id === id);
     if (item) item.basePriceMultiplier = multiplier;
@@ -225,6 +291,22 @@ export const masterDataApi = {
   },
   addNotificationCategory: async (data: Omit<NotificationCategoryOption, 'id'>): Promise<void> => {
     notificationCategories.push({ id: `NC-${Date.now()}`, ...data });
+    return Promise.resolve();
+  },
+  addReviewTag: async (data: Omit<ReviewTagOption, 'id'>): Promise<void> => {
+    reviewTags.push({ id: `RT-${Date.now()}`, ...data });
+    return Promise.resolve();
+  },
+  addDisputeReason: async (data: Omit<DisputeReason, 'id'>): Promise<void> => {
+    disputeReasons.push({ id: `DR-${Date.now()}`, ...data });
+    return Promise.resolve();
+  },
+  addCancellationReason: async (data: Omit<CancellationReason, 'id'>): Promise<void> => {
+    cancellationReasons.push({ id: `CR-${Date.now()}`, ...data });
+    return Promise.resolve();
+  },
+  addKYCDocumentType: async (data: Omit<KYCDocumentType, 'id'>): Promise<void> => {
+    kycDocumentTypes.push({ id: `KYC-${Date.now()}`, ...data });
     return Promise.resolve();
   },
 

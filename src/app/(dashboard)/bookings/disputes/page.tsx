@@ -13,13 +13,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
+
 export default function BookingDisputesPage() {
-  const { disputes, isLoading, updateStatus, overridePenalty } = useDisputes();
+  const { disputes, isLoading: disputesLoading, updateStatus, overridePenalty } = useDisputes();
+  const { disputeReasons, isLoading: masterDataLoading } = useMasterData();
   const [overrideId, setOverrideId] = useState<string | null>(null);
   const [penalty, setPenalty] = useState('');
   const [reason, setReason] = useState('');
 
-  if (isLoading) return <div className="p-6">Loading disputes...</div>;
+  if (disputesLoading || masterDataLoading) return <div className="p-6">Loading disputes...</div>;
 
   const handleOverride = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +33,11 @@ export default function BookingDisputesPage() {
       setPenalty('');
       setReason('');
     }
+  };
+
+  const getReasonLabel = (code: string) => {
+    const r = disputeReasons.find(x => x.code === code);
+    return r ? getLocalizedText(r.label, 'en') : code;
   };
 
   return (
@@ -68,8 +77,9 @@ export default function BookingDisputesPage() {
                       {dispute.raisedBy}
                     </Badge>
                   </TableCell>
-                  <TableCell className="max-w-xs truncate" title={dispute.reason}>
-                    {dispute.reason}
+                  <TableCell className="max-w-xs truncate" title={dispute.reasonDetails}>
+                    <div className="font-medium text-sm">{getReasonLabel(dispute.reasonCode)}</div>
+                    {dispute.reasonDetails && <div className="text-xs text-muted-foreground truncate">{dispute.reasonDetails}</div>}
                   </TableCell>
                   <TableCell>{dispute.noticeGivenHours}h</TableCell>
                   <TableCell>{dispute.calculatedPenaltyPercent}%</TableCell>

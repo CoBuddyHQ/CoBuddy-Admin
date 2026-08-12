@@ -122,6 +122,7 @@ export default function PolicyDocsPage() {
                             <SelectItem value="TERMS_OF_SERVICE">Terms of Service</SelectItem>
                             <SelectItem value="PRIVACY_POLICY">Privacy Policy</SelectItem>
                             <SelectItem value="COMMUNITY_GUIDELINES">Community Guidelines</SelectItem>
+                            <SelectItem value="REFUND_POLICY">Refund Policy</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

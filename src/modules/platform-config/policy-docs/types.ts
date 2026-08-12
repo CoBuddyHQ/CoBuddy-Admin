@@ -2,7 +2,7 @@ export interface PolicyDocument {
   id: string;
   title: Record<string, string>;
   content?: Record<string, string>;
-  type: 'TERMS_OF_SERVICE' | 'PRIVACY_POLICY' | 'COMMUNITY_GUIDELINES';
+  type: 'TERMS_OF_SERVICE' | 'PRIVACY_POLICY' | 'COMMUNITY_GUIDELINES' | 'REFUND_POLICY';
   version: string;
   publishStatus: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   lastUpdated: string;

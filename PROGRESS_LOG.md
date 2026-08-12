@@ -221,5 +221,13 @@ pm run build and confirmed a successful production build with 0 errors. Pushing 
 
 - **Item 1:** Added serviceHours config to global System Config. Wired UI to manage it. Mobile app contract documented.
 - **Item 2:** Added serviceHoursOverride to City type. Implemented UI toggle and input fields in the Master Data list to define custom hours per city, resolving fallback to systemConfig.serviceHours.
-- **Item 3:** The mobile app data contract logic is successfully established and documented in pi.ts (both config and master-data) to guide companion/customer integration.
+- **Item 3:** The mobile app data contract logic is successfully established and documented in  pi.ts (both config and master-data) to guide companion/customer integration.
 - **Item 4:** Ran 	sc --noEmit and eslint src post-implementation and confirmed zero real errors.
+
+## Round 21 Corrective Pass
+
+- **Item 1:** Fixed TS typing error in `MasterDataModals.tsx` `onValueChange` bindings for Radix Select components.
+- **Item 2:** Updated `bookings/disputes` UI to read dispute reasons from the new `DisputeReason` list in Master Data.
+- **Item 3:** Updated `operations/cancelled-bookings` UI to read cancellation reasons from the new `CancellationReason` list in Master Data.
+- **Item 4:** Updated `VerificationCase` types, mock data, and UI (`CaseDetailPanel`) to read `KYCDocumentType` from the Master Data list.
+- **Item 5:** Ran `npx tsc --noEmit` and `npx eslint src` which resulted in 0 errors. Verified all UI integrations successfully.

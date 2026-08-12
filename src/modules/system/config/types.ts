@@ -26,9 +26,17 @@ export interface ServiceHoursConfig {
   closeTime: string;
 }
 
+export interface SafetyConfig {
+  sosHoldToTriggerSeconds: number;
+}
+
 export interface SystemConfig {
   commission: CommissionConfig;
   pricing: PricingConfig;
   safetyBonusRule: SafetyBonusRuleConfig;
   serviceHours: ServiceHoursConfig;
+  safety: SafetyConfig;
+  customerInterestSelectionLimits: { min: number; max: number };
+  companionCategorySelectionLimits: { min: number; max: number };
+  companionServiceAreaLimits: { min: number; max: number };
 }

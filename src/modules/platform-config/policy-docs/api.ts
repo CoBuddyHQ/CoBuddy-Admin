@@ -30,6 +30,16 @@ let mockPolicies: PolicyDocument[] = [
     publishStatus: 'DRAFT',
     lastUpdated: '2023-10-25',
     consentCount: 0
+  },
+  {
+    id: 'POL-004',
+    title: { en: 'Refund Policy', hi: 'धनवापसी नीति' },
+    content: { en: 'Refund Policy content...', hi: 'धनवापसी नीति सामग्री...' },
+    type: 'REFUND_POLICY',
+    version: 'v1.0',
+    publishStatus: 'PUBLISHED',
+    lastUpdated: '2023-11-01',
+    consentCount: 1540
   }
 ];
 

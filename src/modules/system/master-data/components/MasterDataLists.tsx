@@ -450,3 +450,105 @@ export function SessionDurationList({ data, appLanguages, onToggle, onEditTransl
     </Table>
   );
 }
+
+interface ReviewTagListProps { 
+  data: any[]; 
+  appLanguages: AppLanguage[];
+  onToggle: (id: string) => void; 
+  onEditTranslations: (item: any) => void;
+}
+
+export function ReviewTagList({ data, appLanguages, onToggle, onEditTranslations }: ReviewTagListProps) {
+  if (!data.length) return <EmptyState title="No items configured" />;
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Code</TableHeaderCell>
+          <TableHeaderCell>Name</TableHeaderCell>
+          <TableHeaderCell>Polarity</TableHeaderCell>
+          <TableHeaderCell>Applies To</TableHeaderCell>
+          <TableHeaderCell>Status</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map(item => {
+          const missing = getMissingLanguages(item.label, appLanguages);
+          return (
+            <TableRow key={item.id}>
+              <TableCell className="font-mono text-xs">{item.code}</TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  <span>{getLocalizedText(item.label, 'en')}</span>
+                  {missing.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                      <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => onEditTranslations(item)}>Edit Translations</Button>
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant={item.polarity === 'PRAISE' ? 'default' : 'destructive'}>{item.polarity}</Badge>
+              </TableCell>
+              <TableCell>{item.appliesTo.replace(/_/g, ' ')}</TableCell>
+              <TableCell>
+                <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
+  );
+}
+
+interface CancellationReasonListProps { 
+  data: any[]; 
+  appLanguages: AppLanguage[];
+  onToggle: (id: string) => void; 
+  onEditTranslations: (item: any) => void;
+}
+
+export function CancellationReasonList({ data, appLanguages, onToggle, onEditTranslations }: CancellationReasonListProps) {
+  if (!data.length) return <EmptyState title="No items configured" />;
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Code</TableHeaderCell>
+          <TableHeaderCell>Name</TableHeaderCell>
+          <TableHeaderCell>Applies To</TableHeaderCell>
+          <TableHeaderCell>Status</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map(item => {
+          const missing = getMissingLanguages(item.label, appLanguages);
+          return (
+            <TableRow key={item.id}>
+              <TableCell className="font-mono text-xs">{item.code}</TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  <span>{getLocalizedText(item.label, 'en')}</span>
+                  {missing.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                      <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => onEditTranslations(item)}>Edit Translations</Button>
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>{item.appliesTo.replace(/_/g, ' ')}</TableCell>
+              <TableCell>
+                <Switch checked={item.active} onCheckedChange={() => onToggle(item.id)} />
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
+  );
+}

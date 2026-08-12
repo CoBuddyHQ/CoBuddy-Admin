@@ -10,6 +10,7 @@ export interface VerificationCase {
   documentValid: boolean;
   status: VerificationStatus;
   submittedAt: string;
+  documentType: string;
   idDocumentUrl: string;
   selfieUrl: string;
   backgroundDeclarationUrl?: string; // Companion only

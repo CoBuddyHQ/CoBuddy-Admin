@@ -33,7 +33,13 @@ export default function SystemConfigPage() {
     serviceHours: {
       openTime: "06:00",
       closeTime: "23:00"
-    }
+    },
+    safety: {
+      sosHoldToTriggerSeconds: 3
+    },
+    customerInterestSelectionLimits: { min: 3, max: 10 },
+    companionCategorySelectionLimits: { min: 1, max: 3 },
+    companionServiceAreaLimits: { min: 1, max: 8 }
   });
 
   const [activityValues, setActivityValues] = useState<Record<string, number | string>>({});
@@ -244,6 +250,101 @@ export default function SystemConfigPage() {
                       setFormData(p => ({ ...p, serviceHours: { ...p.serviceHours, closeTime: newClose } }));
                     }
                   }}
+                />
+              </div>
+            </div>
+          )
+        },
+        {
+          title: "Safety Controls",
+          description: "Manage app safety parameters and thresholds.",
+          children: (
+            <div className="grid grid-cols-2 gap-4 max-w-xl">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">SOS Hold-to-Trigger Duration (seconds)</label>
+                <Input 
+                  type="number" min="1" max="10"
+                  value={formData.safety?.sosHoldToTriggerSeconds || 3}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    safety: { ...p.safety, sosHoldToTriggerSeconds: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+            </div>
+          )
+        },
+        {
+          title: "Selection Limits",
+          description: "Define how many options users can select for interests and service areas.",
+          children: (
+            <div className="grid grid-cols-2 gap-4 max-w-xl">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Customer Interests (Min)</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.customerInterestSelectionLimits?.min || 3}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    customerInterestSelectionLimits: { ...p.customerInterestSelectionLimits, min: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Customer Interests (Max)</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.customerInterestSelectionLimits?.max || 10}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    customerInterestSelectionLimits: { ...p.customerInterestSelectionLimits, max: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Companion Categories (Min)</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.companionCategorySelectionLimits?.min || 1}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    companionCategorySelectionLimits: { ...p.companionCategorySelectionLimits, min: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Companion Categories (Max)</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.companionCategorySelectionLimits?.max || 3}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    companionCategorySelectionLimits: { ...p.companionCategorySelectionLimits, max: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Companion Service Areas (Min)</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.companionServiceAreaLimits?.min || 1}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    companionServiceAreaLimits: { ...p.companionServiceAreaLimits, min: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Companion Service Areas (Max)</label>
+                <Input 
+                  type="number" min="1"
+                  value={formData.companionServiceAreaLimits?.max || 8}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    companionServiceAreaLimits: { ...p.companionServiceAreaLimits, max: Number(e.target.value) } 
+                  }))}
                 />
               </div>
             </div>

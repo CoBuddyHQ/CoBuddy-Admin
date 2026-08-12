@@ -3,19 +3,19 @@
 import { useState, useEffect } from 'react';
 import { MasterListEditorTemplate } from '@/components/templates/MasterListEditorTemplate';
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
-import { CityList, InterestList, LanguageList, AppLanguageList, GenericCodeLabelList, SessionDurationList } from '@/modules/system/master-data/components/MasterDataLists';
-import { AddCityModal, AddInterestModal, AddLanguageModal, AddAppLanguageModal, GenericCodeLabelModal, AddSessionDurationModal } from '@/modules/system/master-data/components/MasterDataModals';
+import { CityList, InterestList, LanguageList, AppLanguageList, GenericCodeLabelList, SessionDurationList, ReviewTagList, CancellationReasonList } from '@/modules/system/master-data/components/MasterDataLists';
+import { AddCityModal, AddInterestModal, AddLanguageModal, AddAppLanguageModal, GenericCodeLabelModal, AddSessionDurationModal, AddReviewTagModal, AddCancellationReasonModal } from '@/modules/system/master-data/components/MasterDataModals';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { City, Interest, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption } from '@/modules/system/master-data/types';
+import { City, Interest, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption, ReviewTagOption, DisputeReason, CancellationReason, KYCDocumentType } from '@/modules/system/master-data/types';
 
 export default function MasterDataPage() {
   const { 
     cities, interests, languages, appLanguages, isLoading, defaults, isUpdatingDefaults,
-    ticketCategories, incidentTypes, communicationStyles, activityPaces, sessionDurations, notificationCategories,
+    ticketCategories, incidentTypes, communicationStyles, activityPaces, sessionDurations, notificationCategories, reviewTags, disputeReasons, cancellationReasons, kycDocumentTypes,
     toggleCity, toggleInterest, toggleLanguage, toggleAppLanguage,
-    toggleTicketCategory, toggleIncidentType, toggleCommunicationStyle, toggleActivityPace, toggleSessionDuration, toggleNotificationCategory,
+    toggleTicketCategory, toggleIncidentType, toggleCommunicationStyle, toggleActivityPace, toggleSessionDuration, toggleNotificationCategory, toggleReviewTag, toggleDisputeReason, toggleCancellationReason, toggleKYCDocumentType,
     addCity, addInterest, addLanguage, addAppLanguage, 
-    addTicketCategory, addIncidentType, addCommunicationStyle, addActivityPace, addSessionDuration, addNotificationCategory,
+    addTicketCategory, addIncidentType, addCommunicationStyle, addActivityPace, addSessionDuration, addNotificationCategory, addReviewTag, addDisputeReason, addCancellationReason, addKYCDocumentType,
     addAreaToCity, toggleArea,
     updateCityServiceHours,
     updateDefaults
@@ -33,6 +33,10 @@ export default function MasterDataPage() {
   const [isActivityPaceModalOpen, setIsActivityPaceModalOpen] = useState(false);
   const [isSessionDurationModalOpen, setIsSessionDurationModalOpen] = useState(false);
   const [isNotificationCategoryModalOpen, setIsNotificationCategoryModalOpen] = useState(false);
+  const [isReviewTagModalOpen, setIsReviewTagModalOpen] = useState(false);
+  const [isDisputeReasonModalOpen, setIsDisputeReasonModalOpen] = useState(false);
+  const [isCancellationReasonModalOpen, setIsCancellationReasonModalOpen] = useState(false);
+  const [isKYCDocumentTypeModalOpen, setIsKYCDocumentTypeModalOpen] = useState(false);
 
   const [editCity, setEditCity] = useState<City | undefined>();
   const [editInterest, setEditInterest] = useState<Interest | undefined>();
@@ -42,6 +46,10 @@ export default function MasterDataPage() {
   const [editActivityPace, setEditActivityPace] = useState<ActivityPaceOption | undefined>();
   const [editSessionDuration, setEditSessionDuration] = useState<SessionDurationOption | undefined>();
   const [editNotificationCategory, setEditNotificationCategory] = useState<NotificationCategoryOption | undefined>();
+  const [editReviewTag, setEditReviewTag] = useState<ReviewTagOption | undefined>();
+  const [editDisputeReason, setEditDisputeReason] = useState<DisputeReason | undefined>();
+  const [editCancellationReason, setEditCancellationReason] = useState<CancellationReason | undefined>();
+  const [editKYCDocumentType, setEditKYCDocumentType] = useState<KYCDocumentType | undefined>();
 
   const [formData, setFormData] = useState<any>(null);
 
@@ -69,6 +77,10 @@ export default function MasterDataPage() {
     else if (activeTab === 'activity-paces') { setEditActivityPace(undefined); setIsActivityPaceModalOpen(true); }
     else if (activeTab === 'session-durations') { setEditSessionDuration(undefined); setIsSessionDurationModalOpen(true); }
     else if (activeTab === 'notification-categories') { setEditNotificationCategory(undefined); setIsNotificationCategoryModalOpen(true); }
+    else if (activeTab === 'review-tags') { setEditReviewTag(undefined); setIsReviewTagModalOpen(true); }
+    else if (activeTab === 'dispute-reasons') { setEditDisputeReason(undefined); setIsDisputeReasonModalOpen(true); }
+    else if (activeTab === 'cancellation-reasons') { setEditCancellationReason(undefined); setIsCancellationReasonModalOpen(true); }
+    else if (activeTab === 'kyc-document-types') { setEditKYCDocumentType(undefined); setIsKYCDocumentTypeModalOpen(true); }
   };
 
   const handleEditCity = (city: City) => {
@@ -109,6 +121,26 @@ export default function MasterDataPage() {
   const handleEditNotificationCategory = (item: NotificationCategoryOption) => {
     setEditNotificationCategory(item);
     setIsNotificationCategoryModalOpen(true);
+  };
+
+  const handleEditReviewTag = (item: ReviewTagOption) => {
+    setEditReviewTag(item);
+    setIsReviewTagModalOpen(true);
+  };
+
+  const handleEditDisputeReason = (item: DisputeReason) => {
+    setEditDisputeReason(item);
+    setIsDisputeReasonModalOpen(true);
+  };
+
+  const handleEditCancellationReason = (item: CancellationReason) => {
+    setEditCancellationReason(item);
+    setIsCancellationReasonModalOpen(true);
+  };
+
+  const handleEditKYCDocumentType = (item: KYCDocumentType) => {
+    setEditKYCDocumentType(item);
+    setIsKYCDocumentTypeModalOpen(true);
   };
 
   return (
@@ -170,6 +202,26 @@ export default function MasterDataPage() {
             id: 'notification-categories',
             label: 'Notification Categories',
             content: <GenericCodeLabelList data={notificationCategories} appLanguages={appLanguages} onToggle={toggleNotificationCategory} onEditTranslations={handleEditNotificationCategory} codeLabel="Code" />
+          },
+          {
+            id: 'review-tags',
+            label: 'Review Tags',
+            content: <ReviewTagList data={reviewTags} appLanguages={appLanguages} onToggle={toggleReviewTag} onEditTranslations={handleEditReviewTag} />
+          },
+          {
+            id: 'dispute-reasons',
+            label: 'Dispute Reasons',
+            content: <GenericCodeLabelList data={disputeReasons} appLanguages={appLanguages} onToggle={toggleDisputeReason} onEditTranslations={handleEditDisputeReason} codeLabel="Code" />
+          },
+          {
+            id: 'cancellation-reasons',
+            label: 'Cancellation Reasons',
+            content: <CancellationReasonList data={cancellationReasons} appLanguages={appLanguages} onToggle={toggleCancellationReason} onEditTranslations={handleEditCancellationReason} />
+          },
+          {
+            id: 'kyc-document-types',
+            label: 'KYC Document Types',
+            content: <GenericCodeLabelList data={kycDocumentTypes} appLanguages={appLanguages} onToggle={toggleKYCDocumentType} onEditTranslations={handleEditKYCDocumentType} codeLabel="Code" />
           },
           {
             id: 'defaults',
@@ -295,6 +347,36 @@ export default function MasterDataPage() {
         appLanguages={appLanguages}
         initialData={editNotificationCategory}
         title="Notification Category"
+      />
+      <AddReviewTagModal
+        open={isReviewTagModalOpen}
+        onOpenChange={setIsReviewTagModalOpen}
+        onSubmit={addReviewTag}
+        appLanguages={appLanguages}
+        initialData={editReviewTag}
+      />
+      <GenericCodeLabelModal
+        open={isDisputeReasonModalOpen}
+        onOpenChange={setIsDisputeReasonModalOpen}
+        onSubmit={addDisputeReason}
+        appLanguages={appLanguages}
+        initialData={editDisputeReason}
+        title="Dispute Reason"
+      />
+      <AddCancellationReasonModal
+        open={isCancellationReasonModalOpen}
+        onOpenChange={setIsCancellationReasonModalOpen}
+        onSubmit={addCancellationReason}
+        appLanguages={appLanguages}
+        initialData={editCancellationReason}
+      />
+      <GenericCodeLabelModal
+        open={isKYCDocumentTypeModalOpen}
+        onOpenChange={setIsKYCDocumentTypeModalOpen}
+        onSubmit={addKYCDocumentType}
+        appLanguages={appLanguages}
+        initialData={editKYCDocumentType}
+        title="KYC Document Type"
       />
     </>
   );

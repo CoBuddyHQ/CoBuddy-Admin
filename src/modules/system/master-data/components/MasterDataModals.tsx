@@ -286,3 +286,134 @@ export function AddSessionDurationModal({ open, onOpenChange, onSubmit, appLangu
     </Dialog>
   );
 }
+
+export function AddReviewTagModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [code, setCode] = useState('');
+  const [polarity, setPolarity] = useState('PRAISE');
+  const [appliesTo, setAppliesTo] = useState('BOTH');
+
+  useEffect(() => {
+    if (open) {
+      setNames(initialData?.label || {});
+      setCode(initialData?.code || '');
+      setPolarity(initialData?.polarity || 'PRAISE');
+      setAppliesTo(initialData?.appliesTo || 'BOTH');
+    }
+  }, [open, initialData]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (names['en'] && code) {
+      if (initialData) {
+        onSubmit({ ...initialData, label: names, code, polarity, appliesTo });
+      } else {
+        onSubmit({ label: names, code, polarity, appliesTo, active: true });
+      }
+      onOpenChange(false);
+    }
+  };
+
+  const activeLangs = appLanguages.filter(l => l.active);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{initialData ? 'Edit Review Tag' : 'Add New Review Tag'}</DialogTitle></DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Names</h4>
+            {activeLangs.map(lang => (
+              <Input 
+                key={lang.code}
+                placeholder={`Name (${lang.name})`} 
+                value={names[lang.code] || ''} 
+                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
+                required={lang.code === 'en'} 
+              />
+            ))}
+          </div>
+          <Input placeholder="Code (e.g. friendly)" value={code} onChange={e => setCode(e.target.value)} required />
+          <Select value={polarity} onValueChange={(val) => setPolarity(val as string)}>
+            <SelectTrigger><SelectValue placeholder="Polarity" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="PRAISE">Praise</SelectItem>
+              <SelectItem value="CONCERN">Concern</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={appliesTo} onValueChange={(val) => setAppliesTo(val as string)}>
+            <SelectTrigger><SelectValue placeholder="Applies To" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="CUSTOMER_RATING_COMPANION">Customer Rating Companion</SelectItem>
+              <SelectItem value="COMPANION_RATING_CUSTOMER">Companion Rating Customer</SelectItem>
+              <SelectItem value="BOTH">Both</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Review Tag'}</Button></div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function AddCancellationReasonModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [code, setCode] = useState('');
+  const [appliesTo, setAppliesTo] = useState('ANY');
+
+  useEffect(() => {
+    if (open) {
+      setNames(initialData?.label || {});
+      setCode(initialData?.code || '');
+      setAppliesTo(initialData?.appliesTo || 'ANY');
+    }
+  }, [open, initialData]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (names['en'] && code) {
+      if (initialData) {
+        onSubmit({ ...initialData, label: names, code, appliesTo });
+      } else {
+        onSubmit({ label: names, code, appliesTo, active: true });
+      }
+      onOpenChange(false);
+    }
+  };
+
+  const activeLangs = appLanguages.filter(l => l.active);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{initialData ? 'Edit Cancellation Reason' : 'Add New Cancellation Reason'}</DialogTitle></DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Names</h4>
+            {activeLangs.map(lang => (
+              <Input 
+                key={lang.code}
+                placeholder={`Name (${lang.name})`} 
+                value={names[lang.code] || ''} 
+                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
+                required={lang.code === 'en'} 
+              />
+            ))}
+          </div>
+          <Input placeholder="Code (e.g. emergency)" value={code} onChange={e => setCode(e.target.value)} required />
+          <Select value={appliesTo} onValueChange={(val) => setAppliesTo(val as string)}>
+            <SelectTrigger><SelectValue placeholder="Applies To" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="CUSTOMER_CANCEL">Customer Cancel</SelectItem>
+              <SelectItem value="COMPANION_REJECT">Companion Reject</SelectItem>
+              <SelectItem value="COMPANION_CANCEL">Companion Cancel</SelectItem>
+              <SelectItem value="COMPANION_EARLY_END">Companion Early End</SelectItem>
+              <SelectItem value="ANY">Any</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Cancellation Reason'}</Button></div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

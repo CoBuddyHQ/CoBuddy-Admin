@@ -12,6 +12,7 @@ const mockCases: VerificationCase[] = [
     documentValid: true,
     status: 'PENDING_MANUAL_REVIEW',
     submittedAt: new Date().toISOString(),
+    documentType: 'national_id',
     idDocumentUrl: 'https://placehold.co/400x300?text=ID+Document',
     selfieUrl: 'https://placehold.co/300x400?text=Selfie',
     backgroundDeclarationUrl: 'https://example.com/declaration.pdf',
@@ -33,6 +34,7 @@ const mockCases: VerificationCase[] = [
     documentValid: true,
     status: 'AUTO_APPROVED',
     submittedAt: new Date(Date.now() - 3 * 3600000).toISOString(),
+    documentType: 'driving_license',
     idDocumentUrl: 'https://placehold.co/400x300?text=ID+Document',
     selfieUrl: 'https://placehold.co/300x400?text=Selfie',
     auditTrail: [

@@ -8,7 +8,7 @@ export const useAgeEscalation = () => {
   const query = useQuery({ queryKey: ['age-escalation'], queryFn: ageEscalationApi.getCases });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: any }) => ageEscalationApi.updateStatus(id, status),
+    mutationFn: ({ id, status, resolutionNote }: { id: string, status: any, resolutionNote?: string }) => ageEscalationApi.updateStatus(id, status, resolutionNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['age-escalation'] });
       toast.success('Case status updated successfully');

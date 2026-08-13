@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChevronDown, AlertOctagon } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -17,6 +20,16 @@ import {
 
 export default function AgeEscalationPage() {
   const { cases, isLoading, updateStatus } = useAgeEscalation();
+  const [resolutionCase, setResolutionCase] = useState<{ id: string, status: 'RESOLVED_CLEARED' | 'RESOLVED_BANNED' } | null>(null);
+  const [resolutionNote, setResolutionNote] = useState('');
+
+  const submitResolution = () => {
+    if (resolutionCase && resolutionNote.trim()) {
+      updateStatus({ id: resolutionCase.id, status: resolutionCase.status, resolutionNote });
+      setResolutionCase(null);
+      setResolutionNote('');
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 h-full flex flex-col">
@@ -42,6 +55,7 @@ export default function AgeEscalationPage() {
                 <TableHeaderCell>ID Age</TableHeaderCell>
                 <TableHeaderCell>Selfie Age</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
+                <TableHeaderCell>Resolution Note</TableHeaderCell>
                 <TableHeaderCell>Action</TableHeaderCell>
               </TableRow>
             </TableHead>
@@ -68,14 +82,19 @@ export default function AgeEscalationPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
+                    <div className="max-w-xs whitespace-normal text-sm text-muted-foreground">
+                      {c.resolutionNote || '-'}
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 px-3">
                         Update <ChevronDown className="ml-2 h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         {c.status === 'PENDING_REVIEW' && <DropdownMenuItem onClick={() => updateStatus({ id: c.id, status: 'FROZEN' })}>Freeze Account</DropdownMenuItem>}
-                        <DropdownMenuItem onClick={() => updateStatus({ id: c.id, status: 'RESOLVED_CLEARED' })} className="text-green-600 font-medium">Clear User</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateStatus({ id: c.id, status: 'RESOLVED_BANNED' })} className="text-destructive font-medium">Ban User (Underage)</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => { setResolutionCase({ id: c.id, status: 'RESOLVED_CLEARED' }); setResolutionNote(''); }} className="text-green-600 font-medium">Clear User</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => { setResolutionCase({ id: c.id, status: 'RESOLVED_BANNED' }); setResolutionNote(''); }} className="text-destructive font-medium">Ban User (Underage)</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -85,6 +104,31 @@ export default function AgeEscalationPage() {
           </Table>
         )}
       </div>
+
+      <Dialog open={!!resolutionCase} onOpenChange={(open) => !open && setResolutionCase(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Provide Resolution Note</DialogTitle>
+            <DialogDescription>
+              A mandatory resolution note is required before this case can be {resolutionCase?.status === 'RESOLVED_CLEARED' ? 'cleared' : 'banned'}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Textarea
+              placeholder="Enter resolution details..."
+              value={resolutionNote}
+              onChange={(e) => setResolutionNote(e.target.value)}
+              required
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setResolutionCase(null)}>Cancel</Button>
+              <Button onClick={submitResolution} disabled={!resolutionNote.trim()}>
+                Confirm Resolution
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { AlertTriangle, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function LiveSessionsPage() {
-  const { sessions, isLoading, flagSession } = useLiveSessions();
+  const { sessions, isLoading, flagSession, conflictingSessionIds } = useLiveSessions();
 
   if (isLoading) return <div className="p-6">Loading live sessions...</div>;
 
@@ -73,7 +73,14 @@ export default function LiveSessionsPage() {
                 </TableRow>
               ) : activeSessions.map((session) => (
                 <TableRow key={session.id} className={cn(session.status === 'SOS_TRIGGERED' && "bg-destructive/10")}>
-                  <TableCell className="font-mono text-xs">{session.id}</TableCell>
+                  <TableCell>
+                    <div className="font-mono text-xs">{session.id}</div>
+                    {conflictingSessionIds.has(session.id) && (
+                      <Badge variant="destructive" className="mt-1 text-[10px]">
+                        OVERLAP CONFLICT
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell>{session.companionName}</TableCell>
                   <TableCell>{session.customerName}</TableCell>
                   <TableCell>

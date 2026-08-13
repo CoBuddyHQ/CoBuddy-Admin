@@ -552,3 +552,50 @@ export function CancellationReasonList({ data, appLanguages, onToggle, onEditTra
     </Table>
   );
 }
+
+interface PlaceTypeListProps { 
+  data: any[]; 
+  appLanguages: AppLanguage[];
+  onToggle: (id: string) => void; 
+  onEditTranslations: (item: any) => void;
+}
+
+export function PlaceTypeList({ data, appLanguages, onToggle, onEditTranslations }: PlaceTypeListProps) {
+  if (!data.length) return <EmptyState title="No items configured" />;
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Type Name</TableHeaderCell>
+          <TableHeaderCell>Display Name</TableHeaderCell>
+          <TableHeaderCell>Status</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map(item => {
+          const missing = getMissingLanguages(item.displayName, appLanguages);
+          return (
+            <TableRow key={item.id}>
+              <TableCell className="font-mono text-xs">{item.typeName}</TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  <span>{getLocalizedText(item.displayName, 'en')}</span>
+                  {missing.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-[10px]">Missing: {missing.join(', ')}</Badge>
+                      <Button variant="link" size="sm" className="h-4 p-0 text-[10px]" onClick={() => onEditTranslations(item)}>Edit Translations</Button>
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Switch checked={item.isAllowed} onCheckedChange={() => onToggle(item.id)} />
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
+  );
+}

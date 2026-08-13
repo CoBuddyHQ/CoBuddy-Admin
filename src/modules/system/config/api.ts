@@ -17,7 +17,7 @@ let currentConfig: SystemConfig = {
     specialEventMultiplierLimit: 2.0,
     cancellationFeePercentage: 10,
     flatServiceFeeAmount: 50,
-    newCitySuggestedRateFallback: 500,
+    newCitySuggestedRateFallback: { min: 500, max: 900 },
   },
   safetyBonusRule: {
     incidentFreeMonths: 1,
@@ -38,6 +38,10 @@ let currentConfig: SystemConfig = {
   },
   wallet: {
     maxWalletBalance: 50000,
+  },
+  walletBalanceLimits: {
+    nonKycMax: 10000,
+    kycVerifiedMax: null
   }
 };
 

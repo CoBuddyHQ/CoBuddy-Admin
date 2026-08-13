@@ -417,3 +417,72 @@ export function AddCancellationReasonModal({ open, onOpenChange, onSubmit, appLa
     </Dialog>
   );
 }
+
+export function AddPlaceTypeModal({ open, onOpenChange, onSubmit, appLanguages, initialData }: any) {
+  const [typeName, setTypeName] = useState('');
+  const [displayName, setDisplayName] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (open) {
+      if (initialData) {
+        setTypeName(initialData.typeName || '');
+        setDisplayName(initialData.displayName || {});
+      } else {
+        setTypeName('');
+        setDisplayName({});
+      }
+    }
+  }, [open, initialData]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!typeName) return;
+    
+    // Ensure all active languages have a value, fallback to 'en' if missing
+    const finalLabel = { ...displayName };
+    const enVal = finalLabel['en'] || typeName;
+    appLanguages.filter((l: any) => l.active).forEach((l: any) => {
+      if (!finalLabel[l.code]) {
+        finalLabel[l.code] = enVal;
+      }
+    });
+
+    if (initialData) {
+      onSubmit({ id: initialData.id, typeName, displayName: finalLabel });
+    } else {
+      onSubmit({ typeName, displayName: finalLabel });
+    }
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{initialData ? 'Edit' : 'Add'} Place Type</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Type Name</label>
+            <Input required value={typeName} onChange={e => setTypeName(e.target.value)} disabled={!!initialData} />
+          </div>
+          <div className="space-y-3 pt-2">
+            <label className="text-sm font-medium border-b pb-1">Display Name Translations</label>
+            {appLanguages.filter((l: any) => l.active).map((lang: any) => (
+              <div key={lang.code} className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">{lang.name} ({lang.code}){lang.code === 'en' && ' *'}</label>
+                <Input 
+                  required={lang.code === 'en'}
+                  value={displayName[lang.code] || ''} 
+                  onChange={e => setDisplayName({...displayName, [lang.code]: e.target.value})} 
+                  placeholder={lang.code !== 'en' ? `Translation in ${lang.name}` : ''}
+                />
+              </div>
+            ))}
+          </div>
+          <Button type="submit" className="w-full">{initialData ? 'Save Changes' : 'Add Place Type'}</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -244,3 +244,14 @@ px tsc --noEmit and
 px eslint src which both exited with 0 errors. Verified all UI integrations successfully.
 
 **Round 22 completed successfully.**
+
+## Round 23 Corrective Pass
+
+- **Item 1:** Added `resolutionNote?: string` to `AgeEscalationCase` in `src/modules/safety/age-escalation/types.ts`. Re-opened `safety/age-escalation`'s files and confirmed the note-requirement is enforced there specifically (not in support/tickets); the resolve action is genuinely blocked without a note. Populated `resolutionNote` in the existing mock records that have a resolved status.
+- **Item 2:** Added REAL Overlapping-Session Conflict Detection to Live Sessions Monitor. Seeded two mock `LiveSession` records (`session-2` and `session-3`) as a conflicting pair with the same `companionId` (`comp-2`) and overlapping times. Confirmed the red "OVERLAP CONFLICT" badge renders for them in the Live Sessions Monitor UI. Configured detection logic to respect the `overlappingSessionConflictDetection` toggle.
+- **Item 3:** Added the missing `walletBalanceLimits: { nonKycMax: number; kycVerifiedMax: number | null }` config field to `SystemConfig`. Seeded it with `{ nonKycMax: 10000, kycVerifiedMax: null }` and added form fields on the `system/config` page.
+- **Item 4:** Fixed `newCitySuggestedRateFallback` to be a range (`{ min: 500, max: 900 }`) instead of a single number in `SystemConfig`, and updated the `system/config` page to include two inputs (min and max).
+- **Item 5:** Added a dedicated "Place Types" tab to `src/app/(dashboard)/system/master-data/page.tsx` using the `tabs` array. Showed the `placeTypes` list with the ability to toggle `isAllowed` and edit the `displayName` translations, reusing the existing `togglePlaceTypeAllowed` mutation.
+- **Item 6 (Re-verify and Report):** Ran `npx tsc --noEmit` and `npx eslint src` which resulted in 0 errors.
+
+**Round 23 completed successfully.**

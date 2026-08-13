@@ -14,7 +14,10 @@ export interface PricingConfig {
   specialEventMultiplierLimit: number;
   cancellationFeePercentage: number;
   flatServiceFeeAmount: number;
-  newCitySuggestedRateFallback: number;
+  newCitySuggestedRateFallback: {
+    min: number;
+    max: number;
+  };
 }
 
 export interface SafetyBonusRuleConfig {
@@ -45,5 +48,9 @@ export interface SystemConfig {
   };
   wallet: {
     maxWalletBalance: number;
+  };
+  walletBalanceLimits: { 
+    nonKycMax: number; 
+    kycVerifiedMax: number | null;
   };
 }

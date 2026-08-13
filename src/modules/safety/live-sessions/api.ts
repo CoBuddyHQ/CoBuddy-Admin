@@ -30,6 +30,21 @@ let mockSessions: LiveSession[] = [
     timerStatus: 'RUNNING_LATE',
     gpsLocation: { lat: 28.5413, lng: 77.1556 },
     checkInStatus: 'NOT_YET'
+  },
+  {
+    id: 'LS-1003',
+    bookingId: 'B-1003',
+    companionId: 'COMP-123',
+    customerId: 'CUST-789',
+    companionName: 'Neha Gupta',
+    customerName: 'Sanjay Kumar',
+    startTime: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
+    expectedEndTime: new Date(Date.now() + 7200000).toISOString(), // 2 hr from now
+    status: 'ONGOING',
+    venue: 'Barista, CP',
+    timerStatus: 'ON_TRACK',
+    gpsLocation: { lat: 28.6300, lng: 77.2170 },
+    checkInStatus: 'CHECKED_IN'
   }
 ];
 

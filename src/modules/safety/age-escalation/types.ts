@@ -8,4 +8,5 @@ export interface AgeEscalationCase {
   associatedRecordLink: string;
   status: 'PENDING_REVIEW' | 'FROZEN' | 'RESOLVED_CLEARED' | 'RESOLVED_BANNED';
   timestamp: string;
+  resolutionNote?: string;
 }

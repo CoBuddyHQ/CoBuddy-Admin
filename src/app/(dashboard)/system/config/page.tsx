@@ -25,7 +25,7 @@ export default function SystemConfigPage() {
       specialEventMultiplierLimit: 2.0,
       cancellationFeePercentage: 10,
       flatServiceFeeAmount: 50,
-      newCitySuggestedRateFallback: 500,
+      newCitySuggestedRateFallback: { min: 500, max: 900 },
     },
     safetyBonusRule: {
       incidentFreeMonths: 1,
@@ -46,6 +46,10 @@ export default function SystemConfigPage() {
     },
     wallet: {
       maxWalletBalance: 50000,
+    },
+    walletBalanceLimits: {
+      nonKycMax: 10000,
+      kycVerifiedMax: null as number | null,
     }
   });
 
@@ -53,14 +57,14 @@ export default function SystemConfigPage() {
 
   useEffect(() => {
     if (config) {
-      setFormData(config);
+      setFormData(config as any);
     }
   }, [config]);
 
   if (isLoading) return <div className="p-6">Loading config...</div>;
 
   const handleSave = () => {
-    saveConfig(formData);
+    saveConfig(formData as any);
   };
 
   return (
@@ -194,13 +198,24 @@ export default function SystemConfigPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">New City Suggested Rate Fallback (₹)</label>
+                <label className="text-sm font-medium">New City Suggested Min (₹)</label>
                 <Input 
                   type="number" min="0"
-                  value={formData.pricing.newCitySuggestedRateFallback}
+                  value={formData.pricing.newCitySuggestedRateFallback.min}
                   onChange={(e) => setFormData(p => ({ 
                     ...p, 
-                    pricing: { ...p.pricing, newCitySuggestedRateFallback: Number(e.target.value) } 
+                    pricing: { ...p.pricing, newCitySuggestedRateFallback: { ...p.pricing.newCitySuggestedRateFallback, min: Number(e.target.value) } } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">New City Suggested Max (₹)</label>
+                <Input 
+                  type="number" min="0"
+                  value={formData.pricing.newCitySuggestedRateFallback.max}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    pricing: { ...p.pricing, newCitySuggestedRateFallback: { ...p.pricing.newCitySuggestedRateFallback, max: Number(e.target.value) } } 
                   }))}
                 />
               </div>
@@ -322,6 +337,32 @@ export default function SystemConfigPage() {
                     wallet: { ...p.wallet, maxWalletBalance: Number(e.target.value) } 
                   }))}
                 />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Non-KYC Wallet Limit (₹)</label>
+                <Input 
+                  type="number" min="0"
+                  value={formData.walletBalanceLimits?.nonKycMax || 10000}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    walletBalanceLimits: { ...p.walletBalanceLimits, nonKycMax: Number(e.target.value), kycVerifiedMax: p.walletBalanceLimits?.kycVerifiedMax ?? null } 
+                  }))}
+                />
+              </div>
+              <div className="space-y-2 flex flex-col justify-center">
+                <label className="text-sm font-medium">KYC Verified Wallet Limit (₹)</label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    type="number" min="0"
+                    placeholder="Unlimited"
+                    value={formData.walletBalanceLimits?.kycVerifiedMax ?? ''}
+                    onChange={(e) => setFormData(p => ({ 
+                      ...p, 
+                      walletBalanceLimits: { ...p.walletBalanceLimits, nonKycMax: p.walletBalanceLimits?.nonKycMax ?? 10000, kycVerifiedMax: e.target.value === '' ? null : Number(e.target.value) } 
+                    }))}
+                  />
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">(Leave blank for unlimited)</span>
+                </div>
               </div>
             </div>
           )

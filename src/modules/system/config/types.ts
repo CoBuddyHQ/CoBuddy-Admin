@@ -14,6 +14,7 @@ export interface PricingConfig {
   specialEventMultiplierLimit: number;
   cancellationFeePercentage: number;
   flatServiceFeeAmount: number;
+  newCitySuggestedRateFallback: number;
 }
 
 export interface SafetyBonusRuleConfig {
@@ -39,4 +40,10 @@ export interface SystemConfig {
   customerInterestSelectionLimits: { min: number; max: number };
   companionCategorySelectionLimits: { min: number; max: number };
   companionServiceAreaLimits: { min: number; max: number };
+  booking: {
+    overlappingSessionConflictDetection: boolean;
+  };
+  wallet: {
+    maxWalletBalance: number;
+  };
 }

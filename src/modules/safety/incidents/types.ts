@@ -10,6 +10,7 @@ export interface IncidentSummary {
 export interface IncidentDetail extends IncidentSummary {
   description: string;
   evidence: string[];
+  preserveEvidence?: boolean;
   investigatorNotes: {
     timestamp: string;
     note: string;

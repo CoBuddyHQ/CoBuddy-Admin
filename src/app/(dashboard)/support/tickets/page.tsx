@@ -30,6 +30,9 @@ export default function TicketsPage() {
   const [replyText, setReplyText] = useState('');
   const [teamView, setTeamView] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
+  
+  const [resolutionTicket, setResolutionTicket] = useState<{ ticket: SupportTicket, status: 'RESOLVED' | 'CLOSED' } | null>(null);
+  const [resolutionNote, setResolutionNote] = useState('');
 
   if (isLoading || !user) return <div className="p-6">Loading...</div>;
 
@@ -50,6 +53,23 @@ export default function TicketsPage() {
       addReply({ id: selectedTicket.id, message: replyText });
       setReplyText('');
       setSelectedTicket(null);
+    }
+  };
+
+  const handleStatusChange = (ticket: SupportTicket, status: 'RESOLVED' | 'CLOSED') => {
+    if (ticket.category === 'age_minor_escalation') {
+      setResolutionTicket({ ticket, status });
+      setResolutionNote('');
+    } else {
+      updateStatus({ id: ticket.id, status });
+    }
+  };
+
+  const submitResolution = () => {
+    if (resolutionTicket && resolutionNote.trim()) {
+      updateStatus({ id: resolutionTicket.ticket.id, status: resolutionTicket.status, resolutionNote });
+      setResolutionTicket(null);
+      setResolutionNote('');
     }
   };
 
@@ -187,7 +207,7 @@ export default function TicketsPage() {
                           <Button 
                             variant="default" 
                             size="sm"
-                            onClick={() => updateStatus({ id: ticket.id, status: 'RESOLVED' })}
+                            onClick={() => handleStatusChange(ticket, 'RESOLVED')}
                             title="Mark Resolved"
                           >
                             <CheckCircle className="h-4 w-4" />
@@ -195,7 +215,7 @@ export default function TicketsPage() {
                           <Button 
                             variant="destructive" 
                             size="sm"
-                            onClick={() => updateStatus({ id: ticket.id, status: 'CLOSED' })}
+                            onClick={() => handleStatusChange(ticket, 'CLOSED')}
                             title="Close Ticket"
                           >
                             Close
@@ -254,6 +274,31 @@ export default function TicketsPage() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setSelectedTicket(null)}>Close</Button>
               <Button onClick={handleReply} disabled={!replyText.trim()}>Send Reply</Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!resolutionTicket} onOpenChange={(open) => !open && setResolutionTicket(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Provide Resolution Note</DialogTitle>
+            <DialogDescription>
+              Age/Minor Escalation tickets require a mandatory resolution note before they can be {resolutionTicket?.status.toLowerCase()}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Textarea
+              placeholder="Enter resolution details..."
+              value={resolutionNote}
+              onChange={(e) => setResolutionNote(e.target.value)}
+              required
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setResolutionTicket(null)}>Cancel</Button>
+              <Button onClick={submitResolution} disabled={!resolutionNote.trim()}>
+                {resolutionTicket?.status === 'CLOSED' ? 'Close Ticket' : 'Resolve Ticket'}
+              </Button>
             </DialogFooter>
           </div>
         </DialogContent>

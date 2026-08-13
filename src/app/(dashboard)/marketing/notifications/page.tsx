@@ -19,6 +19,8 @@ import {
   TableRow,
 } from '@tremor/react';
 import { Send } from 'lucide-react';
+import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
+import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -26,9 +28,11 @@ import { Switch } from '@/components/ui/switch';
 
 export default function NotificationsPage() {
   const { notifications, config, isLoading, createNotification, isCreating, sendNow, updateConfig, isUpdatingConfig } = useNotifications();
+  const { notificationCategories, isLoading: isMasterDataLoading } = useMasterData();
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ title: '', message: '', targetAudience: 'ALL', targetCity: '', status: 'DRAFT', scheduledFor: '' });
+  const [formData, setFormData] = useState({ title: '', message: '', category: '', targetAudience: 'ALL', targetCity: '', status: 'DRAFT', scheduledFor: '' });
   const [configData, setConfigData] = useState<any>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
 
   useEffect(() => {
     if (config) {
@@ -41,13 +45,14 @@ export default function NotificationsPage() {
     createNotification({
       title: formData.title,
       message: formData.message,
+      category: formData.category,
       targetAudience: formData.targetAudience as any,
       targetCity: formData.targetAudience === 'CITY_SPECIFIC' ? formData.targetCity : undefined,
       status: formData.status as any,
       scheduledFor: formData.status === 'SCHEDULED' ? formData.scheduledFor : undefined
     });
     setIsOpen(false);
-    setFormData({ title: '', message: '', targetAudience: 'ALL', targetCity: '', status: 'DRAFT', scheduledFor: '' });
+    setFormData({ title: '', message: '', category: '', targetAudience: 'ALL', targetCity: '', status: 'DRAFT', scheduledFor: '' });
   };
 
   const handleConfigSubmit = (e: React.FormEvent) => {
@@ -55,7 +60,16 @@ export default function NotificationsPage() {
     if (configData) updateConfig(configData);
   };
 
-  if (isLoading || (config && !configData)) return <div className="p-6">Loading...</div>;
+  const filteredNotifications = categoryFilter === 'ALL'
+    ? notifications
+    : notifications.filter(n => n.category === categoryFilter);
+
+  const getCategoryLabel = (code: string) => {
+    const cat = notificationCategories.find(c => c.code === code);
+    return cat ? getLocalizedText(cat.label, 'en') : code;
+  };
+
+  if (isLoading || isMasterDataLoading || (config && !configData)) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6 space-y-6 h-full flex flex-col">
@@ -63,7 +77,23 @@ export default function NotificationsPage() {
         title="Push Notifications & Triggers" 
         description="Broadcast announcements to users and configure system-level push credentials."
         action={
-          <Button onClick={() => setIsOpen(true)}>New Message</Button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Filter by Category:</span>
+              <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val as string)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Categories</SelectItem>
+                  {notificationCategories.map(c => (
+                    <SelectItem key={c.code} value={c.code}>{getLocalizedText(c.label, 'en')}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={() => setIsOpen(true)}>New Message</Button>
+          </div>
         }
       />
 
@@ -79,6 +109,7 @@ export default function NotificationsPage() {
               <TableHead>
                 <TableRow>
                   <TableHeaderCell>Title</TableHeaderCell>
+                  <TableHeaderCell>Category</TableHeaderCell>
                   <TableHeaderCell>Audience</TableHeaderCell>
                   <TableHeaderCell>Message</TableHeaderCell>
                   <TableHeaderCell>Status</TableHeaderCell>
@@ -87,9 +118,12 @@ export default function NotificationsPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {notifications.map(n => (
+                {filteredNotifications.map(n => (
                   <TableRow key={n.id}>
                     <TableCell className="font-medium">{n.title}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{getCategoryLabel(n.category)}</Badge>
+                    </TableCell>
                     <TableCell>
                       {n.targetAudience} {n.targetCity && `(${n.targetCity})`}
                     </TableCell>
@@ -174,7 +208,7 @@ export default function NotificationsPage() {
                   <>
                     <div className="space-y-2">
                       <Label>SMS Provider</Label>
-                      <Select value={configData.smsProvider} onValueChange={v => setConfigData({ ...configData, smsProvider: v as string })}>
+                      <Select value={configData.smsProvider} onValueChange={(v) => setConfigData({ ...configData, smsProvider: v as string })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="TWILIO">Twilio</SelectItem>
@@ -212,8 +246,19 @@ export default function NotificationsPage() {
               <Textarea placeholder="Type your message here..." value={formData.message} onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} required />
             </div>
             <div className="space-y-2">
+              <Label>Category</Label>
+              <Select value={formData.category} onValueChange={(v) => setFormData(p => ({ ...p, category: v as string }))} required>
+                <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
+                <SelectContent>
+                  {notificationCategories.map(c => (
+                    <SelectItem key={c.code} value={c.code}>{getLocalizedText(c.label, 'en')}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>Target Audience</Label>
-              <Select value={formData.targetAudience} onValueChange={v => setFormData(p => ({ ...p, targetAudience: v as string }))}>
+              <Select value={formData.targetAudience} onValueChange={(v) => setFormData(p => ({ ...p, targetAudience: v as string }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">All Users</SelectItem>
@@ -231,7 +276,7 @@ export default function NotificationsPage() {
             )}
             <div className="space-y-2 border-t pt-4">
               <Label>Send Options</Label>
-              <Select value={formData.status} onValueChange={v => setFormData(p => ({ ...p, status: v as string }))}>
+              <Select value={formData.status} onValueChange={(v) => setFormData(p => ({ ...p, status: v as string }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="DRAFT">Save as Draft</SelectItem>

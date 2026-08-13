@@ -12,6 +12,11 @@ const mockApplications: CompanionApplication[] = [
     dateOfBirth: '1995-06-15',
     gender: 'Female',
     bio: 'Looking forward to showing people around my beautiful city.',
+    categories: ['CITY_TOUR', 'SHOPPING'],
+    spokenLanguages: ['en', 'hi'],
+    proposedHourlyRate: 700,
+    photoUrls: ['https://placehold.co/150x150?text=Photo+1', 'https://placehold.co/150x150?text=Photo+2'],
+    workPreferences: { communicationStyle: 'chatty', activityPace: 'relaxed' },
     backgroundCheckStatus: 'PENDING'
   },
   {
@@ -27,6 +32,11 @@ const mockApplications: CompanionApplication[] = [
     dateOfBirth: '1992-04-20',
     gender: 'Male',
     bio: 'History buff and foodie.',
+    categories: ['HERITAGE', 'FOOD'],
+    spokenLanguages: ['en', 'hi', 'bn'],
+    proposedHourlyRate: 850,
+    photoUrls: ['https://placehold.co/150x150?text=Photo+1'],
+    workPreferences: { communicationStyle: 'balanced', activityPace: 'energetic' },
     backgroundCheckStatus: 'PASSED'
   }
 ];

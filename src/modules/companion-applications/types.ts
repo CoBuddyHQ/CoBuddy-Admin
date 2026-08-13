@@ -15,6 +15,14 @@ export interface CompanionApplication {
   dateOfBirth: string;
   gender: string;
   bio: string;
+  categories: string[];
+  spokenLanguages: string[];
+  proposedHourlyRate: number;
+  photoUrls: string[];
+  workPreferences: {
+    communicationStyle?: string;
+    activityPace?: string;
+  };
   
   // Assessment
   interviewNotes?: string;
@@ -25,4 +33,5 @@ export interface ApplicationDecisionPayload {
   id: string;
   decision: 'APPROVE' | 'REJECT' | 'WAITLIST';
   notes: string;
+  sectionRejectReasons?: Record<string, string>;
 }

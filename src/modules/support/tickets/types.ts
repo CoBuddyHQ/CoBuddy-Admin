@@ -16,5 +16,6 @@ export interface SupportTicket {
   slaDeadline: string;
   escalationLevel: EscalationLevel;
   assignedTo?: string; // Staff name
+  resolutionNote?: string;
   createdAt: string;
 }

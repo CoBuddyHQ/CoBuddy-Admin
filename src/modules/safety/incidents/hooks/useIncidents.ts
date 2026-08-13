@@ -31,10 +31,20 @@ export const useIncidentDetail = (id: string) => {
     }
   });
 
+  const toggleEvidenceMutation = useMutation({
+    mutationFn: () => incidentsApi.togglePreserveEvidence(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['incident', id] });
+      toast.success('Evidence preservation updated');
+    }
+  });
+
   return {
     detail: query.data,
     isLoading: query.isLoading,
     updateStatus: updateMutation.mutate,
-    isUpdating: updateMutation.isPending
+    isUpdating: updateMutation.isPending,
+    togglePreserveEvidence: toggleEvidenceMutation.mutate,
+    isTogglingEvidence: toggleEvidenceMutation.isPending
   };
 };

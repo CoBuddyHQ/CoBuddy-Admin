@@ -3,6 +3,7 @@ import { SystemConfig } from './types';
 // Note: Mobile apps should use this config to determine the allowed time-range for bookings and availability.
 // Both Companion's availability-slot picker and Customer's booking-time picker should fetch their allowed time-range from this config.
 // They should resolve effective hours as `city.serviceHoursOverride ?? systemConfig.serviceHours`.
+// Mobile apps and backend should use `overlappingSessionConflictDetection` to prevent customers from booking a companion if they already have an active/upcoming session that overlaps in time.
 let currentConfig: SystemConfig = {
   commission: {
     platformFeePercentage: 15,
@@ -16,6 +17,7 @@ let currentConfig: SystemConfig = {
     specialEventMultiplierLimit: 2.0,
     cancellationFeePercentage: 10,
     flatServiceFeeAmount: 50,
+    newCitySuggestedRateFallback: 500,
   },
   safetyBonusRule: {
     incidentFreeMonths: 1,
@@ -30,7 +32,13 @@ let currentConfig: SystemConfig = {
   },
   customerInterestSelectionLimits: { min: 3, max: 10 },
   companionCategorySelectionLimits: { min: 1, max: 3 },
-  companionServiceAreaLimits: { min: 1, max: 8 }
+  companionServiceAreaLimits: { min: 1, max: 8 },
+  booking: {
+    overlappingSessionConflictDetection: true,
+  },
+  wallet: {
+    maxWalletBalance: 50000,
+  }
 };
 
 export const configApi = {

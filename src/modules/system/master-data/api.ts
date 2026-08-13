@@ -1,4 +1,4 @@
-import { City, Interest, Language, AppLanguage, SystemDefaults, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption, ReviewTagOption, DisputeReason, CancellationReason, KYCDocumentType } from './types';
+import { City, Interest, Language, AppLanguage, SystemDefaults, TicketCategory, IncidentType, CommunicationStyleOption, ActivityPaceOption, SessionDurationOption, NotificationCategoryOption, ReviewTagOption, DisputeReason, CancellationReason, KYCDocumentType, PlaceTypeConfig } from './types';
 
 // Note: Mobile apps should use systemConfig.serviceHours (from system/config/api.ts) to determine 
 // the allowed time-range for bookings and availability. If a city has a serviceHoursOverride, 
@@ -6,50 +6,32 @@ import { City, Interest, Language, AppLanguage, SystemDefaults, TicketCategory, 
 // Effective hours = `city.serviceHoursOverride ?? systemConfig.serviceHours`.
 
 const cities: City[] = [
-  { 
-    id: 'CITY-1', 
-    name: { en: 'Mumbai', hi: 'मुंबई' }, 
-    state: 'Maharashtra', 
-    country: 'India', 
-    active: true,
-    areas: [
-      { id: 'AREA-1', name: { en: 'Bandra', hi: 'बांद्रा' }, active: true },
-      { id: 'AREA-2', name: { en: 'Andheri', hi: 'अंधेरी' }, active: true }
-    ]
-  },
-  { 
-    id: 'CITY-2', 
-    name: { en: 'Delhi', hi: 'दिल्ली' }, 
-    state: 'Delhi', 
-    country: 'India', 
-    active: true,
-    areas: [] 
-  },
-  { 
-    id: 'CITY-3', 
-    name: { en: 'Bangalore' }, // missing 'hi' on purpose
-    state: 'Karnataka', 
-    country: 'India', 
-    active: false,
-    areas: []
-  },
-  { 
-    id: 'CITY-4', 
-    name: { en: 'Pune', hi: 'पुणे' }, 
-    state: 'Maharashtra', 
-    country: 'India', 
-    active: true,
-    areas: [],
-    serviceHoursOverride: {
-      openTime: '08:00',
-      closeTime: '20:00'
-    }
-  },
+  { id: 'CITY-1', name: { en: 'Mumbai', hi: 'मुंबई' }, state: 'Maharashtra', country: 'India', active: true, areas: [{ id: 'AREA-1', name: { en: 'Bandra', hi: 'बांद्रा' }, active: true }, { id: 'AREA-2', name: { en: 'Andheri', hi: 'अंधेरी' }, active: true }] },
+  { id: 'CITY-2', name: { en: 'Delhi', hi: 'दिल्ली' }, state: 'Delhi', country: 'India', active: true, areas: [{ id: 'AREA-3', name: { en: 'Connaught Place' }, active: true }] },
+  { id: 'CITY-3', name: { en: 'Bangalore', hi: 'बैंगलोर' }, state: 'Karnataka', country: 'India', active: true, areas: [{ id: 'AREA-4', name: { en: 'Indiranagar' }, active: true }] },
+  { id: 'CITY-4', name: { en: 'Pune', hi: 'पुणे' }, state: 'Maharashtra', country: 'India', active: true, areas: [], serviceHoursOverride: { openTime: '08:00', closeTime: '20:00' } },
+  { id: 'CITY-5', name: { en: 'Hyderabad', hi: 'हैदराबाद' }, state: 'Telangana', country: 'India', active: true, areas: [] },
+  { id: 'CITY-6', name: { en: 'Chennai', hi: 'चेन्नई' }, state: 'Tamil Nadu', country: 'India', active: true, areas: [] },
+  { id: 'CITY-7', name: { en: 'Kolkata', hi: 'कोलकाता' }, state: 'West Bengal', country: 'India', active: true, areas: [] },
+  { id: 'CITY-8', name: { en: 'Ahmedabad', hi: 'अहमदाबाद' }, state: 'Gujarat', country: 'India', active: true, areas: [] },
+  { id: 'CITY-9', name: { en: 'Jaipur', hi: 'जयपुर' }, state: 'Rajasthan', country: 'India', active: true, areas: [] },
+  { id: 'CITY-10', name: { en: 'Surat', hi: 'सूरत' }, state: 'Gujarat', country: 'India', active: true, areas: [] },
 ];
 
 const interests: Interest[] = [
-  { id: 'INT-1', name: { en: 'Italian', hi: 'इटालियन' }, type: 'CUISINE', basePriceMultiplier: 1.0, active: true },
-  { id: 'INT-2', name: { en: 'Museums' }, type: 'ACTIVITY', basePriceMultiplier: 1.2, active: true }, // missing 'hi' on purpose
+  { id: 'INT-1', name: { en: 'Italian Cuisine', hi: 'इटालियन' }, type: 'CUISINE', basePriceMultiplier: 1.0, active: true },
+  { id: 'INT-2', name: { en: 'Museums', hi: 'संग्रहालय' }, type: 'ACTIVITY', basePriceMultiplier: 1.2, active: true },
+  { id: 'INT-3', name: { en: 'Cafe Hopping', hi: 'कैफे घूमना' }, type: 'ACTIVITY', basePriceMultiplier: 1.0, active: true },
+  { id: 'INT-4', name: { en: 'Movies', hi: 'फिल्में' }, type: 'ACTIVITY', basePriceMultiplier: 1.0, active: true },
+  { id: 'INT-5', name: { en: 'Concerts', hi: 'समारोह' }, type: 'ACTIVITY', basePriceMultiplier: 1.5, active: true },
+  { id: 'INT-6', name: { en: 'Parks', hi: 'पार्क' }, type: 'ACTIVITY', basePriceMultiplier: 1.0, active: true },
+  { id: 'INT-7', name: { en: 'Sightseeing', hi: 'दर्शनीय स्थल' }, type: 'ACTIVITY', basePriceMultiplier: 1.2, active: true },
+  { id: 'INT-8', name: { en: 'Clubbing', hi: 'क्लबिंग' }, type: 'ACTIVITY', basePriceMultiplier: 1.5, active: true },
+  { id: 'INT-9', name: { en: 'Art Galleries', hi: 'कला दीर्घाएँ' }, type: 'ACTIVITY', basePriceMultiplier: 1.2, active: true },
+  { id: 'INT-10', name: { en: 'Hiking', hi: 'हाइकिंग' }, type: 'ACTIVITY', basePriceMultiplier: 1.5, active: true },
+  { id: 'INT-11', name: { en: 'Board Games', hi: 'बोर्ड गेम्स' }, type: 'ACTIVITY', basePriceMultiplier: 1.0, active: true },
+  { id: 'INT-12', name: { en: 'Karaoke', hi: 'कराओके' }, type: 'ACTIVITY', basePriceMultiplier: 1.2, active: true },
+  { id: 'INT-13', name: { en: 'Gaming', hi: 'गेमिंग' }, type: 'ACTIVITY', basePriceMultiplier: 1.0, active: true },
 ];
 
 const languages: Language[] = [
@@ -85,7 +67,10 @@ const ticketCategories: TicketCategory[] = [
   { id: 'TC-4', code: 'verification', label: { en: 'Verification', hi: 'सत्यापन' }, active: true },
   { id: 'TC-5', code: 'account_access', label: { en: 'Account & Tech Support', hi: 'खाता सहायता' }, active: true },
   { id: 'TC-6', code: 'dispute', label: { en: 'Dispute', hi: 'विवाद' }, active: true },
-  { id: 'TC-7', code: 'general', label: { en: 'General', hi: 'सामान्य' }, active: true }
+  { id: 'TC-7', code: 'general', label: { en: 'General', hi: 'सामान्य' }, active: true },
+  { id: 'TC-8', code: 'age_minor_escalation', label: { en: 'Age / Minor Escalation', hi: 'आयु / नाबालिग वृद्धि' }, active: true },
+  { id: 'TC-9', code: 'marketing_promo', label: { en: 'Promotions & Offers', hi: 'प्रचार और ऑफर' }, active: true },
+  { id: 'TC-10', code: 'feedback', label: { en: 'Feedback & Suggestions', hi: 'प्रतिक्रिया और सुझाव' }, active: true },
 ];
 
 const incidentTypes: IncidentType[] = [
@@ -95,26 +80,40 @@ const incidentTypes: IncidentType[] = [
   { id: 'IT-4', code: 'payment_dispute', label: { en: 'Payment Dispute', hi: 'भुगतान विवाद' }, active: true },
   { id: 'IT-5', code: 'inappropriate_behavior', label: { en: 'Inappropriate Behavior', hi: 'अनुचित व्यवहार' }, active: true },
   { id: 'IT-6', code: 'emergency', label: { en: 'Emergency', hi: 'आपातकाल' }, active: true },
-  { id: 'IT-7', code: 'other', label: { en: 'Other', hi: 'अन्य' }, active: true }
+  { id: 'IT-7', code: 'unauthorized_recording', label: { en: 'Unauthorized Recording', hi: 'अनधिकृत रिकॉर्डिंग' }, active: true },
+  { id: 'IT-8', code: 'privacy_violation', label: { en: 'Privacy Violation', hi: 'गोपनीयता उल्लंघन' }, active: true },
+  { id: 'IT-9', code: 'scam', label: { en: 'Scam/Fraud', hi: 'घोटाला/धोखाधड़ी' }, active: true },
+  { id: 'IT-10', code: 'no_show_customer', label: { en: 'Customer No-Show', hi: 'ग्राहक कोई उपस्थिति नहीं' }, active: true },
+  { id: 'IT-11', code: 'other', label: { en: 'Other', hi: 'अन्य' }, active: true }
 ];
 
 const communicationStyles: CommunicationStyleOption[] = [
   { id: 'CS-1', code: 'chatty', label: { en: 'Chatty', hi: 'बातूनी' }, active: true },
   { id: 'CS-2', code: 'balanced', label: { en: 'Balanced', hi: 'संतुलित' }, active: true },
-  { id: 'CS-3', code: 'comfortable_with_quiet', label: { en: 'Comfortable with quiet', hi: 'शांत वातावरण में सहज' }, active: true }
+  { id: 'CS-3', code: 'comfortable_with_quiet', label: { en: 'Comfortable with quiet', hi: 'शांत वातावरण में सहज' }, active: true },
+  { id: 'CS-4', code: 'deep_conversations', label: { en: 'Deep Conversations', hi: 'गहरी बातचीत' }, active: true },
+  { id: 'CS-5', code: 'listener', label: { en: 'Good Listener', hi: 'अच्छा श्रोता' }, active: true }
 ];
 
 const activityPaces: ActivityPaceOption[] = [
   { id: 'AP-1', code: 'relaxed', label: { en: 'Relaxed', hi: 'आरामदायक' }, active: true },
   { id: 'AP-2', code: 'moderate', label: { en: 'Moderate', hi: 'मध्यम' }, active: true },
-  { id: 'AP-3', code: 'active', label: { en: 'Active', hi: 'सक्रिय' }, active: true }
+  { id: 'AP-3', code: 'active', label: { en: 'Active', hi: 'सक्रिय' }, active: true },
+  { id: 'AP-4', code: 'very_active', label: { en: 'Very Active', hi: 'बहुत सक्रिय' }, active: true },
+  { id: 'AP-5', code: 'slow_paced', label: { en: 'Slow Paced', hi: 'धीमी गति' }, active: true }
 ];
 
 const sessionDurations: SessionDurationOption[] = [
   { id: 'SD-1', minutes: 60, label: { en: '1 Hour', hi: '1 घंटा' }, active: true },
   { id: 'SD-2', minutes: 90, label: { en: '1.5 Hours', hi: '1.5 घंटे' }, active: true },
   { id: 'SD-3', minutes: 120, label: { en: '2 Hours', hi: '2 घंटे' }, active: true },
-  { id: 'SD-4', minutes: 180, label: { en: '3 Hours', hi: '3 घंटे' }, active: true }
+  { id: 'SD-4', minutes: 180, label: { en: '3 Hours', hi: '3 घंटे' }, active: true },
+  { id: 'SD-5', minutes: 240, label: { en: '4 Hours', hi: '4 घंटे' }, active: true },
+  { id: 'SD-6', minutes: 300, label: { en: '5 Hours', hi: '5 घंटे' }, active: true },
+  { id: 'SD-7', minutes: 360, label: { en: '6 Hours', hi: '6 घंटे' }, active: true },
+  { id: 'SD-8', minutes: 480, label: { en: '8 Hours', hi: '8 घंटे' }, active: true },
+  { id: 'SD-9', minutes: 720, label: { en: '12 Hours', hi: '12 घंटे' }, active: true },
+  { id: 'SD-10', minutes: 1440, label: { en: '24 Hours', hi: '24 घंटे' }, active: true }
 ];
 
 const notificationCategories: NotificationCategoryOption[] = [
@@ -125,34 +124,78 @@ const notificationCategories: NotificationCategoryOption[] = [
   { id: 'NC-5', code: 'support', label: { en: 'Support', hi: 'समर्थन' }, active: true },
   { id: 'NC-6', code: 'policy', label: { en: 'Policy', hi: 'नीति' }, active: true },
   { id: 'NC-7', code: 'training', label: { en: 'Training', hi: 'प्रशिक्षण' }, active: true },
-  { id: 'NC-8', code: 'system', label: { en: 'System', hi: 'प्रणाली' }, active: true }
+  { id: 'NC-8', code: 'system', label: { en: 'System', hi: 'प्रणाली' }, active: true },
+  { id: 'NC-9', code: 'wallet', label: { en: 'Wallet', hi: 'वॉलेट' }, active: true },
+  { id: 'NC-10', code: 'promotion', label: { en: 'Promotion', hi: 'प्रचार' }, active: true },
+  { id: 'NC-11', code: 'reminder', label: { en: 'Reminder', hi: 'अनुस्मारक' }, active: true }
 ];
 
 const reviewTags: ReviewTagOption[] = [
-  { id: 'RT-1', code: 'friendly', label: { en: 'Friendly & Polite', hi: 'विनम्र' }, polarity: 'PRAISE', appliesTo: 'BOTH', active: true },
-  { id: 'RT-2', code: 'punctual', label: { en: 'On Time', hi: 'समय पर' }, polarity: 'PRAISE', appliesTo: 'BOTH', active: true },
-  { id: 'RT-3', code: 'late', label: { en: 'Arrived Late', hi: 'देर से आए' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true },
-  { id: 'RT-4', code: 'inappropriate', label: { en: 'Inappropriate Behavior', hi: 'अनुचित व्यवहार' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true }
+  { id: 'RT-1', code: 'punctual', label: { en: 'Punctual', hi: 'समय पर' }, polarity: 'PRAISE', appliesTo: 'BOTH', active: true },
+  { id: 'RT-2', code: 'late', label: { en: 'Late', hi: 'देर से आए' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true },
+  { id: 'RT-3', code: 'rude_unprofessional', label: { en: 'Rude / Unprofessional', hi: 'असभ्य / अव्यावसायिक' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true },
+  { id: 'RT-4', code: 'made_uncomfortable', label: { en: 'Made me uncomfortable', hi: 'मुझे असहज किया' }, polarity: 'CONCERN', appliesTo: 'BOTH', active: true },
+  { id: 'RT-5', code: 'respectful', label: { en: 'Respectful', hi: 'सम्मानजनक' }, polarity: 'PRAISE', appliesTo: 'COMPANION_RATING_CUSTOMER', active: true },
+  { id: 'RT-6', code: 'good_communicator', label: { en: 'Good Communicator', hi: 'अच्छा संचारक' }, polarity: 'PRAISE', appliesTo: 'COMPANION_RATING_CUSTOMER', active: true },
+  { id: 'RT-7', code: 'fun', label: { en: 'Fun', hi: 'मज़ेदार' }, polarity: 'PRAISE', appliesTo: 'COMPANION_RATING_CUSTOMER', active: true },
+  { id: 'RT-8', code: 'no_show_risk', label: { en: 'No-show Risk', hi: 'न आने का जोखिम' }, polarity: 'CONCERN', appliesTo: 'COMPANION_RATING_CUSTOMER', active: true },
+  { id: 'RT-9', code: 'great_listener', label: { en: 'Great Listener', hi: 'अच्छा श्रोता' }, polarity: 'PRAISE', appliesTo: 'CUSTOMER_RATING_COMPANION', active: true },
+  { id: 'RT-10', code: 'dressed_well', label: { en: 'Dressed Well', hi: 'अच्छे कपड़े पहने' }, polarity: 'PRAISE', appliesTo: 'CUSTOMER_RATING_COMPANION', active: true },
+  { id: 'RT-11', code: 'safe_comforting', label: { en: 'Safe & Comforting', hi: 'सुरक्षित और आरामदायक' }, polarity: 'PRAISE', appliesTo: 'CUSTOMER_RATING_COMPANION', active: true },
+  { id: 'RT-12', code: 'catfished_fake_profile', label: { en: 'Catfished / Fake Profile', hi: 'नकली प्रोफ़ाइल' }, polarity: 'CONCERN', appliesTo: 'CUSTOMER_RATING_COMPANION', active: true },
+  { id: 'RT-13', code: 'boring', label: { en: 'Boring', hi: 'उबाऊ' }, polarity: 'CONCERN', appliesTo: 'CUSTOMER_RATING_COMPANION', active: true },
 ];
 
 const disputeReasons: DisputeReason[] = [
-  { id: 'DR-1', code: 'no_show', label: { en: 'Companion did not show up', hi: 'साथी नहीं आया' }, active: true },
-  { id: 'DR-2', code: 'early_end', label: { en: 'Session ended much earlier', hi: 'सत्र बहुत पहले समाप्त हो गया' }, active: true },
-  { id: 'DR-3', code: 'behavior', label: { en: 'Unprofessional behavior', hi: 'अव्यावसायिक व्यवहार' }, active: true }
+  { id: 'DR-1', code: 'payment_not_received', label: { en: 'Payment not received', hi: 'भुगतान प्राप्त नहीं हुआ' }, active: true },
+  { id: 'DR-2', code: 'unfair_cancellation', label: { en: 'Unfair cancellation', hi: 'अनुचित रद्दीकरण' }, active: true },
+  { id: 'DR-3', code: 'false_review', label: { en: 'False review', hi: 'झूठी समीक्षा' }, active: true },
+  { id: 'DR-4', code: 'no_show', label: { en: 'No show', hi: 'कोई उपस्थिति नहीं' }, active: true },
+  { id: 'DR-5', code: 'service_quality', label: { en: 'Service quality', hi: 'सेवा की गुणवत्ता' }, active: true },
+  { id: 'DR-6', code: 'different_profile', label: { en: 'Companion different from profile', hi: 'साथी प्रोफ़ाइल से अलग था' }, active: true },
+  { id: 'DR-7', code: 'early_end', label: { en: 'Session ended early', hi: 'सत्र जल्दी समाप्त हो गया' }, active: true },
+  { id: 'DR-8', code: 'companion_late', label: { en: 'Companion was late', hi: 'साथी को देर हो गई थी' }, active: true },
+  { id: 'DR-9', code: 'customer_late', label: { en: 'Customer was late', hi: 'ग्राहक को देर हो गई थी' }, active: true },
+  { id: 'DR-10', code: 'safety_concern', label: { en: 'Safety Concern', hi: 'सुरक्षा चिंता' }, active: true },
+  { id: 'DR-11', code: 'other', label: { en: 'Other', hi: 'अन्य' }, active: true }
 ];
 
 const cancellationReasons: CancellationReason[] = [
-  { id: 'CR-1', code: 'change_plans', label: { en: 'Plans changed', hi: 'योजनाएँ बदल गईं' }, appliesTo: 'CUSTOMER_CANCEL', active: true },
-  { id: 'CR-2', code: 'emergency', label: { en: 'Personal emergency', hi: 'व्यक्तिगत आपातकाल' }, appliesTo: 'ANY', active: true },
-  { id: 'CR-3', code: 'unreachable', label: { en: 'Could not reach other party', hi: 'संपर्क नहीं हो सका' }, appliesTo: 'ANY', active: true },
-  { id: 'CR-4', code: 'uncomfortable', label: { en: 'Felt uncomfortable', hi: 'असहज महसूस किया' }, appliesTo: 'COMPANION_EARLY_END', active: true }
+  { id: 'CR-1', code: 'schedule_conflict', label: { en: 'Schedule conflict', hi: 'समय का टकराव' }, appliesTo: 'COMPANION_REJECT', active: true },
+  { id: 'CR-2', code: 'location_too_far', label: { en: 'Location too far', hi: 'स्थान बहुत दूर है' }, appliesTo: 'COMPANION_REJECT', active: true },
+  { id: 'CR-3', code: 'not_comfortable_activity', label: { en: 'Not comfortable with activity', hi: 'गतिविधि के साथ असहज' }, appliesTo: 'COMPANION_REJECT', active: true },
+  { id: 'CR-4', code: 'incomplete_profile', label: { en: 'Incomplete profile', hi: 'अपूर्ण प्रोफ़ाइल' }, appliesTo: 'COMPANION_REJECT', active: true },
+  { id: 'CR-5', code: 'personal_emergency', label: { en: 'Personal emergency', hi: 'व्यक्तिगत आपातकाल' }, appliesTo: 'ANY', active: true },
+  { id: 'CR-6', code: 'health_issue', label: { en: 'Health issue', hi: 'स्वास्थ्य समस्या' }, appliesTo: 'COMPANION_CANCEL', active: true },
+  { id: 'CR-7', code: 'transport_problem', label: { en: 'Transport problem', hi: 'परिवहन समस्या' }, appliesTo: 'COMPANION_CANCEL', active: true },
+  { id: 'CR-8', code: 'customer_request', label: { en: 'Customer request', hi: 'ग्राहक का अनुरोध' }, appliesTo: 'COMPANION_EARLY_END', active: true },
+  { id: 'CR-9', code: 'safety_concern', label: { en: 'Safety concern', hi: 'सुरक्षा चिंता' }, appliesTo: 'COMPANION_EARLY_END', active: true },
+  { id: 'CR-10', code: 'mutual_agreement', label: { en: 'Mutual agreement', hi: 'आपसी सहमति' }, appliesTo: 'COMPANION_EARLY_END', active: true },
+  { id: 'CR-11', code: 'found_another_companion', label: { en: 'Found another companion', hi: 'एक और साथी मिल गया' }, appliesTo: 'CUSTOMER_CANCEL', active: true },
+  { id: 'CR-12', code: 'booked_by_mistake', label: { en: 'Booked by mistake', hi: 'गलती से बुक हो गया' }, appliesTo: 'CUSTOMER_CANCEL', active: true },
+  { id: 'CR-13', code: 'changed_mind', label: { en: 'Changed mind', hi: 'मन बदल गया' }, appliesTo: 'CUSTOMER_CANCEL', active: true },
+  { id: 'CR-14', code: 'unresponsive', label: { en: 'Unresponsive', hi: 'अनुत्तरदायी' }, appliesTo: 'ANY', active: true },
 ];
 
 const kycDocumentTypes: KYCDocumentType[] = [
   { id: 'KYC-1', code: 'AADHAAR', label: { en: 'Aadhaar Card', hi: 'आधार कार्ड' }, active: true },
   { id: 'KYC-2', code: 'PAN', label: { en: 'PAN Card', hi: 'पैन कार्ड' }, active: true },
   { id: 'KYC-3', code: 'PASSPORT', label: { en: 'Passport', hi: 'पासपोर्ट' }, active: true },
-  { id: 'KYC-4', code: 'DRIVING_LICENSE', label: { en: 'Driving License', hi: 'ड्राइविंग लाइसेंस' }, active: true }
+  { id: 'KYC-4', code: 'DRIVING_LICENSE', label: { en: 'Driving License', hi: 'ड्राइविंग लाइसेंस' }, active: true },
+  { id: 'KYC-5', code: 'VOTER_ID', label: { en: 'Voter ID', hi: 'मतदाता पहचान पत्र' }, active: true }
+];
+
+let mockPlaceTypes: PlaceTypeConfig[] = [
+  { id: 'PT-1', typeName: 'cafe', displayName: { en: 'Café', hi: 'कैफे' }, isAllowed: true },
+  { id: 'PT-2', typeName: 'restaurant', displayName: { en: 'Restaurant', hi: 'भोजनालय' }, isAllowed: true },
+  { id: 'PT-3', typeName: 'park', displayName: { en: 'Public Park', hi: 'सार्वजनिक पार्क' }, isAllowed: true },
+  { id: 'PT-4', typeName: 'museum', displayName: { en: 'Gallery/Museum', hi: 'संग्रहालय' }, isAllowed: true },
+  { id: 'PT-5', typeName: 'book_store', displayName: { en: 'Bookstore', hi: 'किताबों की दुकान' }, isAllowed: true },
+  { id: 'PT-6', typeName: 'shopping_mall', displayName: { en: 'Shopping Mall', hi: 'शॉपिंग मॉल' }, isAllowed: true },
+  { id: 'PT-7', typeName: 'lodging', displayName: { en: 'Hotel/Lodging', hi: 'होटल' }, isAllowed: false },
+  { id: 'PT-8', typeName: 'bar', displayName: { en: 'Bar/Pub', hi: 'बार' }, isAllowed: false },
+  { id: 'PT-9', typeName: 'movie_theater', displayName: { en: 'Movie Theater', hi: 'सिनेमा घर' }, isAllowed: true },
+  { id: 'PT-10', typeName: 'amusement_park', displayName: { en: 'Amusement Park', hi: 'मनोरंजन पार्क' }, isAllowed: true },
 ];
 
 let mockDefaults: SystemDefaults = {
@@ -175,6 +218,7 @@ export const masterDataApi = {
   getDisputeReasons: async (): Promise<DisputeReason[]> => Promise.resolve([...disputeReasons]),
   getCancellationReasons: async (): Promise<CancellationReason[]> => Promise.resolve([...cancellationReasons]),
   getKYCDocumentTypes: async (): Promise<KYCDocumentType[]> => Promise.resolve([...kycDocumentTypes]),
+  getPlaceTypes: async (): Promise<PlaceTypeConfig[]> => Promise.resolve([...mockPlaceTypes]),
 
   toggleCity: async (id: string): Promise<void> => {
     const item = cities.find(i => i.id === id);
@@ -244,6 +288,10 @@ export const masterDataApi = {
   toggleKYCDocumentType: async (id: string): Promise<void> => {
     const item = kycDocumentTypes.find(i => i.id === id);
     if (item) item.active = !item.active;
+    return Promise.resolve();
+  },
+  togglePlaceTypeAllowed: async (id: string): Promise<void> => {
+    mockPlaceTypes = mockPlaceTypes.map(p => p.id === id ? { ...p, isAllowed: !p.isAllowed } : p);
     return Promise.resolve();
   },
   updateInterestMultiplier: async (id: string, multiplier: number): Promise<void> => {

@@ -25,6 +25,7 @@ export default function SystemConfigPage() {
       specialEventMultiplierLimit: 2.0,
       cancellationFeePercentage: 10,
       flatServiceFeeAmount: 50,
+      newCitySuggestedRateFallback: 500,
     },
     safetyBonusRule: {
       incidentFreeMonths: 1,
@@ -39,7 +40,13 @@ export default function SystemConfigPage() {
     },
     customerInterestSelectionLimits: { min: 3, max: 10 },
     companionCategorySelectionLimits: { min: 1, max: 3 },
-    companionServiceAreaLimits: { min: 1, max: 8 }
+    companionServiceAreaLimits: { min: 1, max: 8 },
+    booking: {
+      overlappingSessionConflictDetection: true,
+    },
+    wallet: {
+      maxWalletBalance: 50000,
+    }
   });
 
   const [activityValues, setActivityValues] = useState<Record<string, number | string>>({});
@@ -186,6 +193,17 @@ export default function SystemConfigPage() {
                   }))}
                 />
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">New City Suggested Rate Fallback (₹)</label>
+                <Input 
+                  type="number" min="0"
+                  value={formData.pricing.newCitySuggestedRateFallback}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    pricing: { ...p.pricing, newCitySuggestedRateFallback: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
             </div>
           )
         },
@@ -268,6 +286,40 @@ export default function SystemConfigPage() {
                   onChange={(e) => setFormData(p => ({ 
                     ...p, 
                     safety: { ...p.safety, sosHoldToTriggerSeconds: Number(e.target.value) } 
+                  }))}
+                />
+              </div>
+            </div>
+          )
+        },
+        {
+          title: "Booking & Wallet Limits",
+          description: "Manage overlapping conflicts and maximum wallet limits.",
+          children: (
+            <div className="grid grid-cols-2 gap-4 max-w-xl">
+              <div className="space-y-2 flex flex-col justify-center">
+                <label className="text-sm font-medium mb-2">Overlapping Session Detection</label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    type="checkbox"
+                    className="w-4 h-4"
+                    checked={formData.booking?.overlappingSessionConflictDetection}
+                    onChange={(e) => setFormData(p => ({ 
+                      ...p, 
+                      booking: { ...p.booking, overlappingSessionConflictDetection: e.target.checked } 
+                    }))}
+                  />
+                  <span className="text-sm">Enabled</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Max Wallet Balance (₹)</label>
+                <Input 
+                  type="number" min="0"
+                  value={formData.wallet?.maxWalletBalance || 50000}
+                  onChange={(e) => setFormData(p => ({ 
+                    ...p, 
+                    wallet: { ...p.wallet, maxWalletBalance: Number(e.target.value) } 
                   }))}
                 />
               </div>

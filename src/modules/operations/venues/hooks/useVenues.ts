@@ -10,10 +10,6 @@ export const useVenues = () => {
     queryFn: venuesApi.getFeaturedVenues,
   });
 
-  const placeTypesQuery = useQuery({
-    queryKey: ['place-types'],
-    queryFn: venuesApi.getPlaceTypes,
-  });
 
   const toggleVenueMutation = useMutation({
     mutationFn: venuesApi.toggleVenueActive,
@@ -31,13 +27,6 @@ export const useVenues = () => {
     },
   });
 
-  const togglePlaceTypeMutation = useMutation({
-    mutationFn: venuesApi.togglePlaceTypeAllowed,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['place-types'] });
-      toast.success('Place category rule updated');
-    },
-  });
 
   const createVenueMutation = useMutation({
     mutationFn: (data: Omit<FeaturedVenue, 'id' | 'isActive'>) => venuesApi.createFeaturedVenue(data),
@@ -49,11 +38,9 @@ export const useVenues = () => {
 
   return {
     venues: venuesQuery.data ?? [],
-    placeTypes: placeTypesQuery.data ?? [],
-    isLoading: venuesQuery.isLoading || placeTypesQuery.isLoading,
+    isLoading: venuesQuery.isLoading,
     toggleVenue: toggleVenueMutation.mutate,
     deleteVenue: deleteVenueMutation.mutate,
-    togglePlaceType: togglePlaceTypeMutation.mutate,
     createVenue: createVenueMutation.mutate,
   };
 };

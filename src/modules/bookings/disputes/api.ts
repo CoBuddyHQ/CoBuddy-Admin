@@ -1,5 +1,5 @@
 import { BookingDispute } from './types';
-import { refundsApi } from '../../financials/refunds/api';
+import { refundsApi } from '../../financial/refunds/api';
 
 export function getRefundPercentForNotice(noticeHours: number, tiers: any[]): number {
   const tier = tiers.find(t => 

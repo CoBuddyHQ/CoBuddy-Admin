@@ -21,6 +21,7 @@ export const useMasterData = () => {
   const disputeReasonsQuery = useQuery({ queryKey: ['disputeReasons'], queryFn: masterDataApi.getDisputeReasons });
   const cancellationReasonsQuery = useQuery({ queryKey: ['cancellationReasons'], queryFn: masterDataApi.getCancellationReasons });
   const kycDocumentTypesQuery = useQuery({ queryKey: ['kycDocumentTypes'], queryFn: masterDataApi.getKYCDocumentTypes });
+  const placeTypesQuery = useQuery({ queryKey: ['placeTypes'], queryFn: masterDataApi.getPlaceTypes });
 
   const toggleCityMutation = useMutation({
     mutationFn: masterDataApi.toggleCity,
@@ -78,6 +79,10 @@ export const useMasterData = () => {
   const toggleKYCDocumentTypeMutation = useMutation({
     mutationFn: masterDataApi.toggleKYCDocumentType,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['kycDocumentTypes'] }); toast.success('Status updated'); }
+  });
+  const togglePlaceTypeAllowedMutation = useMutation({
+    mutationFn: masterDataApi.togglePlaceTypeAllowed,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['placeTypes'] }); toast.success('Status updated'); }
   });
 
   const addCityMutation = useMutation({
@@ -169,8 +174,9 @@ export const useMasterData = () => {
     disputeReasons: disputeReasonsQuery.data || [],
     cancellationReasons: cancellationReasonsQuery.data || [],
     kycDocumentTypes: kycDocumentTypesQuery.data || [],
+    placeTypes: placeTypesQuery.data || [],
     defaults: defaultsQuery.data,
-    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading || ticketCategoriesQuery.isLoading || incidentTypesQuery.isLoading || communicationStylesQuery.isLoading || activityPacesQuery.isLoading || sessionDurationsQuery.isLoading || notificationCategoriesQuery.isLoading || reviewTagsQuery.isLoading || disputeReasonsQuery.isLoading || cancellationReasonsQuery.isLoading || kycDocumentTypesQuery.isLoading,
+    isLoading: citiesQuery.isLoading || interestsQuery.isLoading || languagesQuery.isLoading || appLanguagesQuery.isLoading || defaultsQuery.isLoading || ticketCategoriesQuery.isLoading || incidentTypesQuery.isLoading || communicationStylesQuery.isLoading || activityPacesQuery.isLoading || sessionDurationsQuery.isLoading || notificationCategoriesQuery.isLoading || reviewTagsQuery.isLoading || disputeReasonsQuery.isLoading || cancellationReasonsQuery.isLoading || kycDocumentTypesQuery.isLoading || placeTypesQuery.isLoading,
     
     toggleCity: toggleCityMutation.mutate,
     toggleInterest: toggleInterestMutation.mutate,
@@ -186,6 +192,7 @@ export const useMasterData = () => {
     toggleDisputeReason: toggleDisputeReasonMutation.mutate,
     toggleCancellationReason: toggleCancellationReasonMutation.mutate,
     toggleKYCDocumentType: toggleKYCDocumentTypeMutation.mutate,
+    togglePlaceTypeAllowed: togglePlaceTypeAllowedMutation.mutate,
     
     addCity: addCityMutation.mutate,
     addInterest: addInterestMutation.mutate,

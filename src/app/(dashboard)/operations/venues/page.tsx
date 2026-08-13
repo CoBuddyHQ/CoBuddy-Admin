@@ -24,8 +24,8 @@ function getMissingLanguages(nameObj: Record<string, string>, appLanguages: AppL
 }
 
 export default function VenuesPage() {
-  const { venues, placeTypes, isLoading, toggleVenue, deleteVenue, togglePlaceType, createVenue } = useVenues();
-  const { appLanguages } = useMasterData();
+  const { venues, isLoading: venuesLoading, toggleVenue, deleteVenue, createVenue } = useVenues();
+  const { appLanguages, placeTypes = [], togglePlaceTypeAllowed, isLoading: mdLoading } = useMasterData();
   const activeLangs = appLanguages?.filter(l => l.active) || [];
 
   const [open, setOpen] = useState(false);
@@ -66,7 +66,7 @@ export default function VenuesPage() {
     setOpen(true);
   };
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (venuesLoading || mdLoading) return <div className="p-6">Loading...</div>;
 
   const allowedCategories = placeTypes.filter(pt => pt.isAllowed);
 
@@ -231,7 +231,7 @@ export default function VenuesPage() {
                     </span>
                     <Switch 
                       checked={pt.isAllowed}
-                      onCheckedChange={() => togglePlaceType(pt.id)}
+                      onCheckedChange={() => togglePlaceTypeAllowed(pt.id)}
                     />
                   </div>
                 </div>

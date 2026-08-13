@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, User, FileText, Image as ImageIcon, ShieldAlert } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { useAuthStore } from '@/store/authStore';
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
@@ -21,7 +22,7 @@ export default function IncidentDetailPage() {
   const { user } = useAuthStore();
   const { incidentTypes } = useMasterData();
 
-  const { detail, isLoading, updateStatus, isUpdating } = useIncidentDetail(incidentId);
+  const { detail, isLoading, updateStatus, isUpdating, togglePreserveEvidence, isTogglingEvidence } = useIncidentDetail(incidentId);
 
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'ESCALATED_LEGAL' | 'CLOSED'>('INVESTIGATING');
@@ -127,9 +128,19 @@ export default function IncidentDetailPage() {
 
         <div className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Evidence Preserved</CardTitle>
-              <CardDescription>Files attached and preserved for legal.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div className="space-y-0.5">
+                <CardTitle>Evidence Preserved</CardTitle>
+                <CardDescription>Files attached and preserved for legal.</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">Preserve</span>
+                <Switch 
+                  checked={detail.preserveEvidence || false}
+                  onCheckedChange={() => togglePreserveEvidence()}
+                  disabled={isTogglingEvidence}
+                />
+              </div>
             </CardHeader>
             <CardContent>
               {detail.evidence.length === 0 ? (

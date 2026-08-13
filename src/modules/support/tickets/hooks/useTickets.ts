@@ -12,11 +12,14 @@ export const useTickets = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: SupportTicket['status'] }) => ticketsApi.updateStatus(id, status),
+    mutationFn: ({ id, status, resolutionNote }: { id: string; status: SupportTicket['status']; resolutionNote?: string }) => ticketsApi.updateStatus(id, status, resolutionNote),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
       toast.success(`Ticket status updated to ${status}`);
     },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update ticket');
+    }
   });
 
   const escalateMutation = useMutation({

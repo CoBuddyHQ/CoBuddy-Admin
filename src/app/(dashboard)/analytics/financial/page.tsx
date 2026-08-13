@@ -2,7 +2,7 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useMarketPerformance } from '@/modules/analytics/market/hooks/useMarketPerformance';
-import { useRevenueStats } from '@/modules/financials/revenue/hooks/useRevenueStats';
+import { useRevenueStats } from '@/modules/financial/revenue-reports/hooks/useRevenueStats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, DonutChart } from '@tremor/react';
 import {

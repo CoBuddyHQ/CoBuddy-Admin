@@ -8,9 +8,3 @@ export interface FeaturedVenue {
   isActive: boolean;
 }
 
-export interface PlaceTypeConfig {
-  id: string;
-  typeName: string; // e.g. "cafe", "restaurant", "park"
-  displayName: Record<string, string>; // e.g. "Café", "Restaurant", "Public Park"
-  isAllowed: boolean;
-}

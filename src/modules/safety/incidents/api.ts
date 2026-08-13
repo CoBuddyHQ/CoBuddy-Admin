@@ -9,6 +9,7 @@ const mockDetail: IncidentDetail = {
   ...mockIncidents[0],
   description: 'Companion reported that customer grabbed them forcefully during the movie.',
   evidence: ['sos_audio_123.mp3', 'chat_transcript_456.pdf'],
+  preserveEvidence: false,
   investigatorNotes: [
     { timestamp: new Date(Date.now() - 80000000).toISOString(), note: 'Called companion to verify. Escalating to Legal.', author: 'Safety Officer Mike' }
   ],
@@ -30,6 +31,12 @@ export const incidentsApi = {
       mockDetail.investigatorNotes.push({ timestamp: new Date().toISOString(), note, author });
       mockDetail.status = status;
       if (status === 'ESCALATED_LEGAL') mockDetail.legalEscalation = true;
+    }
+    return Promise.resolve();
+  },
+  togglePreserveEvidence: async (id: string): Promise<void> => {
+    if (id === mockDetail.id) {
+      mockDetail.preserveEvidence = !mockDetail.preserveEvidence;
     }
     return Promise.resolve();
   }

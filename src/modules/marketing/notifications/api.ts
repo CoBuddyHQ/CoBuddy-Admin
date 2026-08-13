@@ -1,8 +1,9 @@
 import { PushNotification, NotificationConfig } from './types';
 
 const mockNotifications: PushNotification[] = [
-  { id: 'PN-01', title: 'Weekend Special!', message: 'Get 20% off all bookings this weekend.', targetAudience: 'CUSTOMERS', status: 'SENT', sentAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'PN-02', title: 'Mumbai Meetup', message: 'Join the companion mixer in Bandra.', targetAudience: 'CITY_SPECIFIC', targetCity: 'Mumbai', status: 'SCHEDULED', scheduledFor: new Date(Date.now() + 86400000).toISOString() },
+  { id: 'PN-01', title: 'Weekend Special!', message: 'Get 20% off all bookings this weekend.', category: 'promo', targetAudience: 'CUSTOMERS', status: 'SENT', sentAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'PN-02', title: 'Mumbai Meetup', message: 'Join the companion mixer in Bandra.', category: 'event', targetAudience: 'CITY_SPECIFIC', targetCity: 'Mumbai', status: 'SCHEDULED', scheduledFor: new Date(Date.now() + 86400000).toISOString() },
+  { id: 'PN-03', title: 'Wallet Top-up Successful', message: '₹500 has been credited to your wallet.', category: 'wallet', targetAudience: 'CUSTOMERS', status: 'SENT', sentAt: new Date(Date.now() - 3600000).toISOString() },
 ];
 
 let mockConfig: NotificationConfig = {

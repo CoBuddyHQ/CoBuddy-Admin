@@ -42,8 +42,16 @@ export const ticketsApi = {
     return [...mockTickets];
   },
   
-  updateStatus: async (id: string, status: SupportTicket['status']): Promise<void> => {
-    mockTickets = mockTickets.map(t => t.id === id ? { ...t, status } : t);
+  updateStatus: async (id: string, status: SupportTicket['status'], resolutionNote?: string): Promise<void> => {
+    mockTickets = mockTickets.map(t => {
+      if (t.id === id) {
+        if (t.category === 'age_minor_escalation' && (status === 'RESOLVED' || status === 'CLOSED') && !resolutionNote) {
+          throw new Error('A resolution note is required to resolve or close an Age/Minor Escalation ticket.');
+        }
+        return { ...t, status, resolutionNote: resolutionNote || t.resolutionNote };
+      }
+      return t;
+    });
   },
 
   escalateTicket: async (id: string): Promise<void> => {

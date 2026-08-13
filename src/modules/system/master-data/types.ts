@@ -119,3 +119,10 @@ export interface KYCDocumentType {
   label: Record<string, string>;
   active: boolean;
 }
+
+export interface PlaceTypeConfig {
+  id: string;
+  typeName: string; // e.g. "cafe", "restaurant", "park"
+  displayName: Record<string, string>; // e.g. "Café", "Restaurant", "Public Park"
+  isAllowed: boolean;
+}

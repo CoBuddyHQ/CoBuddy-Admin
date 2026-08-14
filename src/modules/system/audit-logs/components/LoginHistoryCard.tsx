@@ -22,7 +22,7 @@ export function LoginHistoryCard({ employeeId, title = "Login / Session History"
         ) : (
           <div className="space-y-4">
             {loginHistory.map(log => (
-              <div key={log.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+              <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between items-start gap-2 border-b pb-2 last:border-0 last:pb-0">
                 <div>
                   <div className="font-medium text-sm">
                     {log.action === 'LOGIN' ? 'Logged In' : 'Logged Out'}

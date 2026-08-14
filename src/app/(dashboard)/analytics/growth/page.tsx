@@ -43,7 +43,7 @@ export default function GrowthDashboardPage() {
         <CardContent className="flex-1">
           <AreaChart
             className="h-full w-full min-h-[300px]"
-            data={stats.chartData}
+            data={stats.chartData.map(d => ({ ...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }))}
             index="date"
             categories={['newSignups', 'activeUsers']}
             colors={['cyan', 'indigo']}

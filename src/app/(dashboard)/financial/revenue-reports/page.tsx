@@ -29,7 +29,10 @@ export default function RevenueDashboardPage() {
     if (startDate && new Date(d.date) < new Date(startDate)) return false;
     if (endDate && new Date(d.date) > new Date(endDate)) return false;
     return true;
-  });
+  }).map(d => ({
+    ...d,
+    date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }));
 
   const handleExport = () => {
     exportToCsv(filteredChartData, `revenue_export_${new Date().toISOString().split('T')[0]}`);
@@ -41,6 +44,7 @@ export default function RevenueDashboardPage() {
         <PageHeader 
           title="Platform Revenue Dashboard" 
           description="Monitor Gross Booking Value (GBV), commissions, escrow status, and taxes."
+          className="w-full"
         />
         <div className="flex flex-wrap items-center gap-2 bg-background p-2 border rounded-md">
           <Input type="date" className="w-36 h-8 text-xs" value={startDate} onChange={e => setStartDate(e.target.value)} />

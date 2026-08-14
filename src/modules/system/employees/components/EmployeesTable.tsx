@@ -52,7 +52,7 @@ export function EmployeesTable({ employees, onToggleStatus, onForceLogout, onEdi
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2 bg-background p-4 border rounded-md">
+      <div className="flex flex-wrap items-center gap-2 bg-background p-4 border rounded-md">
         <span className="text-sm font-medium">Filter by Department:</span>
         <Select value={departmentFilter} onValueChange={(val) => setDepartmentFilter(val as string)}>
           <SelectTrigger className="w-[200px]">

@@ -43,7 +43,7 @@ export function ConfigFormTemplate({
         ))}
       </div>
       
-      <div className="flex items-center gap-4 bg-background p-4 rounded-md border">
+      <div className="flex flex-wrap items-center gap-4 bg-background p-4 rounded-md border">
         <Button onClick={onSave} disabled={isSaving}>
           {isSaving ? 'Saving...' : 'Save Changes'}
         </Button>
@@ -52,7 +52,7 @@ export function ConfigFormTemplate({
             Cancel
           </Button>
         )}
-        <p className="text-sm text-muted-foreground ml-auto">
+        <p className="text-sm text-muted-foreground w-full sm:w-auto sm:ml-auto">
           Note: changes take effect immediately, no app-redeploy needed
         </p>
       </div>

@@ -15,9 +15,10 @@ export default function MasterDataPage() {
     toggleCity, toggleInterest, toggleLanguage, toggleAppLanguage,
     toggleTicketCategory, toggleIncidentType, toggleCommunicationStyle, toggleActivityPace, toggleSessionDuration, toggleNotificationCategory, toggleReviewTag, toggleDisputeReason, toggleCancellationReason, toggleKYCDocumentType, togglePlaceTypeAllowed,
     addCity, addInterest, addLanguage, addAppLanguage, 
-    addTicketCategory, addIncidentType, addCommunicationStyle, addActivityPace, addSessionDuration, addNotificationCategory, addReviewTag, addDisputeReason, addCancellationReason, addKYCDocumentType, // wait, there is no addPlaceType in useMasterData for now? Or wait, let's just add it if it exists, otherwise omit. The requirement doesn't mention adding place types, just toggling and editing translations. But I built the AddPlaceTypeModal anyway, so let's import it. We can just omit `addPlaceType` or include it if available. Wait, I will look at `useMasterData.ts`. It does not have `addPlaceType` exported. I will just pass a dummy or undefined, wait, if I don't export `addPlaceType`, I shouldn't try to use it.
+    addTicketCategory, addIncidentType, addCommunicationStyle, addActivityPace, addSessionDuration, addNotificationCategory, addReviewTag, addDisputeReason, addCancellationReason, addKYCDocumentType,
     addAreaToCity, toggleArea,
     updateCityServiceHours,
+    updatePlaceType,
     updateDefaults
   } = useMasterData();
 
@@ -395,15 +396,7 @@ export default function MasterDataPage() {
         open={isPlaceTypeModalOpen}
         onOpenChange={setIsPlaceTypeModalOpen}
         onSubmit={(data: any) => {
-          // In real implementation we'd probably have an addPlaceType or updatePlaceType.
-          // Since it's mock, we might just update locally or not have it exposed. 
-          // If we want to support it, we need to add the mutation or ignore it.
-          // Wait, the prompt says "showing the placeTypes list with the ability to toggle isAllowed and edit the displayName translations".
-          // In a real app we'd dispatch an update mutation. Since the prompt only said reuse togglePlaceTypeAllowed for toggles, and edit translations, I should dispatch an update here if it existed.
-          // Actually, let me just add it. Wait, the hook `useMasterData` doesn't expose `updatePlaceType`. I'll just close the modal for now, or maybe the mock data doesn't support edit translations directly?
-          // I will just let it be a UI for now if there is no mutation for it.
-          // The prompt says "ability to... edit the displayName translations - reuse the existing togglePlaceTypeAllowed mutation...". It only mentions togglePlaceTypeAllowed for toggle.
-          console.log("Saving Place Type", data);
+          updatePlaceType(data);
           setIsPlaceTypeModalOpen(false);
         }}
         appLanguages={appLanguages}

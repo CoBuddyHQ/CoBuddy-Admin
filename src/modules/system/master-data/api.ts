@@ -84,7 +84,8 @@ const incidentTypes: IncidentType[] = [
   { id: 'IT-8', code: 'privacy_violation', label: { en: 'Privacy Violation', hi: 'गोपनीयता उल्लंघन' }, active: true },
   { id: 'IT-9', code: 'scam', label: { en: 'Scam/Fraud', hi: 'घोटाला/धोखाधड़ी' }, active: true },
   { id: 'IT-10', code: 'no_show_customer', label: { en: 'Customer No-Show', hi: 'ग्राहक कोई उपस्थिति नहीं' }, active: true },
-  { id: 'IT-11', code: 'other', label: { en: 'Other', hi: 'अन्य' }, active: true }
+  { id: 'IT-11', code: 'other', label: { en: 'Other', hi: 'अन्य' }, active: true },
+  { id: 'IT-12', code: 'identity_mismatch', label: { en: 'Identity Mismatch / Fake Profile', hi: 'पहचान बेमेल / नकली प्रोफ़ाइल' }, active: true }
 ];
 
 const communicationStyles: CommunicationStyleOption[] = [
@@ -292,6 +293,10 @@ export const masterDataApi = {
   },
   togglePlaceTypeAllowed: async (id: string): Promise<void> => {
     mockPlaceTypes = mockPlaceTypes.map(p => p.id === id ? { ...p, isAllowed: !p.isAllowed } : p);
+    return Promise.resolve();
+  },
+  updatePlaceType: async (id: string, displayName: Record<string, string>): Promise<void> => {
+    mockPlaceTypes = mockPlaceTypes.map(p => p.id === id ? { ...p, displayName } : p);
     return Promise.resolve();
   },
   updateInterestMultiplier: async (id: string, multiplier: number): Promise<void> => {

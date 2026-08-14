@@ -212,6 +212,11 @@ export const useMasterData = () => {
     addAreaToCity: addAreaToCityMutation.mutate,
     toggleArea: toggleAreaMutation.mutate,
 
+    updatePlaceType: useMutation({
+      mutationFn: ({ id, displayName }: { id: string; displayName: Record<string, string> }) => masterDataApi.updatePlaceType(id, displayName),
+      onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['placeTypes'] }); toast.success('Place Type updated'); }
+    }).mutate,
+
     updateCityServiceHours: useMutation({
       mutationFn: ({ cityId, hours }: { cityId: string, hours: { openTime: string; closeTime: string } | null }) => masterDataApi.updateCityServiceHours(cityId, hours),
       onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cities'] }); toast.success('Service hours updated'); }

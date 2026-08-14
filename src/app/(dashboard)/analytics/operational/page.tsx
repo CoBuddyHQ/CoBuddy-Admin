@@ -45,7 +45,7 @@ export default function SessionMetricsPage() {
 
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Session Metrics" 
         description="Track booking volumes, duration, and cancellation trends."
@@ -77,7 +77,7 @@ export default function SessionMetricsPage() {
             index="hour"
             categories={['sessions', 'cancellations']}
             colors={['indigo', 'rose']}
-            yAxisWidth={40}
+            yAxisWidth={80}
           />
         </CardContent>
       </Card>

@@ -53,7 +53,7 @@ export default function LiveSessionsPage() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="whitespace-nowrap">
                 <TableHead>Session ID</TableHead>
                 <TableHead>Companion</TableHead>
                 <TableHead>Customer</TableHead>

@@ -28,7 +28,7 @@ export default function FinancialAnalyticsPage() {
   }));
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col overflow-auto">
       <PageHeader 
         title="Financial Analytics" 
         description="Analyze revenue, customer acquisition cost (CAC), LTV, and market performance."
@@ -66,7 +66,7 @@ export default function FinancialAnalyticsPage() {
               categories={['Revenue']}
               colors={['indigo']}
               valueFormatter={formatCurrency}
-              yAxisWidth={80}
+              yAxisWidth={110}
             />
           </CardContent>
         </Card>

@@ -23,7 +23,7 @@ export default function TrustScorePage() {
   if (isLoading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader 
         title="Trust Score Engine" 
         description="Monitor companion trust scores, configure safety bonus rules, and manage manual overrides." 

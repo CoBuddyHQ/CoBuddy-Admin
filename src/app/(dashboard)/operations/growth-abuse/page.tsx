@@ -54,7 +54,7 @@ export default function GrowthAbusePage() {
                     <div className="font-medium">{alert.targetName}</div>
                     <div className="text-xs text-muted-foreground">{alert.targetId}</div>
                   </TableCell>
-                  <TableCell className="max-w-md">
+                  <TableCell className="min-w-[300px] max-w-md whitespace-normal">
                     <p className="text-sm">{alert.details}</p>
                     <div className="text-xs text-muted-foreground mt-1">{new Date(alert.timestamp).toLocaleString()}</div>
                   </TableCell>

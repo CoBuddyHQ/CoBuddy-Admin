@@ -39,7 +39,7 @@ export default function RevenueDashboardPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col overflow-auto">
+    <div className="space-y-6 h-full flex flex-col overflow-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <PageHeader 
           title="Platform Revenue Dashboard" 
@@ -113,7 +113,7 @@ export default function RevenueDashboardPage() {
               categories={['grossBookingValue', 'platformFee']}
               colors={['indigo', 'cyan']}
               valueFormatter={formatCurrency}
-              yAxisWidth={80}
+              yAxisWidth={110}
             />
           </CardContent>
         </Card>
@@ -130,7 +130,7 @@ export default function RevenueDashboardPage() {
               categories={['taxes']}
               colors={['amber']}
               valueFormatter={formatCurrency}
-              yAxisWidth={80}
+              yAxisWidth={110}
             />
           </CardContent>
         </Card>
@@ -147,7 +147,7 @@ export default function RevenueDashboardPage() {
               categories={['gmv', 'commission']}
               colors={['indigo', 'cyan']}
               valueFormatter={formatCurrency}
-              yAxisWidth={80}
+              yAxisWidth={110}
             />
           </CardContent>
         </Card>

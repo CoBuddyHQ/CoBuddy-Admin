@@ -24,7 +24,7 @@ export default function AnalyticsSafetyPage() {
   const resolvedAgeEscalations = ageEscalations.filter((e: any) => e.status === 'APPROVED' || e.status === 'REJECTED').length;
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col overflow-auto">
+    <div className="space-y-6 h-full flex flex-col overflow-auto">
       <PageHeader 
         title="Safety Analytics" 
         description="Monitor platform safety, bans, fraud hits, and age verification escalations."

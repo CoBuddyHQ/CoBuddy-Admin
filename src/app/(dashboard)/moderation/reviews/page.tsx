@@ -90,9 +90,9 @@ export default function ReviewsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="max-w-xs whitespace-normal">
-                      <p className="text-sm font-medium">{r.text}</p>
-                      <div className="flex flex-wrap mt-1">
+                    <div className="min-w-[300px] max-w-md whitespace-normal">
+                      <p className="text-sm font-medium leading-relaxed">{r.text}</p>
+                      <div className="flex flex-wrap gap-1 mt-2">
                         {r.tags.map(getTagBadge)}
                       </div>
                       {r.flagReason && <p className="text-xs text-destructive mt-1">Flag: {r.flagReason}</p>}

@@ -41,19 +41,20 @@ export function MasterListEditorTemplate({
           )
         }
       />
-      
-      <Tabs value={activeTab || tabs[0]?.id} onValueChange={onTabChange} className="w-full flex-1 flex flex-col">
-        <TabsList className="w-full justify-start overflow-x-auto">
+      <Tabs value={activeTab || tabs[0]?.id} onValueChange={onTabChange} orientation="vertical" className="w-full flex-1 flex flex-col md:flex-row gap-6 min-h-0">
+        <TabsList className="w-full md:w-64 flex-col items-stretch justify-start overflow-y-auto max-h-[40vh] md:max-h-full shrink-0 border rounded-md p-1 bg-background h-full">
           {tabs.map(tab => (
-            <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
+            <TabsTrigger key={tab.id} value={tab.id} className="justify-start text-left shrink-0">{tab.label}</TabsTrigger>
           ))}
         </TabsList>
         
-        {tabs.map(tab => (
-          <TabsContent key={tab.id} value={tab.id} className="flex-1 mt-4 bg-background rounded-md border overflow-hidden">
-            {tab.content}
-          </TabsContent>
-        ))}
+        <div className="flex-1 overflow-hidden flex flex-col min-w-0">
+          {tabs.map(tab => (
+            <TabsContent key={tab.id} value={tab.id} className="flex-1 bg-background rounded-md border overflow-hidden m-0 p-0">
+              {tab.content}
+            </TabsContent>
+          ))}
+        </div>
       </Tabs>
     </div>
   );

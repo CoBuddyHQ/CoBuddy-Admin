@@ -18,7 +18,7 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
   if (!companion) return <div className="p-6">Companion not found</div>;
 
   return (
-    <div className="space-y-6 h-full flex flex-col p-6">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader
         title={`Companion: ${companion.name}`}
         description="Detailed view of companion profile and performance."

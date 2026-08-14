@@ -11,7 +11,7 @@ export default function GrowthDashboardPage() {
   if (isLoading || !stats) return <div className="p-6">Loading Analytics Data...</div>;
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="User Growth & Retention" 
         description="Track user acquisition, companion onboarding, and overall retention metrics."
@@ -47,7 +47,7 @@ export default function GrowthDashboardPage() {
             index="date"
             categories={['newSignups', 'activeUsers']}
             colors={['cyan', 'indigo']}
-            yAxisWidth={60}
+            yAxisWidth={80}
           />
         </CardContent>
       </Card>

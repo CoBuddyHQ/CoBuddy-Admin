@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MoreHorizontal, ShieldOff, KeyRound, Edit2, LogOut } from 'lucide-react';
 import { formatDate } from '@/lib/utils/formatDate';
 import { EmptyState } from '@/components/ui/empty-state';
+import Link from 'next/link';
 
 interface EmployeesTableProps {
   employees: Employee[];
@@ -84,7 +85,12 @@ export function EmployeesTable({ employees, onToggleStatus, onForceLogout, onEdi
             {filteredEmployees.map((emp) => (
               <TableRow key={emp.id}>
                 <TableCell>
-                  <div className="font-medium">{emp.name} <span className="text-muted-foreground text-xs font-normal">({emp.employeeId})</span></div>
+                  <div className="font-medium">
+                    <Link href={`/system/employees/${emp.id}`} className="hover:underline text-primary">
+                      {emp.name}
+                    </Link>{' '}
+                    <span className="text-muted-foreground text-xs font-normal">({emp.employeeId})</span>
+                  </div>
                   <div className="text-xs text-muted-foreground">{emp.designation}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{emp.email} • {emp.phone}</div>
                 </TableCell>

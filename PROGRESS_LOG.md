@@ -132,7 +132,7 @@ All missing 15 modules have been implemented following the List+Detail/Dashboard
 - **Item 1: Assign to Me / Claim Mechanism:** Implemented `assignedTo` and `assignToMe` across `support/tickets` and `moderation/reports`. Reused the existing pattern from `companion-applications` with API updates, custom hooks extensions, and UI additions featuring a dedicated "Assignment" column and an interactive "Assign to Me" button.
 - **Item 2: SUPPORT_LEAD Role & Team View:** Created the `SUPPORT_LEAD` enum in `role.types.ts`. Granted this role all `SUPPORT_AGENT` module permissions plus `analytics` access in `permissions.ts`. Updated the `support/tickets/page.tsx` with conditional filtering logic enabling `SUPPORT_LEAD` to see a "Team View" toggle to view all tickets, and provided them a dropdown to reassign tickets to other support staff.
 - **Item 3: HR_ADMIN Role:** Created the `HR_ADMIN` enum in `role.types.ts`. Granted this role exclusive access alongside `SUPER_ADMIN` to the `employees` module. Added "HR" to the list of selectable departments in `AddStaffModal` and `Employee` type constraints.
-- **Item 4: Planned - Login History/Attendance:** V1 scope does not include active timesheet logging or attendance management. This remains a planned future feature.
+- **Item 4: Planned - Login History/Attendance:** V1 scope does not include active timesheet logging or attendance management. Update: this was built in Round 26 (session tracking) and Round 27 (per-employee Login History tab) — no longer planned/outstanding.
 - **Item 5: Verification & Reporting:** Completed `npx tsc --noEmit` and `npx eslint src` with 0 errors. Verified role-based conditionals safely default to strict paths.
 
 ## Round 10 Corrective Pass (Full Frontend Completeness Sweep)
@@ -284,3 +284,12 @@ px eslint src which both exited with 0 errors. Verified all UI integrations succ
 - **Item 4 (Re-verify and Report):** Re-ran `npx tsc --noEmit` and `npx eslint src` completely successfully. Verified that logging in records the login action correctly, logging out logs the logout action correctly, and the new test accounts successfully function as expected.
 
 **Round 26 completed successfully.**
+
+
+## Round 27 Corrective Pass
+
+- **Item 1 (Build system/employees Detail Page):** Added a new `[id]` detail page for employees following the `ListDetailTemplate` and Tab structure used by companions and customers. Added tabs for Profile, Reporting Chain, Login / Session History, and Account Actions. Extracted `LoginHistoryCard` from the `/profile` page and reused it. Made `EmployeesTable` rows clickable to route to the new detail page.
+- **Item 2 (Update Stale Note):** Updated the Round 9 note regarding Login History/Attendance to reflect that it is no longer planned but actually completed.
+- **Item 3 (Re-verify and Report):** Re-ran `npx tsc --noEmit` and `npx eslint src` completely successfully with 0 errors.
+
+**Round 27 completed successfully.**

@@ -2,17 +2,14 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useAuthStore } from '@/store/authStore';
-import { useAuditLogs } from '@/modules/system/audit-logs/hooks/useAuditLogs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Shield, ShieldAlert, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LoginHistoryCard } from '@/modules/system/audit-logs/components/LoginHistoryCard';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const { logs, isLoading: isLoadingLogs } = useAuditLogs();
   const twoFactorEnabled = user?.twoFactorEnabled || false;
-
-  const loginHistory = logs.filter(l => l.adminId === user?.id && (l.action === 'LOGIN' || l.action === 'LOGOUT'));
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -96,35 +93,11 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Login / Session History</CardTitle>
-            <CardDescription>Your recent login and logout activity.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingLogs ? (
-              <div className="text-sm text-muted-foreground">Loading history...</div>
-            ) : loginHistory.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No recent login history found.</div>
-            ) : (
-              <div className="space-y-4">
-                {loginHistory.map(log => (
-                  <div key={log.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
-                    <div>
-                      <div className="font-medium text-sm">
-                        {log.action === 'LOGIN' ? 'Logged In' : 'Logged Out'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">IP: {log.ipAddress}</div>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {user && (
+          <div className="md:col-span-2">
+            <LoginHistoryCard employeeId={user.id} />
+          </div>
+        )}
       </div>
     </div>
   );

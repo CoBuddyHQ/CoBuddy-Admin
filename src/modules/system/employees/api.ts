@@ -1,4 +1,3 @@
-import axios from '@/lib/api/client';
 import { Employee, AddEmployeePayload, UpdateEmployeeRolesPayload } from './types';
 
 // Mock data for development
@@ -45,6 +44,85 @@ const mockEmployees: Employee[] = [
     status: 'active',
     twoFactorEnabled: false,
     inviteStatus: 'pending'
+  },
+  {
+    id: 'emp-4',
+    employeeId: 'EMP-004',
+    name: 'Moderator User',
+    email: 'moderator@cobuddy.com',
+    phone: '+91 9876543213',
+    designation: 'Content Moderator',
+    department: 'Trust & Safety',
+    roles: ['MODERATOR' as any],
+    status: 'active',
+    twoFactorEnabled: false,
+    inviteStatus: 'accepted'
+  },
+  {
+    id: 'emp-5',
+    employeeId: 'EMP-005',
+    name: 'Safety Operator',
+    email: 'safety@cobuddy.com',
+    phone: '+91 9876543214',
+    designation: 'Trust & Safety',
+    department: 'Trust & Safety',
+    roles: ['SAFETY_OPERATOR' as any],
+    status: 'active',
+    twoFactorEnabled: false,
+    inviteStatus: 'accepted'
+  },
+  {
+    id: 'emp-6',
+    employeeId: 'EMP-006',
+    name: 'Finance Admin',
+    email: 'finance@cobuddy.com',
+    phone: '+91 9876543215',
+    designation: 'Finance Controller',
+    department: 'Finance',
+    roles: ['FINANCE_ADMIN' as any],
+    status: 'active',
+    twoFactorEnabled: false,
+    inviteStatus: 'accepted'
+  },
+  {
+    id: 'emp-7',
+    employeeId: 'EMP-007',
+    name: 'Legal Admin',
+    email: 'legal@cobuddy.com',
+    phone: '+91 9876543216',
+    designation: 'Legal Counsel',
+    department: 'Legal',
+    roles: ['LEGAL_ADMIN' as any],
+    status: 'active',
+    twoFactorEnabled: false,
+    inviteStatus: 'accepted'
+  },
+  {
+    id: 'emp-8',
+    employeeId: 'EMP-008',
+    name: 'City Ops Manager',
+    email: 'cityops@cobuddy.com',
+    phone: '+91 9876543217',
+    designation: 'Operations Manager',
+    department: 'Operations',
+    roles: ['CITY_OPS_MANAGER' as any],
+    cityScope: 'CITY-1',
+    status: 'active',
+    twoFactorEnabled: false,
+    inviteStatus: 'accepted'
+  },
+  {
+    id: 'emp-9',
+    employeeId: 'EMP-009',
+    name: 'HR Admin',
+    email: 'hr@cobuddy.com',
+    phone: '+91 9876543218',
+    designation: 'HR Manager',
+    department: 'HR',
+    roles: ['HR_ADMIN' as any],
+    status: 'active',
+    twoFactorEnabled: false,
+    inviteStatus: 'accepted'
   }
 ];
 

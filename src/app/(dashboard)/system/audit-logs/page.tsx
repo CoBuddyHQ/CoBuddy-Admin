@@ -37,7 +37,9 @@ export default function AuditLogsPage() {
                 <TableCell>{new Date(l.timestamp).toLocaleString()}</TableCell>
                 <TableCell className="font-medium">{l.adminName} ({l.adminId})</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{l.action}</Badge>
+                  <Badge variant={l.action === 'LOGIN' ? 'default' : l.action === 'LOGOUT' ? 'secondary' : 'outline'} className={l.action === 'LOGIN' ? 'bg-green-600 hover:bg-green-700' : ''}>
+                    {l.action}
+                  </Badge>
                 </TableCell>
                 <TableCell>{l.moduleAffected}</TableCell>
                 <TableCell className="max-w-sm truncate" title={l.details}>{l.details}</TableCell>

@@ -274,3 +274,13 @@ px eslint src which both exited with 0 errors. Verified all UI integrations succ
 - **Item 5 (Re-verify and Report):** Ran `npx tsc --noEmit`, `npx eslint src`, and `npm run build`. Fixed a minor TS typing bug in `RoleSwitcher.tsx`. Final build succeeded without errors. Verified that the auth-guard routing, authentication sequence, and dev tools operate perfectly on a production build.
 
 **Round 25 completed successfully.**
+
+
+## Round 26 Corrective Pass
+
+- **Item 1 (Login/Logout History):** Added `logAction` function to `auditLogsApi` to add new logs. Captured `LOGIN` events in `src/app/login/page.tsx` and `LOGOUT` events in `src/components/layout/TopBar.tsx` via the `auditLogsApi`. Enhanced `src/app/(dashboard)/system/audit-logs/page.tsx` to render `LOGIN` and `LOGOUT` actions with distinct colors on the badge. Added a new "Login / Session History" card to the `/profile` page that displays the user's latest login/logout activities.
+- **Item 2 (Add Test Employee Accounts for Missing Roles):** Added 6 new mock employee accounts into `src/modules/system/employees/api.ts` for all remaining staff roles (`MODERATOR`, `SAFETY_OPERATOR`, `FINANCE_ADMIN`, `LEGAL_ADMIN`, `CITY_OPS_MANAGER`, and `HR_ADMIN`) with realistic designations and departments.
+- **Item 3 (Remove Unused axios Import):** Removed the unused `axios` import from `src/modules/system/employees/api.ts`.
+- **Item 4 (Re-verify and Report):** Re-ran `npx tsc --noEmit` and `npx eslint src` completely successfully. Verified that logging in records the login action correctly, logging out logs the logout action correctly, and the new test accounts successfully function as expected.
+
+**Round 26 completed successfully.**

@@ -8,4 +8,13 @@ const mockLogs: AuditLog[] = [
 
 export const auditLogsApi = {
   getLogs: async (): Promise<AuditLog[]> => Promise.resolve([...mockLogs]),
+  logAction: async (log: Omit<AuditLog, 'id' | 'timestamp'>): Promise<AuditLog> => {
+    const newLog: AuditLog = {
+      ...log,
+      id: `AL-${Math.floor(1000 + Math.random() * 9000)}`,
+      timestamp: new Date().toISOString()
+    };
+    mockLogs.unshift(newLog); // Add to beginning for newest-first
+    return Promise.resolve(newLog);
+  }
 };

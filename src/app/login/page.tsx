@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { employeeApi } from '@/modules/system/employees/api';
+import { auditLogsApi } from '@/modules/system/audit-logs/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -80,6 +81,14 @@ export default function LoginPage() {
 
   const finalizeLogin = async (user: StaffUser) => {
     await employeeApi.updateLastLogin(user.id);
+    await auditLogsApi.logAction({
+      adminId: user.id,
+      adminName: user.name,
+      action: 'LOGIN',
+      moduleAffected: 'System',
+      details: 'User logged in',
+      ipAddress: '127.0.0.1' // Mock IP
+    });
     login(user);
     router.replace('/');
   };

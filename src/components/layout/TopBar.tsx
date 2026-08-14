@@ -3,6 +3,7 @@
 import { Bell, Search, User as UserIcon } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useStaffNotifications } from '@/modules/system/staff-notifications/hooks/useStaffNotifications';
+import { auditLogsApi } from '@/modules/system/audit-logs/api';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -25,7 +26,17 @@ export function TopBar() {
   const { setTheme, theme } = useTheme();
   const { notifications } = useStaffNotifications();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (user) {
+      await auditLogsApi.logAction({
+        adminId: user.id,
+        adminName: user.name,
+        action: 'LOGOUT',
+        moduleAffected: 'System',
+        details: 'User logged out',
+        ipAddress: '127.0.0.1' // Mock IP
+      });
+    }
     logout();
     router.replace('/login');
   };

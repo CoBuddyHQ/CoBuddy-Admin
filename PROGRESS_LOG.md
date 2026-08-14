@@ -324,3 +324,15 @@ px eslint src which resulted in 0 errors. Verified all UI responsive layout fixe
 
 **Round 29 completed successfully.**
 
+
+## Round 29 Re-Correction (Final Polish Pass)
+
+- **Padding Consistency:** Reverted all custom padding instances on individual page wrappers across 30+ dashboard routes and localized the uniform p-6 constraint exclusively inside src/app/(dashboard)/layout.tsx. This permanently resolves the inconsistent, double, or completely missing padding anomalies ('sidebar se chipka hai') reported by the user, ensuring pixel-perfect spacing on every route.
+- **Master Data UI Overhaul:** Completely redesigned the layout structure for src/components/templates/MasterListEditorTemplate.tsx. Replaced the previous grid of ugly pills with a sleek, vertical, Settings-style sidebar leveraging Base UI's native ariant='line' implementation. Tab triggers were resized and structured to function as standalone sidebar menu items, vastly improving UX and aesthetic polish.
+- **Tremor Charts & Recharts Hotfixes:** 
+  - **Tooltips:** Removed the clipping overflow-hidden constraint from the global Card component in src/components/ui/card.tsx. Tooltips hovering at the far right of Tremor charts (especially Donut charts) now smoothly overflow the container instead of cutting off or overlapping the border.
+  - **Legend Alignment & Overlaps:** Injected direct global CSS patches into globals.css targeting .recharts-legend-item to forcibly inject proper right-margins and element gaps, solving Tailwind v4 compatibility issues with Tremor's default spacing rules.
+  - **Expanded Axes:** Boosted yAxisWidth properties to 110 across all analytical and financial Bar/Area charts to prevent large currency amounts (e.g., ?16,00,000) from being clipped out of frame.
+- **Table Constraints:** Upgraded column boundary logic using min-w-[300px] and whitespace-normal wraps across moderation/reviews and operations/growth-abuse tables to guarantee content wraps downwards predictably without overlapping action or status badges.
+- **Live Sessions Table:** Implemented a strict whitespace-nowrap declaration on the <TableRow> header bounds to perfectly structure horizontal alignment across complex real-time active session columns.
+

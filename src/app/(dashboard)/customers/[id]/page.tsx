@@ -18,8 +18,8 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
   const { reports } = useReports();
   const customerReports = reports?.filter(r => r.reporterId === id || r.reportedUserId === id) || [];
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
-  if (!customer) return <div className="p-6">Customer not found</div>;
+  if (isLoading) return <div className="">Loading...</div>;
+  if (!customer) return <div className="">Customer not found</div>;
 
   return (
     <div className="space-y-6 h-full flex flex-col">

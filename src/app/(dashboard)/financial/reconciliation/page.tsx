@@ -11,7 +11,7 @@ import { RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react';
 export default function ReconciliationPage() {
   const { records, isLoading, updateStatus, retryWebhook } = useReconciliation();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -101,3 +101,4 @@ export default function ReconciliationPage() {
     </div>
   );
 }
+

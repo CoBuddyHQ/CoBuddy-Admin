@@ -14,7 +14,7 @@ export default function SessionMetricsPage() {
   const { tickets, isLoading: ticketsLoading } = useTickets();
   const { alerts, isLoading: slaLoading } = useSLA();
 
-  if (sessionsLoading || compsLoading || ticketsLoading || slaLoading || !metrics) return <div className="p-6">Loading Analytics Data...</div>;
+  if (sessionsLoading || compsLoading || ticketsLoading || slaLoading || !metrics) return <div className="">Loading Analytics Data...</div>;
 
   // 1. Booking Funnel
   // Requested = totalSessionsToday * 1.3, Accepted = totalSessionsToday, Completed = totalSessionsToday * (1 - cancellationRate)
@@ -139,3 +139,4 @@ export default function SessionMetricsPage() {
     </div>
   );
 }
+

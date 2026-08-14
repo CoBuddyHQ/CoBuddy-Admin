@@ -28,7 +28,7 @@ export default function TrustScoreDetailPage() {
 
   const canOverride = user && hasPermission(user.roles, 'super-admin');
 
-  if (isLoading || !detail) return <div className="p-6">Loading details...</div>;
+  if (isLoading || !detail) return <div className="">Loading details...</div>;
 
   const handleOverride = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +41,7 @@ export default function TrustScoreDetailPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4 mb-4">
         <Button variant="ghost" size="icon" onClick={() => router.push('/trust-score')}>
           <ArrowLeft className="h-4 w-4" />

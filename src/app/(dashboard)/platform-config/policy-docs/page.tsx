@@ -47,7 +47,7 @@ export default function PolicyDocsPage() {
     }
   }, [settings]);
 
-  if (isLoading || (settings && !formData)) return <div className="p-6">Loading...</div>;
+  if (isLoading || (settings && !formData)) return <div className="">Loading...</div>;
 
   const handleSubmitSettings = (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,3 +315,4 @@ export default function PolicyDocsPage() {
     </div>
   );
 }
+

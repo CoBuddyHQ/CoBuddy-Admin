@@ -21,7 +21,7 @@ export default function PayoutsPage() {
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Payouts & Escrow Management" 
         description="Release funds to companions from escrow after booking completion."
@@ -99,3 +99,4 @@ export default function PayoutsPage() {
     </div>
   );
 }
+

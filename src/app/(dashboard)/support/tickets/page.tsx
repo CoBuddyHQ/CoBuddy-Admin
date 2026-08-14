@@ -34,7 +34,7 @@ export default function TicketsPage() {
   const [resolutionTicket, setResolutionTicket] = useState<{ ticket: SupportTicket, status: 'RESOLVED' | 'CLOSED' } | null>(null);
   const [resolutionNote, setResolutionNote] = useState('');
 
-  if (isLoading || !user) return <div className="p-6">Loading...</div>;
+  if (isLoading || !user) return <div className="">Loading...</div>;
 
   const isLead = user.roles.includes(StaffRole.SUPPORT_LEAD);
   
@@ -306,3 +306,4 @@ export default function TicketsPage() {
     </div>
   );
 }
+

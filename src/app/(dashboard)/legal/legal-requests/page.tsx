@@ -45,7 +45,7 @@ export default function LegalRequestsPage() {
 
   const [selectedDocs, setSelectedDocs] = useState<string[] | null>(null);
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -223,3 +223,4 @@ export default function LegalRequestsPage() {
     </div>
   );
 }
+

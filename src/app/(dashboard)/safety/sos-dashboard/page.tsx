@@ -17,12 +17,12 @@ export default function SosDashboardPage() {
   const [selectedAudioUrl, setSelectedAudioUrl] = useState<string | null>(null);
   const [selectedContactAlert, setSelectedContactAlert] = useState<any>(null);
 
-  if (isLoading) return <div className="p-6">Loading Live SOS Dashboard...</div>;
+  if (isLoading) return <div className="">Loading Live SOS Dashboard...</div>;
 
   const activeAlerts = alerts.filter(a => a.status === 'ACTIVE' || a.status === 'ACKNOWLEDGED');
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col bg-red-50/30 dark:bg-red-950/10">
+    <div className="space-y-6 h-full flex flex-col bg-red-50/30 dark:bg-red-950/10">
       <div className="flex items-center justify-between">
         <PageHeader 
           title="Live SOS Dashboard" 
@@ -178,3 +178,4 @@ export default function SosDashboardPage() {
     </div>
   );
 }
+

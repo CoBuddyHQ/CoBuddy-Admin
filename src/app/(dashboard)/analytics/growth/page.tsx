@@ -8,7 +8,7 @@ import { AreaChart } from '@tremor/react';
 export default function GrowthDashboardPage() {
   const { stats, isLoading } = useGrowthStats();
 
-  if (isLoading || !stats) return <div className="p-6">Loading Analytics Data...</div>;
+  if (isLoading || !stats) return <div className="">Loading Analytics Data...</div>;
 
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -54,3 +54,4 @@ export default function GrowthDashboardPage() {
     </div>
   );
 }
+

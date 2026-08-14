@@ -61,7 +61,7 @@ export default function SystemConfigPage() {
     }
   }, [config]);
 
-  if (isLoading) return <div className="p-6">Loading config...</div>;
+  if (isLoading) return <div className="">Loading config...</div>;
 
   const handleSave = () => {
     saveConfig(formData as any);
@@ -477,3 +477,4 @@ export default function SystemConfigPage() {
     />
   );
 }
+

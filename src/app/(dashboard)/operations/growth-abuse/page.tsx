@@ -11,7 +11,7 @@ import { ShieldAlert, Ban, UserX } from 'lucide-react';
 export default function GrowthAbusePage() {
   const { alerts, isLoading, updateStatus, takeAction } = useGrowthAbuse();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -106,3 +106,4 @@ export default function GrowthAbusePage() {
     </div>
   );
 }
+

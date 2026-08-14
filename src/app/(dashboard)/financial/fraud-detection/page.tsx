@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 export default function FraudDetectionPage() {
   const { alerts, isLoading, updateStatus } = useFraudDetection();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -107,3 +107,4 @@ export default function FraudDetectionPage() {
     </div>
   );
 }
+

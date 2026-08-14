@@ -20,7 +20,7 @@ export default function EmergencyWorkflowPage() {
   const [nextStep, setNextStep] = useState<any>('');
   const [detail, setDetail] = useState('');
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   const handleAdvance = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function EmergencyWorkflowPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Emergency Escalation Workflow" 
         description="Standard Operating Procedure (SOP) tracker for handling active SOS alerts."
@@ -125,3 +125,4 @@ export default function EmergencyWorkflowPage() {
     </div>
   );
 }
+

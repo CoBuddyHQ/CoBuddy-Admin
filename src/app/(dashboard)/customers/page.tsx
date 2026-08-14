@@ -13,7 +13,7 @@ import Link from 'next/link';
 export default function CustomersPage() {
   const { customers, isLoading, updateStatus } = useCustomers();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -112,3 +112,4 @@ export default function CustomersPage() {
     </div>
   );
 }
+

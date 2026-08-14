@@ -11,7 +11,7 @@ import { AlertCircle, Clock, UserMinus } from 'lucide-react';
 export default function SLADashboardPage() {
   const { alerts, performance, isLoading, reassignTicket } = useSLA();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   const formatTime = (ms: number) => {
     const isNegative = ms < 0;
@@ -107,3 +107,4 @@ export default function SLADashboardPage() {
     </div>
   );
 }
+

@@ -66,7 +66,7 @@ export default function VenuesPage() {
     setOpen(true);
   };
 
-  if (venuesLoading || mdLoading) return <div className="p-6">Loading...</div>;
+  if (venuesLoading || mdLoading) return <div className="">Loading...</div>;
 
   const allowedCategories = placeTypes.filter(pt => pt.isAllowed);
 
@@ -243,3 +243,4 @@ export default function VenuesPage() {
     </div>
   );
 }
+

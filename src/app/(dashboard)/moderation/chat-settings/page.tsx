@@ -19,7 +19,7 @@ export default function ChatSettingsPage() {
     }
   }, [settings]);
 
-  if (isLoading || !formData) return <div className="p-6">Loading settings...</div>;
+  if (isLoading || !formData) return <div className="">Loading settings...</div>;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +27,7 @@ export default function ChatSettingsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Chat Settings" 
         description="Configure features and retention policies for in-app messaging."
@@ -103,3 +103,4 @@ export default function ChatSettingsPage() {
     </div>
   );
 }
+

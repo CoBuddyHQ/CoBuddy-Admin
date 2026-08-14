@@ -35,7 +35,7 @@ export default function DiscoveryRankingPage() {
   }, [weights]);
 
   if (isUISettingsLoading || isLoadingWeights || isLoadingPromoted || isLoadingMatch || !uiFormData || !weightsFormData || !matchConfig) {
-    return <div className="p-6">Loading settings...</div>;
+    return <div className="">Loading settings...</div>;
   }
 
   const handleUISubmit = (e: React.FormEvent) => {
@@ -68,7 +68,7 @@ export default function DiscoveryRankingPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Discovery & Ranking Config" 
         description="Configure how the app ranks companions and behaves for end users."
@@ -255,3 +255,4 @@ export default function DiscoveryRankingPage() {
     </div>
   );
 }
+

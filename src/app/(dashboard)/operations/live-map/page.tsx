@@ -9,10 +9,10 @@ import { MapPin } from 'lucide-react';
 export default function LiveMapPage() {
   const { markers, isLoading } = useLiveMap();
 
-  if (isLoading) return <div className="p-6">Loading Live Map...</div>;
+  if (isLoading) return <div className="">Loading Live Map...</div>;
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Live Booking Map" 
         description="Real-time map view of all ongoing sessions (heatmaps & pinpoints)."
@@ -74,3 +74,4 @@ export default function LiveMapPage() {
     </div>
   );
 }
+

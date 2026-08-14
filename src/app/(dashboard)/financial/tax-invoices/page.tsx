@@ -11,7 +11,7 @@ import { Download, CheckCircle } from 'lucide-react';
 export default function TaxInvoicesPage() {
   const { invoices, isLoading, updateStatus } = useTaxInvoices();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   const handleDownloadPdf = (invoice: any) => {
     const text = `Invoice ID: ${invoice.id}\nCompanion: ${invoice.companionName}\nPeriod: ${invoice.period}\nEarnings: ₹${invoice.totalEarnings}\nTDS: ₹${invoice.tdsDeducted}\nGST: ₹${invoice.gstCollected}\nStatus: ${invoice.status}`;
@@ -119,3 +119,4 @@ export default function TaxInvoicesPage() {
     </div>
   );
 }
+

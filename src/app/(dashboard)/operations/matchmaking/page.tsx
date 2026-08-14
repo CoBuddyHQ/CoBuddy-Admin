@@ -21,7 +21,7 @@ export default function MatchmakingConfigPage() {
     }
   }, [config]);
 
-  if (isLoading || !formData) return <div className="p-6">Loading configuration...</div>;
+  if (isLoading || !formData) return <div className="">Loading configuration...</div>;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ export default function MatchmakingConfigPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Search & Matchmaking Config" 
         description="Tune the algorithm governing how customers discover companions."
@@ -109,3 +109,4 @@ export default function MatchmakingConfigPage() {
     </div>
   );
 }
+

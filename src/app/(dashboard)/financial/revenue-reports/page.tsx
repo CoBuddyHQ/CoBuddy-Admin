@@ -20,7 +20,7 @@ export default function RevenueDashboardPage() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
-  if (isLoading || !stats) return <div className="p-6">Loading Financial Data...</div>;
+  if (isLoading || !stats) return <div className="">Loading Financial Data...</div>;
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
@@ -155,3 +155,4 @@ export default function RevenueDashboardPage() {
     </div>
   );
 }
+

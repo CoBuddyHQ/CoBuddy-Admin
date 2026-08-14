@@ -19,7 +19,7 @@ export default function AppealsPage() {
   const { appeals, isLoading, resolveAppeal } = useAppeals();
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Appeals & Ban Reversal Review" 
         description="Review user appeals against bans and restrictions."
@@ -82,3 +82,4 @@ export default function AppealsPage() {
     </div>
   );
 }
+

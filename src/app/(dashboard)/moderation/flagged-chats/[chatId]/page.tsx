@@ -22,7 +22,7 @@ export default function FlaggedChatDetailPage() {
   const [actionType, setActionType] = useState<'DISMISS' | 'WARN' | 'ESCALATE'>('DISMISS');
   const [notes, setNotes] = useState('');
 
-  if (isLoading || !detail) return <div className="p-6">Loading details...</div>;
+  if (isLoading || !detail) return <div className="">Loading details...</div>;
 
   const handleAction = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ export default function FlaggedChatDetailPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4 mb-4 shrink-0">
         <Button variant="ghost" size="icon" onClick={() => router.push('/moderation/flagged-chats')}>
           <ArrowLeft className="h-4 w-4" />

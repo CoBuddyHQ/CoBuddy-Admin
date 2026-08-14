@@ -23,7 +23,7 @@ export default function BookingDisputesPage() {
   const [penalty, setPenalty] = useState('');
   const [reason, setReason] = useState('');
 
-  if (disputesLoading || masterDataLoading) return <div className="p-6">Loading disputes...</div>;
+  if (disputesLoading || masterDataLoading) return <div className="">Loading disputes...</div>;
 
   const handleOverride = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,3 +140,4 @@ export default function BookingDisputesPage() {
     </div>
   );
 }
+

@@ -22,7 +22,7 @@ export default function MasterDataPage() {
     updateDefaults
   } = useMasterData();
 
-  const [activeTab, setActiveTab] = useState('cities');
+  const [activeTab, setActiveTab] = useState('');
   
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [isInterestModalOpen, setIsInterestModalOpen] = useState(false);
@@ -67,7 +67,7 @@ export default function MasterDataPage() {
     if (formData) updateDefaults(formData);
   };
 
-  if (isLoading || (defaults && !formData)) return <div className="p-6">Loading master data...</div>;
+  if (isLoading || (defaults && !formData)) return <div className="">Loading master data...</div>;
 
   const handleAddClick = () => {
     if (activeTab === 'cities') { setEditCity(undefined); setIsCityModalOpen(true); }
@@ -241,7 +241,7 @@ export default function MasterDataPage() {
             id: 'defaults',
             label: 'Global Defaults',
             content: (
-              <div className="p-6 max-w-2xl">
+              <div className="max-w-2xl">
                 <form onSubmit={handleSubmitDefaults} className="space-y-6 bg-card p-6 border rounded-lg shadow-sm">
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Localization Defaults</h3>
@@ -405,3 +405,4 @@ export default function MasterDataPage() {
     </>
   );
 }
+

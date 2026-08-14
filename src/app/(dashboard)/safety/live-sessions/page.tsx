@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 export default function LiveSessionsPage() {
   const { sessions, isLoading, flagSession, conflictingSessionIds } = useLiveSessions();
 
-  if (isLoading) return <div className="p-6">Loading live sessions...</div>;
+  if (isLoading) return <div className="">Loading live sessions...</div>;
 
   const activeSessions = sessions.filter(s => s.status !== 'COMPLETED');
 
@@ -130,3 +130,4 @@ export default function LiveSessionsPage() {
     </div>
   );
 }
+

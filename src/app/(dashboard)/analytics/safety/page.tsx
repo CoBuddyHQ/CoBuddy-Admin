@@ -11,7 +11,7 @@ export default function AnalyticsSafetyPage() {
   const { alerts: fraudAlerts, isLoading: fraudLoading } = useFraudDetection();
   const { cases: ageEscalations, isLoading: ageLoading } = useAgeEscalation();
 
-  if (bansLoading || fraudLoading || ageLoading) return <div className="p-6">Loading Safety Data...</div>;
+  if (bansLoading || fraudLoading || ageLoading) return <div className="">Loading Safety Data...</div>;
 
   const totalBans = restrictions.length;
   const repeatOffenders = restrictions.filter(r => r.reason.toLowerCase().includes('repeat') || r.reason.toLowerCase().includes('multiple')).length;
@@ -71,3 +71,4 @@ export default function AnalyticsSafetyPage() {
     </div>
   );
 }
+

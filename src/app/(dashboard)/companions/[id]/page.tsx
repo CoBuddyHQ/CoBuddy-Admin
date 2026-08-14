@@ -14,8 +14,8 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
   const { id } = use(params);
   const { companion, trustScoreHistory, sessionHistory, earnings, isLoading, updateStatus } = useCompanionDetail(id);
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
-  if (!companion) return <div className="p-6">Companion not found</div>;
+  if (isLoading) return <div className="">Loading...</div>;
+  if (!companion) return <div className="">Companion not found</div>;
 
   return (
     <div className="space-y-6 h-full flex flex-col">

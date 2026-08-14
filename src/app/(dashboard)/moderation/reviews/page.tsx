@@ -39,7 +39,7 @@ export default function ReviewsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Reviews Moderation" 
         description="Review flagged ratings and comments."
@@ -120,3 +120,4 @@ export default function ReviewsPage() {
     </div>
   );
 }
+

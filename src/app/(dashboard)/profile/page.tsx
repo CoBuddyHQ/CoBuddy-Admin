@@ -12,7 +12,7 @@ export default function ProfilePage() {
   const twoFactorEnabled = user?.twoFactorEnabled || false;
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-4xl">
       <PageHeader
         title="My Profile"
         description="View your account details and security settings."
@@ -102,3 +102,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

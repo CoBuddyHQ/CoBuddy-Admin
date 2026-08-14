@@ -18,7 +18,7 @@ export default function FinancialAnalyticsPage() {
   const { performance, isLoading: marketLoading } = useMarketPerformance();
   const { stats: revenueStats, isLoading: revLoading } = useRevenueStats();
 
-  if (marketLoading || revLoading || !revenueStats) return <div className="p-6">Loading Analytics Data...</div>;
+  if (marketLoading || revLoading || !revenueStats) return <div className="">Loading Analytics Data...</div>;
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
   const chartData = performance.map(p => ({
@@ -123,3 +123,4 @@ export default function FinancialAnalyticsPage() {
     </div>
   );
 }
+

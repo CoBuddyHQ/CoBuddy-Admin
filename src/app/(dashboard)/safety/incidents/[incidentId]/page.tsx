@@ -29,7 +29,7 @@ export default function IncidentDetailPage() {
   const [note, setNote] = useState('');
   const [selectedEvidence, setSelectedEvidence] = useState<string | null>(null);
 
-  if (isLoading || !detail) return <div className="p-6">Loading details...</div>;
+  if (isLoading || !detail) return <div className="">Loading details...</div>;
 
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ export default function IncidentDetailPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4 mb-4 shrink-0">
         <Button variant="ghost" size="icon" onClick={() => router.push('/safety/incidents')}>
           <ArrowLeft className="h-4 w-4" />

@@ -50,7 +50,7 @@ export default function CityLaunchPage() {
   };
 
   if (isLoadingLaunches || isLoadingWaitlist || (config && !formData)) {
-    return <div className="p-6">Loading...</div>;
+    return <div className="">Loading...</div>;
   }
 
   return (
@@ -275,3 +275,4 @@ export default function CityLaunchPage() {
     </div>
   );
 }
+

@@ -21,7 +21,7 @@ export default function AppConfigsPage() {
     }
   }, [config]);
 
-  if (isLoading || !formData) return <div className="p-6">Loading configuration...</div>;
+  if (isLoading || !formData) return <div className="">Loading configuration...</div>;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ export default function AppConfigsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Dynamic App Configs" 
         description="Control maintenance mode, forced updates, and global limits."
@@ -140,3 +140,4 @@ export default function AppConfigsPage() {
     </div>
   );
 }
+

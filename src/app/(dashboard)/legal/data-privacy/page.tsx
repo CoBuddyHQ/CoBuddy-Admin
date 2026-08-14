@@ -12,7 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 export default function PrivacyRequestsPage() {
   const { requests, isLoading, updateStatus, toggleLegalHold } = usePrivacy();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -128,3 +128,4 @@ export default function PrivacyRequestsPage() {
     </div>
   );
 }
+

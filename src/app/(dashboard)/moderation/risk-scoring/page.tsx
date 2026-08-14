@@ -19,7 +19,7 @@ export default function RiskScoringPage() {
   const { scores, isLoading, reclassify } = useRiskScores();
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Risk Scoring Engine" 
         description="Monitor device fingerprints, GPS spoofing, and duplicate accounts."
@@ -86,3 +86,4 @@ export default function RiskScoringPage() {
     </div>
   );
 }
+

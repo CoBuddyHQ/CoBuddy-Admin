@@ -23,8 +23,8 @@ export default function CompanionApplicationDetailPage() {
     isSubmittingDecision
   } = useCompanionApplicationDetail(id);
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
-  if (!application) return <div className="p-6">Application not found.</div>;
+  if (isLoading) return <div className="">Loading...</div>;
+  if (!application) return <div className="">Application not found.</div>;
 
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col">

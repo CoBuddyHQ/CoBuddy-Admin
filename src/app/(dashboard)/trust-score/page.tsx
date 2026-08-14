@@ -20,7 +20,7 @@ export default function TrustScorePage() {
   const { summaries, rules, isLoading, toggleRule } = useTrustScores();
   const router = useRouter();
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -102,3 +102,4 @@ export default function TrustScorePage() {
     </div>
   );
 }
+

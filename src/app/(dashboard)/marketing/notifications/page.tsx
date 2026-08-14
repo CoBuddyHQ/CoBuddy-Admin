@@ -69,10 +69,10 @@ export default function NotificationsPage() {
     return cat ? getLocalizedText(cat.label, 'en') : code;
   };
 
-  if (isLoading || isMasterDataLoading || (config && !configData)) return <div className="p-6">Loading...</div>;
+  if (isLoading || isMasterDataLoading || (config && !configData)) return <div className="">Loading...</div>;
 
   return (
-    <div className="p-6 space-y-6 h-full flex flex-col">
+    <div className="space-y-6 h-full flex flex-col">
       <PageHeader 
         title="Push Notifications & Triggers" 
         description="Broadcast announcements to users and configure system-level push credentials."
@@ -300,3 +300,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

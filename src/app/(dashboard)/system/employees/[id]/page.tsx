@@ -21,9 +21,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const { cities } = useMasterData();
   const [isEditingRoles, setIsEditingRoles] = useState(false);
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
   const employee = employees.find(e => e.id === id);
-  if (!employee) return <div className="p-6">Employee not found</div>;
+  if (!employee) return <div className="">Employee not found</div>;
 
   const cityName = employee.cityScope 
     ? cities.find((c: any) => c.id === employee.cityScope)?.name.en || employee.cityScope

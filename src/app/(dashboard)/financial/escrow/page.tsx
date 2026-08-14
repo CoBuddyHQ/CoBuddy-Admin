@@ -15,7 +15,7 @@ export default function EscrowPage() {
   const [maxTx, setMaxTx] = useState(config?.maxPerTransaction?.toString() || '');
   const [maxDay, setMaxDay] = useState(config?.maxPerDay?.toString() || '');
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="">Loading...</div>;
 
   const handleSaveConfig = () => {
     updateConfig({
@@ -132,3 +132,4 @@ export default function EscrowPage() {
     </div>
   );
 }
+

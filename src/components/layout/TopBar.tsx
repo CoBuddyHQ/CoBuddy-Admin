@@ -17,11 +17,18 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function TopBar() {
+  const router = useRouter();
   const { user, logout } = useAuthStore();
   const { setTheme, theme } = useTheme();
   const { notifications } = useStaffNotifications();
+
+  const handleLogout = () => {
+    logout();
+    router.replace('/login');
+  };
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-6">
@@ -100,7 +107,7 @@ export function TopBar() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

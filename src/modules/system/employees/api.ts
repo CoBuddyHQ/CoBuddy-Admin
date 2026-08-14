@@ -81,6 +81,14 @@ export const employeeApi = {
     return Promise.resolve(emp);
   },
 
+  updateLastLogin: async (id: string): Promise<void> => {
+    const emp = mockEmployees.find(e => e.id === id);
+    if (emp) {
+      emp.lastLogin = new Date().toISOString();
+    }
+    return Promise.resolve();
+  },
+
   resendInvite: async (id: string): Promise<void> => {
     return Promise.resolve();
   },

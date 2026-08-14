@@ -10,6 +10,7 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   'trust-score': { roles: [StaffRole.SUPER_ADMIN, StaffRole.MODERATOR] },
   
   'flagged-chats': { roles: [StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
+  'chat-settings': { roles: [StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
   'reports': { roles: [StaffRole.MODERATOR] },
   'bans': { roles: [StaffRole.SUPER_ADMIN, StaffRole.MODERATOR] },
   'risk-scoring': { roles: [StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
@@ -32,6 +33,10 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   
   'active-sessions': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
   'live-sessions': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.SUPER_ADMIN] },
+  'session-audit': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
+  'live-map': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
+  'completed-bookings': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
+  'cancelled-bookings': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.CITY_OPS_MANAGER, StaffRole.FINANCE_ADMIN, StaffRole.SUPER_ADMIN] },
   'booking-disputes': { roles: [StaffRole.FINANCE_ADMIN, StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.SUPER_ADMIN] },
   'audit-logs-bookings': { roles: [StaffRole.SUPER_ADMIN, StaffRole.MODERATOR] },
   'customers': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
@@ -41,11 +46,14 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   'sla-dashboard': { roles: [StaffRole.SUPPORT_AGENT, StaffRole.SUPPORT_LEAD, StaffRole.SUPER_ADMIN] },
   
   'ranking-config': { roles: [StaffRole.SUPER_ADMIN, StaffRole.CITY_OPS_MANAGER] },
+  'matchmaking': { roles: [StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
+  'events': { roles: [StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
   'city-launch': { roles: [StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
   'venues': { roles: [StaffRole.CITY_OPS_MANAGER, StaffRole.SUPER_ADMIN] },
   'growth-abuse': { roles: [StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },
   
   'master-data': { roles: [StaffRole.SUPER_ADMIN] },
+  'notifications': { roles: [StaffRole.SUPER_ADMIN, StaffRole.CITY_OPS_MANAGER] },
   'training': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.SUPER_ADMIN] },
   'announcements': { roles: [StaffRole.SUPER_ADMIN, StaffRole.CITY_OPS_MANAGER] },
   'policy-docs': { roles: [StaffRole.LEGAL_ADMIN, StaffRole.SUPER_ADMIN] },
@@ -54,6 +62,7 @@ export const MODULE_PERMISSIONS: Record<string, ModuleConfig> = {
   'legal-requests': { roles: [StaffRole.LEGAL_ADMIN, StaffRole.SUPER_ADMIN] },
   
   'config': { roles: [StaffRole.SUPER_ADMIN] },
+  'app-configs': { roles: [StaffRole.SUPER_ADMIN] },
   'employees': { roles: [StaffRole.SUPER_ADMIN, StaffRole.HR_ADMIN] },
   'audit-logs': { roles: [StaffRole.SUPER_ADMIN] },
   'analytics-safety': { roles: [StaffRole.SAFETY_OPERATOR, StaffRole.MODERATOR, StaffRole.SUPER_ADMIN] },

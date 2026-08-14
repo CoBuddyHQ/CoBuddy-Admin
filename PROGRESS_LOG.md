@@ -293,3 +293,17 @@ px eslint src which both exited with 0 errors. Verified all UI integrations succ
 - **Item 3 (Re-verify and Report):** Re-ran `npx tsc --noEmit` and `npx eslint src` completely successfully with 0 errors.
 
 **Round 27 completed successfully.**
+
+
+## Round 28 Corrective Pass
+
+- **Item 1 (Missing MODULE_PERMISSIONS):** Added 9 missing module permission entries in \src/lib/auth/permissions.ts\ (\chat-settings\, \live-map\, \completed-bookings\, \cancelled-bookings\, \matchmaking\, \session-audit\, \events\, \
+otifications\, \pp-configs\) assigning logical default roles aligned with their respective sidebar sections.
+  - *Note:* \
+otifications\ has been granted to \SUPER_ADMIN\ and \CITY_OPS_MANAGER\. There is no dedicated Marketing role in the current \StaffRole\ enum, so this is scoped to the closest existing roles. It is highly recommended to introduce a dedicated \MARKETING_ADMIN\ role in a future iteration if the platform's marketing capabilities grow.
+- **Item 2 (Cross-Check Verification):** Ran a script to cross-check all 53 unique \module\ keys referenced in \src/components/layout/Sidebar.tsx\ against the entries in \MODULE_PERMISSIONS\. Confirmed that there are exactly 0 missing module keys remaining in the permissions map.
+- **Item 3 (Validation & Push):** Ran \
+px tsc --noEmit\ and \
+px eslint src\ yielding 0 errors. Confirmed that logging in as the \cityops@cobuddy.com\ test account correctly renders 'Live Booking Map', 'Completed Bookings', 'Failed / Cancelled', 'Search & Matchmaking', and 'Special Events' within the Sidebar navigation interface.
+
+**Round 28 completed successfully.**

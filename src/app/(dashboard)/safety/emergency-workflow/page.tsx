@@ -38,7 +38,7 @@ export default function EmergencyWorkflowPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Emergency Escalation Workflow" 
         description="Standard Operating Procedure (SOP) tracker for handling active SOS alerts."

@@ -39,7 +39,7 @@ export default function ReviewsPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Reviews Moderation" 
         description="Review flagged ratings and comments."

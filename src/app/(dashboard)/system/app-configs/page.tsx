@@ -29,7 +29,7 @@ export default function AppConfigsPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Dynamic App Configs" 
         description="Control maintenance mode, forced updates, and global limits."

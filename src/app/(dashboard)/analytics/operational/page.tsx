@@ -45,7 +45,7 @@ export default function SessionMetricsPage() {
 
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Session Metrics" 
         description="Track booking volumes, duration, and cancellation trends."
@@ -66,13 +66,13 @@ export default function SessionMetricsPage() {
         </Card>
       </div>
 
-      <Card className="flex-1 min-h-[400px] flex flex-col">
+      <Card>
         <CardHeader>
           <CardTitle>Session Volume & Cancellations (Hourly)</CardTitle>
         </CardHeader>
-        <CardContent className="flex-1">
+        <CardContent>
           <LineChart
-            className="h-full w-full min-h-[300px]"
+            className="h-80 mt-4"
             data={metrics.chartData}
             index="hour"
             categories={['sessions', 'cancellations']}

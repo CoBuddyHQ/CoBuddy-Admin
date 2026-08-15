@@ -21,7 +21,7 @@ export function ListDetailTemplate({
   isDetailOpen
 }: ListDetailTemplateProps) {
   return (
-    <div className="flex h-[calc(100vh-8rem)]">
+    <div className="flex flex-1 min-h-0">
       <div className={`flex-1 transition-all duration-300 ${isDetailOpen ? 'mr-6 pr-6 border-r' : ''}`}>
         <PageHeader title={title} description={description} action={headerAction} />
         

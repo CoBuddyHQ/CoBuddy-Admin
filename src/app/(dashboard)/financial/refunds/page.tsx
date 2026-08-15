@@ -39,7 +39,7 @@ export default function RefundsPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Refunds & Booking Settings" 
         description="Process refunds and configure global booking duration/cancellation policies."

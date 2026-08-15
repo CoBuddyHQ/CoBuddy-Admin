@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import React from 'react';
 interface Props {
   idUrl: string;
   selfieUrl: string;

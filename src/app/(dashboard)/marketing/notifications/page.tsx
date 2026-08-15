@@ -72,7 +72,7 @@ export default function NotificationsPage() {
   if (isLoading || isMasterDataLoading || (config && !configData)) return <div className="">Loading...</div>;
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Push Notifications & Triggers" 
         description="Broadcast announcements to users and configure system-level push credentials."

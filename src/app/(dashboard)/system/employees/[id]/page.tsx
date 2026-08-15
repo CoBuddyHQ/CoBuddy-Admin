@@ -36,7 +36,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const directReports = employees.filter(e => e.reportingManagerId === employee.id);
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader
         title={`Employee: ${employee.name}`}
         description="Detailed view of employee profile and access."

@@ -25,7 +25,7 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Special Events & Category Highlights" 
         description="Manage promotional banners and featured categories on the customer app home screen."

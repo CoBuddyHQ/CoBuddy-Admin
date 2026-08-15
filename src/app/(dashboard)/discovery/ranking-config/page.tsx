@@ -68,7 +68,7 @@ export default function DiscoveryRankingPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Discovery & Ranking Config" 
         description="Configure how the app ranks companions and behaves for end users."

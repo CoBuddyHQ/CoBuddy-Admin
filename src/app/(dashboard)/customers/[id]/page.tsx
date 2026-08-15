@@ -22,7 +22,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
   if (!customer) return <div className="">Customer not found</div>;
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader
         title={`Customer: ${customer.name}`}
         description="Detailed view of customer profile, wallet, and history."

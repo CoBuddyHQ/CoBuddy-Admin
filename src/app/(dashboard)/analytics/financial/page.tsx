@@ -28,7 +28,7 @@ export default function FinancialAnalyticsPage() {
   }));
 
   return (
-    <div className="space-y-6 h-full flex flex-col overflow-auto">
+    <div className="space-y-6">
       <PageHeader 
         title="Financial Analytics" 
         description="Analyze revenue, customer acquisition cost (CAC), LTV, and market performance."

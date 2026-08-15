@@ -34,7 +34,7 @@ export default function BansPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Ban & Restriction Management" 
         description="Apply restrictions, suspend accounts, and forcefully logout users globally."

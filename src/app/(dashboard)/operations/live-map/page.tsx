@@ -12,7 +12,7 @@ export default function LiveMapPage() {
   if (isLoading) return <div className="">Loading Live Map...</div>;
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Live Booking Map" 
         description="Real-time map view of all ongoing sessions (heatmaps & pinpoints)."

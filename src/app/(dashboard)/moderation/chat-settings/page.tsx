@@ -27,7 +27,7 @@ export default function ChatSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Chat Settings" 
         description="Configure features and retention policies for in-app messaging."

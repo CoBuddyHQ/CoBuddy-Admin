@@ -21,7 +21,7 @@ export default function GeofencePage() {
   const router = useRouter();
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Geofence Breach Alerts" 
         description="Monitor instances where a companion deviates significantly from the expected booking location."

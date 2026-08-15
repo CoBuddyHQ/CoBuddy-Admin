@@ -29,7 +29,7 @@ export default function MatchmakingConfigPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Search & Matchmaking Config" 
         description="Tune the algorithm governing how customers discover companions."

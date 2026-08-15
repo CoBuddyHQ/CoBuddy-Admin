@@ -31,7 +31,7 @@ export function MasterListEditorTemplate({
 
   if (!activeTab || !activeTabData) {
     return (
-      <div className="space-y-6 h-full flex flex-col">
+      <div className="space-y-6 flex-1 flex flex-col min-h-0">
         <PageHeader title={title} description={description} />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 flex-1 content-start">
@@ -58,7 +58,7 @@ export function MasterListEditorTemplate({
   }
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6 flex-1 flex flex-col min-h-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" onClick={() => onTabChange?.('')} className="shrink-0 rounded-full">

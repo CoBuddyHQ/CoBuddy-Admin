@@ -32,7 +32,7 @@ export default function AgeEscalationPage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="Age / Minor-Safety Escalation" 
         description="High-priority queue for suspected underage users. Access restricted to Legal & Super Admin."

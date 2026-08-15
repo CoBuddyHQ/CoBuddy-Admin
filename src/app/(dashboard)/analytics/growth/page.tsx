@@ -11,7 +11,7 @@ export default function GrowthDashboardPage() {
   if (isLoading || !stats) return <div className="">Loading Analytics Data...</div>;
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <PageHeader 
         title="User Growth & Retention" 
         description="Track user acquisition, companion onboarding, and overall retention metrics."
@@ -36,13 +36,13 @@ export default function GrowthDashboardPage() {
         </Card>
       </div>
 
-      <Card className="flex-1 min-h-[400px] flex flex-col">
+      <Card>
         <CardHeader>
           <CardTitle>Signups vs Active Users</CardTitle>
         </CardHeader>
-        <CardContent className="flex-1">
+        <CardContent>
           <AreaChart
-            className="h-full w-full min-h-[300px]"
+            className="h-80 mt-4"
             data={stats.chartData.map(d => ({ ...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }))}
             index="date"
             categories={['newSignups', 'activeUsers']}

@@ -1,15 +1,64 @@
-import { SosAlert } from './types';
+import axios from '@/lib/api/client';
+import type { SosAlert, SosStatusUpdate } from './types';
 
-const mockAlerts: SosAlert[] = [
-  { id: 'SOS-991', userId: 'CompA', userName: 'Alice', userType: 'COMPANION', sessionId: 'SESS-100', latitude: 19.0760, longitude: 72.8777, timestamp: new Date().toISOString(), status: 'ACTIVE', audioCaptureUrl: 'https://example.com/audio1.mp3', phone: '+1234567890', otherPartyName: 'Charlie', otherPartyType: 'CUSTOMER', venue: 'Central Park Cafe', activity: 'Coffee Meet' },
-  { id: 'SOS-992', userId: 'UserB', userName: 'Bob', userType: 'CUSTOMER', sessionId: 'SESS-101', latitude: 28.7041, longitude: 77.1025, timestamp: new Date(Date.now() - 300000).toISOString(), status: 'ACKNOWLEDGED', phone: '+0987654321', otherPartyName: 'Diana', otherPartyType: 'COMPANION', venue: 'Downtown Mall', activity: 'Shopping' },
-];
+interface SosApiAlert {
+  id: string;
+  userId: string;
+  userType: SosAlert['userType'];
+  bookingId: string | null;
+  lat: number | null;
+  lng: number | null;
+  status: string;
+  createdAt: string;
+  audioClipUrl: string | null;
+  booking?: {
+    bookingRef: string;
+    customer?: { name: string; phone: string };
+    companion?: { name: string; phone: string };
+    venue?: { name: string };
+    activityLabel?: string;
+  } | null;
+}
+
+const statuses: Record<string, SosAlert['status']> = {
+  TRIGGERED: 'ACTIVE',
+  ACKNOWLEDGED: 'ACKNOWLEDGED',
+  INVESTIGATING: 'INVESTIGATING',
+  ESCALATED_AUTHORITIES: 'ESCALATED',
+  RESOLVED_FALSE_ALARM: 'RESOLVED',
+  RESOLVED_REAL_INCIDENT: 'RESOLVED',
+};
 
 export const sosApi = {
-  getAlerts: async (): Promise<SosAlert[]> => Promise.resolve([...mockAlerts]),
-  updateStatus: async (id: string, status: SosAlert['status']): Promise<void> => {
-    const alert = mockAlerts.find(a => a.id === id);
-    if (alert) alert.status = status;
-    return Promise.resolve();
-  }
+  getAlerts: async (): Promise<SosAlert[]> => {
+    const response = await axios.get<{ data: SosApiAlert[] }>('/safety/sos', {
+      params: { activeOnly: true },
+    });
+    if (!Array.isArray(response.data.data)) throw new Error('Invalid SOS response');
+    return response.data.data.map((item) => {
+      const booking = item.booking;
+      const user = item.userType === 'COMPANION' ? booking?.companion : booking?.customer;
+      const other = item.userType === 'COMPANION' ? booking?.customer : booking?.companion;
+      return {
+        id: item.id,
+        userId: item.userId,
+        userName: user?.name ?? item.userId,
+        userType: item.userType,
+        sessionId: booking?.bookingRef ?? item.bookingId ?? '',
+        latitude: item.lat,
+        longitude: item.lng,
+        timestamp: item.createdAt,
+        status: statuses[item.status] ?? 'UNKNOWN',
+        audioCaptureUrl: item.audioClipUrl ?? undefined,
+        phone: user?.phone ?? '',
+        otherPartyName: other?.name ?? '',
+        otherPartyType: item.userType === 'COMPANION' ? 'CUSTOMER' : 'COMPANION',
+        venue: booking?.venue?.name ?? '',
+        activity: booking?.activityLabel ?? '',
+      } satisfies SosAlert;
+    });
+  },
+  updateStatus: async (id: string, status: SosStatusUpdate): Promise<void> => {
+    await axios.patch('/safety/sos/' + encodeURIComponent(id) + '/status', { status });
+  },
 };

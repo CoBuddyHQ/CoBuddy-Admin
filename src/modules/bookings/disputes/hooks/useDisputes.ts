@@ -8,29 +8,31 @@ export const useDisputes = () => {
 
   const { data: disputes = [], isLoading } = useQuery({
     queryKey: ['disputes'],
-    queryFn: disputesApi.getDisputes
+    queryFn: disputesApi.getDisputes,
   });
 
   const { mutate: updateStatus } = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: BookingDispute['status'] }) => disputesApi.updateDisputeStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: BookingDispute['status'] }) =>
+      disputesApi.updateDisputeStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disputes'] });
       toast.success('Dispute status updated successfully');
-    }
+    },
   });
 
   const { mutate: overridePenalty } = useMutation({
-    mutationFn: ({ id, penalty, reason }: { id: string, penalty: number, reason: string }) => disputesApi.overridePenalty(id, penalty, reason),
+    mutationFn: ({ id, penalty, reason }: { id: string; penalty: number; reason: string }) =>
+      disputesApi.overridePenalty(id, penalty, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disputes'] });
       toast.success('Penalty overridden successfully');
-    }
+    },
   });
 
   return {
     disputes,
     isLoading,
     updateStatus,
-    overridePenalty
+    overridePenalty,
   };
 };

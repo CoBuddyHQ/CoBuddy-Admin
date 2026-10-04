@@ -3,25 +3,22 @@
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useRiskScores } from '@/modules/moderation/risk-scoring/hooks/useRiskScores';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChevronDown, AlertCircle } from 'lucide-react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown, AlertCircle } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function RiskScoringPage() {
   const { scores, isLoading, reclassify } = useRiskScores();
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Risk Scoring Engine" 
+      <PageHeader
+        title="Risk Scoring Engine"
         description="Monitor device fingerprints, GPS spoofing, and duplicate accounts."
       />
 
@@ -43,7 +40,7 @@ export default function RiskScoringPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {scores.map(s => (
+              {scores.map((s) => (
                 <TableRow key={s.userId}>
                   <TableCell>
                     <div className="font-medium">{s.userName}</div>
@@ -51,18 +48,42 @@ export default function RiskScoringPage() {
                   </TableCell>
                   <TableCell>{s.userType}</TableCell>
                   <TableCell>
-                    <Badge variant={
-                      s.riskLevel === 'CRITICAL' ? 'destructive' : 
-                      s.riskLevel === 'HIGH' ? 'destructive' : 
-                      s.riskLevel === 'MEDIUM' ? 'outline' : 'secondary'
-                    }>
+                    <Badge
+                      variant={
+                        s.riskLevel === 'CRITICAL'
+                          ? 'destructive'
+                          : s.riskLevel === 'HIGH'
+                            ? 'destructive'
+                            : s.riskLevel === 'MEDIUM'
+                              ? 'outline'
+                              : 'secondary'
+                      }
+                    >
                       {s.riskLevel === 'CRITICAL' && <AlertCircle className="w-3 h-3 mr-1" />}
                       {s.riskLevel}
                     </Badge>
                   </TableCell>
-                  <TableCell>{s.deviceFlags > 0 ? <span className="text-red-500 font-bold">{s.deviceFlags}</span> : s.deviceFlags}</TableCell>
-                  <TableCell>{s.gpsSpoofFlags > 0 ? <span className="text-red-500 font-bold">{s.gpsSpoofFlags}</span> : s.gpsSpoofFlags}</TableCell>
-                  <TableCell>{s.duplicateAccountSignals > 0 ? <span className="text-red-500 font-bold">{s.duplicateAccountSignals}</span> : s.duplicateAccountSignals}</TableCell>
+                  <TableCell>
+                    {s.deviceFlags > 0 ? (
+                      <span className="text-red-500 font-bold">{s.deviceFlags}</span>
+                    ) : (
+                      s.deviceFlags
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {s.gpsSpoofFlags > 0 ? (
+                      <span className="text-red-500 font-bold">{s.gpsSpoofFlags}</span>
+                    ) : (
+                      s.gpsSpoofFlags
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {s.duplicateAccountSignals > 0 ? (
+                      <span className="text-red-500 font-bold">{s.duplicateAccountSignals}</span>
+                    ) : (
+                      s.duplicateAccountSignals
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(s.lastUpdated).toLocaleString()}</TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -70,10 +91,26 @@ export default function RiskScoringPage() {
                         Reclassify <ChevronDown className="ml-2 h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => reclassify({ userId: s.userId, level: 'LOW' })}>Set to LOW</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => reclassify({ userId: s.userId, level: 'MEDIUM' })}>Set to MEDIUM</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => reclassify({ userId: s.userId, level: 'HIGH' })}>Set to HIGH</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => reclassify({ userId: s.userId, level: 'CRITICAL' })}>Set to CRITICAL</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => reclassify({ userId: s.userId, level: 'LOW' })}
+                        >
+                          Set to LOW
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => reclassify({ userId: s.userId, level: 'MEDIUM' })}
+                        >
+                          Set to MEDIUM
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => reclassify({ userId: s.userId, level: 'HIGH' })}
+                        >
+                          Set to HIGH
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => reclassify({ userId: s.userId, level: 'CRITICAL' })}
+                        >
+                          Set to CRITICAL
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -86,4 +123,3 @@ export default function RiskScoringPage() {
     </div>
   );
 }
-

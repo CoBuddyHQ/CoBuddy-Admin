@@ -3,10 +3,20 @@
 import { useAuditLogs } from '@/modules/system/audit-logs/hooks/useAuditLogs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-export function LoginHistoryCard({ employeeId, title = "Login / Session History", description = "Recent login and logout activity." }: { employeeId: string, title?: string, description?: string }) {
+export function LoginHistoryCard({
+  employeeId,
+  title = 'Login / Session History',
+  description = 'Recent login and logout activity.',
+}: {
+  employeeId: string;
+  title?: string;
+  description?: string;
+}) {
   const { logs, isLoading: isLoadingLogs } = useAuditLogs();
-  
-  const loginHistory = logs.filter(l => l.adminId === employeeId && (l.action === 'LOGIN' || l.action === 'LOGOUT'));
+
+  const loginHistory = logs.filter(
+    (l) => l.adminId === employeeId && (l.action === 'LOGIN' || l.action === 'LOGOUT'),
+  );
 
   return (
     <Card>
@@ -21,8 +31,11 @@ export function LoginHistoryCard({ employeeId, title = "Login / Session History"
           <div className="text-sm text-muted-foreground">No recent login history found.</div>
         ) : (
           <div className="space-y-4">
-            {loginHistory.map(log => (
-              <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between items-start gap-2 border-b pb-2 last:border-0 last:pb-0">
+            {loginHistory.map((log) => (
+              <div
+                key={log.id}
+                className="flex flex-col sm:flex-row sm:items-center justify-between items-start gap-2 border-b pb-2 last:border-0 last:pb-0"
+              >
                 <div>
                   <div className="font-medium text-sm">
                     {log.action === 'LOGIN' ? 'Logged In' : 'Logged Out'}

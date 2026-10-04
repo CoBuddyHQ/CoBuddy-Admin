@@ -7,4 +7,3 @@ export interface FeaturedVenue {
   photoUrl: string;
   isActive: boolean;
 }
-

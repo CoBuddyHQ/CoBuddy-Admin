@@ -1,8 +1,15 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useLiveSessions } from '@/modules/safety/live-sessions/hooks/useLiveSessions';
@@ -14,7 +21,7 @@ export default function LiveSessionsPage() {
 
   if (isLoading) return <div className="">Loading live sessions...</div>;
 
-  const activeSessions = sessions.filter(s => s.status !== 'COMPLETED');
+  const activeSessions = sessions.filter((s) => s.status !== 'COMPLETED');
 
   return (
     <div className="space-y-6">
@@ -40,7 +47,7 @@ export default function LiveSessionsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">
-              {sessions.filter(s => s.status === 'SOS_TRIGGERED').length}
+              {sessions.filter((s) => s.status === 'SOS_TRIGGERED').length}
             </div>
           </CardContent>
         </Card>
@@ -71,58 +78,87 @@ export default function LiveSessionsPage() {
                     No active sessions right now.
                   </TableCell>
                 </TableRow>
-              ) : activeSessions.map((session) => (
-                <TableRow key={session.id} className={cn(session.status === 'SOS_TRIGGERED' && "bg-destructive/10")}>
-                  <TableCell>
-                    <div className="font-mono text-xs">{session.id}</div>
-                    {conflictingSessionIds.has(session.id) && (
-                      <Badge variant="destructive" className="mt-1 text-[10px]">
-                        OVERLAP CONFLICT
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>{session.companionName}</TableCell>
-                  <TableCell>{session.customerName}</TableCell>
-                  <TableCell>
-                    <div className="text-sm">{session.venue}</div>
-                    <div className="text-xs text-muted-foreground font-mono">
-                      {session.gpsLocation.lat.toFixed(4)}, {session.gpsLocation.lng.toFixed(4)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-xs">Start: {new Date(session.startTime).toLocaleTimeString()}</div>
-                    <div className="text-xs">End: {new Date(session.expectedEndTime).toLocaleTimeString()}</div>
-                  </TableCell>
-                  <TableCell>
-                    {session.status === 'SOS_TRIGGERED' ? (
-                      <Badge variant="destructive" className="animate-pulse">SOS TRIGGERED</Badge>
-                    ) : (
-                      <Badge variant="secondary">ONGOING</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <Badge variant={session.timerStatus === 'ON_TRACK' ? 'outline' : session.timerStatus === 'RUNNING_LATE' ? 'secondary' : 'destructive'} className="w-max text-[10px]">
-                        Timer: {session.timerStatus.replace('_', ' ')}
-                      </Badge>
-                      <Badge variant={session.checkInStatus === 'CHECKED_IN' ? 'default' : session.checkInStatus === 'NOT_YET' ? 'outline' : 'destructive'} className="w-max text-[10px]">
-                        Check-in: {session.checkInStatus.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="text-destructive"
-                      onClick={() => flagSession(session.id)}
-                      disabled={session.status === 'SOS_TRIGGERED'}
-                    >
-                      <AlertTriangle className="h-4 w-4 mr-1" /> Flag to Ops
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              ) : (
+                activeSessions.map((session) => (
+                  <TableRow
+                    key={session.id}
+                    className={cn(session.status === 'SOS_TRIGGERED' && 'bg-destructive/10')}
+                  >
+                    <TableCell>
+                      <div className="font-mono text-xs">{session.id}</div>
+                      {conflictingSessionIds.has(session.id) && (
+                        <Badge variant="destructive" className="mt-1 text-[10px]">
+                          OVERLAP CONFLICT
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>{session.companionName}</TableCell>
+                    <TableCell>{session.customerName}</TableCell>
+                    <TableCell>
+                      <div className="text-sm">{session.venue}</div>
+                      <div className="text-xs text-muted-foreground font-mono">
+                        {session.gpsLocation.lat.toFixed(4)}, {session.gpsLocation.lng.toFixed(4)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-xs">
+                        Start: {new Date(session.startTime).toLocaleTimeString()}
+                      </div>
+                      <div className="text-xs">
+                        End: {new Date(session.expectedEndTime).toLocaleTimeString()}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {session.status === 'SOS_TRIGGERED' ? (
+                        <Badge variant="destructive" className="animate-pulse">
+                          SOS TRIGGERED
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">ONGOING</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Badge
+                          variant={
+                            session.timerStatus === 'ON_TRACK'
+                              ? 'outline'
+                              : session.timerStatus === 'RUNNING_LATE'
+                                ? 'secondary'
+                                : 'destructive'
+                          }
+                          className="w-max text-[10px]"
+                        >
+                          Timer: {session.timerStatus.replace('_', ' ')}
+                        </Badge>
+                        <Badge
+                          variant={
+                            session.checkInStatus === 'CHECKED_IN'
+                              ? 'default'
+                              : session.checkInStatus === 'NOT_YET'
+                                ? 'outline'
+                                : 'destructive'
+                          }
+                          className="w-max text-[10px]"
+                        >
+                          Check-in: {session.checkInStatus.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-destructive"
+                        onClick={() => flagSession(session.id)}
+                        disabled={session.status === 'SOS_TRIGGERED'}
+                      >
+                        <AlertTriangle className="h-4 w-4 mr-1" /> Flag to Ops
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -130,4 +166,3 @@ export default function LiveSessionsPage() {
     </div>
   );
 }
-

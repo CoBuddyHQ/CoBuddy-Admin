@@ -13,7 +13,7 @@ let mockLaunches: CityLaunch[] = [
       { id: 'CHK-2', task: 'Verify local emergency contacts', completed: true },
       { id: 'CHK-3', task: 'Configure local venue whitelist', completed: false },
       { id: 'CHK-4', task: 'Marketing pre-launch campaign', completed: false },
-    ]
+    ],
   },
   {
     id: 'CITY-002',
@@ -25,8 +25,8 @@ let mockLaunches: CityLaunch[] = [
     checklist: [
       { id: 'CHK-5', task: 'Market research & demand mapping', completed: true },
       { id: 'CHK-6', task: 'Hire local city manager', completed: false },
-    ]
-  }
+    ],
+  },
 ];
 
 let mockConfig: WaitlistConfig = {
@@ -36,26 +36,42 @@ let mockConfig: WaitlistConfig = {
 };
 
 const mockEntries: WaitlistEntry[] = [
-  { id: 'WL-01', email: 'test1@example.com', phone: '+919876543210', city: 'Mumbai', signupDate: new Date().toISOString(), status: 'PENDING' },
-  { id: 'WL-02', email: 'test2@example.com', phone: '+919876543211', city: 'Delhi', signupDate: new Date(Date.now() - 86400000).toISOString(), status: 'APPROVED' },
+  {
+    id: 'WL-01',
+    email: 'test1@example.com',
+    phone: '+919876543210',
+    city: 'Mumbai',
+    signupDate: new Date().toISOString(),
+    status: 'PENDING',
+  },
+  {
+    id: 'WL-02',
+    email: 'test2@example.com',
+    phone: '+919876543211',
+    city: 'Delhi',
+    signupDate: new Date(Date.now() - 86400000).toISOString(),
+    status: 'APPROVED',
+  },
 ];
 
 export const cityLaunchApi = {
   getLaunches: async (): Promise<CityLaunch[]> => {
     return [...mockLaunches];
   },
-  
+
   updateStatus: async (id: string, status: CityLaunch['status']): Promise<void> => {
-    const launch = mockLaunches.find(l => l.id === id);
+    const launch = mockLaunches.find((l) => l.id === id);
     if (!launch) return;
-    
+
     // ITEM 3: Link City Launch's "Go Live" Action to Master Data's Cities List
     if (status === 'LIVE' && launch.status !== 'LIVE') {
       try {
         const { masterDataApi } = await import('@/modules/system/master-data/api');
         const cities = await masterDataApi.getCities();
-        const existingCity = cities.find(c => c.name.en.toLowerCase() === launch.cityName.toLowerCase());
-        
+        const existingCity = cities.find(
+          (c) => c.name.en.toLowerCase() === launch.cityName.toLowerCase(),
+        );
+
         if (existingCity) {
           if (!existingCity.active) {
             await masterDataApi.toggleCity(existingCity.id);
@@ -65,7 +81,7 @@ export const cityLaunchApi = {
             name: { en: launch.cityName },
             state: launch.region,
             country: 'India',
-            active: true
+            active: true,
           });
         }
       } catch (err) {
@@ -73,10 +89,15 @@ export const cityLaunchApi = {
       }
     }
 
-    mockLaunches = mockLaunches.map(l => l.id === id ? { ...l, status } : l);
+    mockLaunches = mockLaunches.map((l) => (l.id === id ? { ...l, status } : l));
   },
 
-  createLaunch: async (data: { cityName: string; region: string; targetLaunchDate: string; managerName: string }): Promise<void> => {
+  createLaunch: async (data: {
+    cityName: string;
+    region: string;
+    targetLaunchDate: string;
+    managerName: string;
+  }): Promise<void> => {
     const newId = `CITY-${(mockLaunches.length + 1).toString().padStart(3, '0')}`;
     const newLaunch: CityLaunch = {
       ...data,
@@ -87,17 +108,19 @@ export const cityLaunchApi = {
         { id: `${newId}-CHK-2`, task: 'Verify local emergency contacts', completed: false },
         { id: `${newId}-CHK-3`, task: 'Configure local venue whitelist', completed: false },
         { id: `${newId}-CHK-4`, task: 'Marketing pre-launch campaign', completed: false },
-      ]
+      ],
     };
     mockLaunches = [newLaunch, ...mockLaunches];
   },
 
   toggleChecklistTask: async (cityId: string, taskId: string): Promise<void> => {
-    mockLaunches = mockLaunches.map(l => {
+    mockLaunches = mockLaunches.map((l) => {
       if (l.id === cityId) {
         return {
           ...l,
-          checklist: l.checklist.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t)
+          checklist: l.checklist.map((t) =>
+            t.id === taskId ? { ...t, completed: !t.completed } : t,
+          ),
         };
       }
       return l;
@@ -111,8 +134,8 @@ export const cityLaunchApi = {
   },
   getEntries: async (): Promise<WaitlistEntry[]> => Promise.resolve([...mockEntries]),
   approveEntry: async (id: string): Promise<void> => {
-    const e = mockEntries.find(x => x.id === id);
+    const e = mockEntries.find((x) => x.id === id);
     if (e) e.status = 'APPROVED';
     return Promise.resolve();
-  }
+  },
 };

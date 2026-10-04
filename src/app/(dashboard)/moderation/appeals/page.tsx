@@ -3,25 +3,22 @@
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useAppeals } from '@/modules/moderation/appeals/hooks/useAppeals';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function AppealsPage() {
   const { appeals, isLoading, resolveAppeal } = useAppeals();
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Appeals & Ban Reversal Review" 
+      <PageHeader
+        title="Appeals & Ban Reversal Review"
         description="Review user appeals against bans and restrictions."
       />
 
@@ -41,7 +38,7 @@ export default function AppealsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {appeals.map(a => (
+              {appeals.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell>{a.id}</TableCell>
                   <TableCell>
@@ -50,9 +47,7 @@ export default function AppealsPage() {
                   </TableCell>
                   <TableCell>{a.originalBanReason}</TableCell>
                   <TableCell>
-                    <div className="text-sm font-medium mt-1">
-                      &quot;{a.appealStatement}&quot;
-                    </div>
+                    <div className="text-sm font-medium mt-1">&quot;{a.appealStatement}&quot;</div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={a.status === 'PENDING' ? 'destructive' : 'secondary'}>
@@ -66,9 +61,25 @@ export default function AppealsPage() {
                           Resolve <ChevronDown className="ml-2 h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => resolveAppeal({ id: a.id, action: 'UPHELD' })} className="text-destructive font-medium">Uphold Ban</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => resolveAppeal({ id: a.id, action: 'REDUCED_TO_WARNING' })}>Reduce to Warning</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => resolveAppeal({ id: a.id, action: 'REVERSED' })} className="text-green-600 font-medium">Reverse Ban</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => resolveAppeal({ id: a.id, action: 'UPHELD' })}
+                            className="text-destructive font-medium"
+                          >
+                            Uphold Ban
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              resolveAppeal({ id: a.id, action: 'REDUCED_TO_WARNING' })
+                            }
+                          >
+                            Reduce to Warning
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => resolveAppeal({ id: a.id, action: 'REVERSED' })}
+                            className="text-green-600 font-medium"
+                          >
+                            Reverse Ban
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
@@ -82,4 +93,3 @@ export default function AppealsPage() {
     </div>
   );
 }
-

@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: cobuddy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cobuddy
+      POSTGRES_PASSWORD: cobuddy
+      POSTGRES_DB: cobuddy
+      TZ: Asia/Kolkata
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./pg-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cobuddy']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cobuddy-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: cobuddy-redis
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', 'cobuddy-redis-pw']
+    environment:
+      TZ: Asia/Kolkata
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'cobuddy-redis-pw', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - cobuddy-net
+
+networks:
+  cobuddy-net:
+    driver: bridge
+
+volumes:
+  postgres-data:

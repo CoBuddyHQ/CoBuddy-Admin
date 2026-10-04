@@ -22,7 +22,8 @@ export const usePolicyDocs = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: PolicyDocument['publishStatus'] }) => policyApi.updatePolicyStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: PolicyDocument['publishStatus'] }) =>
+      policyApi.updatePolicyStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['policy-docs'] });
       toast.success(`Policy status updated to ${status}`);
@@ -38,7 +39,12 @@ export const usePolicyDocs = () => {
   });
 
   const createDocumentMutation = useMutation({
-    mutationFn: (data: Omit<PolicyDocument, 'id' | 'publishStatus' | 'lastUpdated' | 'consentCount' | 'version'>) => policyApi.createDocument(data),
+    mutationFn: (
+      data: Omit<
+        PolicyDocument,
+        'id' | 'publishStatus' | 'lastUpdated' | 'consentCount' | 'version'
+      >,
+    ) => policyApi.createDocument(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['policy-docs'] });
       toast.success('Document created successfully');

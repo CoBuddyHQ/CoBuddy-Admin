@@ -4,9 +4,16 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { useGrowthAbuse } from '@/modules/operations/growth-abuse/hooks/useGrowthAbuse';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShieldAlert, Ban, UserX } from 'lucide-react';
+import { Ban, UserX } from 'lucide-react';
 
 export default function GrowthAbusePage() {
   const { alerts, isLoading, updateStatus, takeAction } = useGrowthAbuse();
@@ -46,7 +53,13 @@ export default function GrowthAbusePage() {
                     <Badge variant="outline">{alert.type.replace('_', ' ')}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={alert.severity === 'CRITICAL' || alert.severity === 'HIGH' ? 'destructive' : 'default'}>
+                    <Badge
+                      variant={
+                        alert.severity === 'CRITICAL' || alert.severity === 'HIGH'
+                          ? 'destructive'
+                          : 'default'
+                      }
+                    >
                       {alert.severity}
                     </Badge>
                   </TableCell>
@@ -56,13 +69,20 @@ export default function GrowthAbusePage() {
                   </TableCell>
                   <TableCell className="min-w-[300px] max-w-md whitespace-normal">
                     <p className="text-sm">{alert.details}</p>
-                    <div className="text-xs text-muted-foreground mt-1">{new Date(alert.timestamp).toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {new Date(alert.timestamp).toLocaleString()}
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={
-                      alert.status === 'ACTIONED' || alert.status === 'RESOLVED' ? 'default' : 
-                      alert.status === 'INVESTIGATING' ? 'secondary' : 'outline'
-                    }>
+                    <Badge
+                      variant={
+                        alert.status === 'ACTIONED' || alert.status === 'RESOLVED'
+                          ? 'default'
+                          : alert.status === 'INVESTIGATING'
+                            ? 'secondary'
+                            : 'outline'
+                      }
+                    >
                       {alert.status}
                     </Badge>
                   </TableCell>
@@ -70,24 +90,24 @@ export default function GrowthAbusePage() {
                     <div className="flex gap-2">
                       {alert.status !== 'ACTIONED' && alert.status !== 'RESOLVED' && (
                         <>
-                          <Button 
-                            variant="destructive" 
+                          <Button
+                            variant="destructive"
                             size="sm"
                             onClick={() => takeAction({ id: alert.id, action: 'BAN_ACCOUNTS' })}
                             title="Ban Associated Accounts"
                           >
                             <Ban className="h-4 w-4 mr-1" /> Ban
                           </Button>
-                          <Button 
-                            variant="secondary" 
+                          <Button
+                            variant="secondary"
                             size="sm"
                             onClick={() => takeAction({ id: alert.id, action: 'BLOCK_REFERRAL' })}
                             title="Block Referral Chain"
                           >
                             <UserX className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => updateStatus({ id: alert.id, status: 'RESOLVED' })}
                           >
@@ -106,4 +126,3 @@ export default function GrowthAbusePage() {
     </div>
   );
 }
-

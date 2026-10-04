@@ -2,22 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StaffRole } from '@/types/role.types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Employee } from '../types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 
 interface EditRolesModalProps {
   employee: Employee | null;
   onClose: () => void;
-  onSave: (id: string, data: { roles: StaffRole[], cityScope?: string }) => void;
+  onSave: (id: string, data: { roles: StaffRole[]; cityScope?: string }) => void;
   isUpdating: boolean;
 }
 
@@ -26,7 +27,7 @@ export function EditRolesModal({ employee, onClose, onSave, isUpdating }: EditRo
   const [cityScope, setCityScope] = useState('');
 
   const { cities } = useMasterData();
-  const activeCities = cities.filter(c => c.active);
+  const activeCities = cities.filter((c) => c.active);
   const allRoles = Object.values(StaffRole);
   const showCityScope = roles.includes(StaffRole.CITY_OPS_MANAGER);
 
@@ -42,18 +43,14 @@ export function EditRolesModal({ employee, onClose, onSave, isUpdating }: EditRo
     if (employee && roles.length > 0) {
       onSave(employee.id, {
         roles,
-        cityScope: showCityScope ? cityScope : undefined
+        cityScope: showCityScope ? cityScope : undefined,
       });
       onClose();
     }
   };
 
   const toggleRole = (role: StaffRole) => {
-    setRoles(prev => 
-      prev.includes(role) 
-        ? prev.filter(r => r !== role)
-        : [...prev, role]
-    );
+    setRoles((prev) => (prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]));
   };
 
   return (
@@ -66,14 +63,16 @@ export function EditRolesModal({ employee, onClose, onSave, isUpdating }: EditRo
           <div className="space-y-2">
             <label className="text-sm font-medium">Assign Roles</label>
             <div className="grid grid-cols-2 gap-2">
-              {allRoles.map(role => (
+              {allRoles.map((role) => (
                 <div key={role} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`edit-role-${role}`} 
+                  <Checkbox
+                    id={`edit-role-${role}`}
                     checked={roles.includes(role)}
                     onCheckedChange={() => toggleRole(role)}
                   />
-                  <label htmlFor={`edit-role-${role}`} className="text-xs">{role.replace('_', ' ')}</label>
+                  <label htmlFor={`edit-role-${role}`} className="text-xs">
+                    {role.replace('_', ' ')}
+                  </label>
                 </div>
               ))}
             </div>
@@ -87,8 +86,10 @@ export function EditRolesModal({ employee, onClose, onSave, isUpdating }: EditRo
                   <SelectValue placeholder="Select City" />
                 </SelectTrigger>
                 <SelectContent>
-                  {activeCities.map(city => (
-                    <SelectItem key={city.id} value={city.name.en || city.id}>{city.name.en || 'Unknown City'}</SelectItem>
+                  {activeCities.map((city) => (
+                    <SelectItem key={city.id} value={city.id}>
+                      {city.name.en || 'Unknown City'}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -96,7 +97,9 @@ export function EditRolesModal({ employee, onClose, onSave, isUpdating }: EditRo
           )}
 
           <div className="pt-4 flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={isUpdating || roles.length === 0}>
               {isUpdating ? 'Saving...' : 'Save Changes'}
             </Button>

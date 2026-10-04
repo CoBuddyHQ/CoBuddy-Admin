@@ -1,43 +1,43 @@
+import axios from '@/lib/api/client';
 import { IncidentSummary, IncidentDetail } from './types';
 
-const mockIncidents: IncidentSummary[] = [
-  { id: 'INC-001', type: 'harassment', involvedParties: ['UserA', 'CompB'], status: 'ESCALATED_LEGAL', legalEscalation: true, timestamp: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'INC-002', type: 'inappropriate_behavior', involvedParties: ['CompC', 'UserD'], status: 'OPEN', legalEscalation: false, timestamp: new Date().toISOString() },
-];
-
-const mockDetail: IncidentDetail = {
-  ...mockIncidents[0],
-  description: 'Companion reported that customer grabbed them forcefully during the movie.',
-  evidence: ['sos_audio_123.mp3', 'chat_transcript_456.pdf'],
-  preserveEvidence: false,
-  investigatorNotes: [
-    { timestamp: new Date(Date.now() - 80000000).toISOString(), note: 'Called companion to verify. Escalating to Legal.', author: 'Safety Officer Mike' }
-  ],
-  assignedInvestigator: 'Mike'
-};
+const unwrap = (response: any) => response.data.data?.data ?? response.data.data;
+const mapSummary = (item: any): IncidentSummary => ({
+  id: item.id,
+  type: item.incidentTypeCode,
+  involvedParties: [...(item.involvedCustomerIds ?? []), ...(item.involvedCompanionIds ?? [])],
+  status: item.status,
+  legalEscalation: item.legalEscalation,
+  timestamp: item.createdAt,
+});
+const mapDetail = (item: any): IncidentDetail => ({
+  ...mapSummary(item),
+  description: item.description,
+  evidence: item.evidenceUrls ?? [],
+  preserveEvidence: item.preserveEvidence,
+  investigatorNotes: Array.isArray(item.investigatorNotes) ? item.investigatorNotes : [],
+  assignedInvestigator: item.assignedInvestigatorId ?? undefined,
+});
 
 export const incidentsApi = {
-  getIncidents: async (): Promise<IncidentSummary[]> => Promise.resolve([...mockIncidents]),
-  getDetail: async (id: string): Promise<IncidentDetail> => {
-    return Promise.resolve({ ...mockDetail, id });
+  getIncidents: async (): Promise<IncidentSummary[]> => {
+    const response = await axios.get('/safety/incidents');
+    const value = unwrap(response) ?? [];
+    return value.map(mapSummary);
   },
-  updateStatus: async (id: string, status: any, note?: string, author?: string): Promise<void> => {
-    const inc = mockIncidents.find(x => x.id === id);
-    if (inc) {
-      inc.status = status;
-      if (status === 'ESCALATED_LEGAL') inc.legalEscalation = true;
-    }
-    if (note && author && id === mockDetail.id) {
-      mockDetail.investigatorNotes.push({ timestamp: new Date().toISOString(), note, author });
-      mockDetail.status = status;
-      if (status === 'ESCALATED_LEGAL') mockDetail.legalEscalation = true;
-    }
-    return Promise.resolve();
+  getDetail: async (id: string): Promise<IncidentDetail> => {
+    const response = await axios.get('/safety/incidents/' + id);
+    return mapDetail(unwrap(response));
+  },
+  updateStatus: async (
+    id: string,
+    status: IncidentSummary['status'],
+    note?: string,
+    _author?: string,
+  ): Promise<void> => {
+    await axios.patch('/safety/incidents/' + id + '/status', { status, note });
   },
   togglePreserveEvidence: async (id: string): Promise<void> => {
-    if (id === mockDetail.id) {
-      mockDetail.preserveEvidence = !mockDetail.preserveEvidence;
-    }
-    return Promise.resolve();
-  }
+    await axios.post('/safety/incidents/' + id + '/preserve-evidence/toggle');
+  },
 };

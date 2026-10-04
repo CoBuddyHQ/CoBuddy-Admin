@@ -3,14 +3,7 @@
 import { ListDetailTemplate } from '@/components/templates/ListDetailTemplate';
 import { useCancelledBookings } from '@/modules/operations/cancelled-bookings/hooks/useCancelledBookings';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
@@ -22,7 +15,7 @@ export default function CancelledBookingsPage() {
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
   const getReasonLabel = (code: string) => {
-    const r = cancellationReasons.find(x => x.code === code);
+    const r = cancellationReasons.find((x) => x.code === code);
     return r ? getLocalizedText(r.label, 'en') : code;
   };
 
@@ -45,7 +38,7 @@ export default function CancelledBookingsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookings.map(b => (
+            {bookings.map((b) => (
               <TableRow key={b.id}>
                 <TableCell>{b.sessionId}</TableCell>
                 <TableCell className="font-medium">{b.companionName}</TableCell>
@@ -57,10 +50,16 @@ export default function CancelledBookingsPage() {
                 </TableCell>
                 <TableCell>
                   <div className="font-medium text-sm">{getReasonLabel(b.reasonCode)}</div>
-                  {b.reasonDetails && <div className="text-xs text-muted-foreground">{b.reasonDetails}</div>}
+                  {b.reasonDetails && (
+                    <div className="text-xs text-muted-foreground">{b.reasonDetails}</div>
+                  )}
                 </TableCell>
-                <TableCell className="text-destructive font-medium">{formatCurrency(b.penaltyApplied)}</TableCell>
-                <TableCell className="text-green-600 font-medium">{formatCurrency(b.refundAmount)}</TableCell>
+                <TableCell className="text-destructive font-medium">
+                  {formatCurrency(b.penaltyApplied)}
+                </TableCell>
+                <TableCell className="text-green-600 font-medium">
+                  {formatCurrency(b.refundAmount)}
+                </TableCell>
                 <TableCell>{new Date(b.dateCancelled).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}

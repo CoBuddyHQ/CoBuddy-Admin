@@ -4,7 +4,14 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { useTaxInvoices } from '@/modules/financial/tax-invoices/hooks/useTaxInvoices';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Download, CheckCircle } from 'lucide-react';
 
@@ -39,9 +46,17 @@ export default function TaxInvoicesPage() {
             <CardTitle>Invoice Directory</CardTitle>
             <CardDescription>Monthly tax statements and compliance tracking.</CardDescription>
           </div>
-          <Button variant="outline" onClick={() => {
-            import('@/lib/exportCsv').then(m => m.exportToCsv(invoices, `tax-invoices-export-${new Date().toISOString().split('T')[0]}.csv`));
-          }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              import('@/lib/exportCsv').then((m) =>
+                m.exportToCsv(
+                  invoices,
+                  `tax-invoices-export-${new Date().toISOString().split('T')[0]}.csv`,
+                ),
+              );
+            }}
+          >
             <Download className="mr-2 h-4 w-4" /> Export CSV
           </Button>
         </CardHeader>
@@ -66,45 +81,67 @@ export default function TaxInvoicesPage() {
                   <TableCell>
                     <div className="font-medium">{invoice.companionName}</div>
                     <div className="text-xs text-muted-foreground">PAN: {invoice.panNumber}</div>
-                    {invoice.gstNumber && <div className="text-xs text-muted-foreground">GST: {invoice.gstNumber}</div>}
+                    {invoice.gstNumber && (
+                      <div className="text-xs text-muted-foreground">GST: {invoice.gstNumber}</div>
+                    )}
                   </TableCell>
                   <TableCell>{invoice.period}</TableCell>
                   <TableCell>₹{invoice.totalEarnings.toLocaleString()}</TableCell>
                   <TableCell>₹{invoice.tdsDeducted.toLocaleString()}</TableCell>
                   <TableCell>₹{invoice.gstCollected.toLocaleString()}</TableCell>
                   <TableCell>
-                    <Badge variant={invoice.status === 'COMPLIANT' ? 'default' : invoice.status === 'GENERATED' ? 'secondary' : 'outline'}>
+                    <Badge
+                      variant={
+                        invoice.status === 'PAID'
+                          ? 'default'
+                          : invoice.status === 'ISSUED'
+                            ? 'secondary'
+                            : invoice.status === 'CANCELLED'
+                              ? 'destructive'
+                              : 'outline'
+                      }
+                    >
                       {invoice.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {invoice.status === 'PENDING' && (
-                        <Button 
-                          variant="outline" 
+                      {invoice.status === 'DRAFT' && (
+                        <Button
+                          variant="outline"
                           size="sm"
-                          onClick={() => updateStatus({ id: invoice.id, status: 'GENERATED' })}
+                          onClick={() => updateStatus({ id: invoice.id, status: 'ISSUED' })}
                         >
                           Generate
                         </Button>
                       )}
-                      {invoice.status === 'GENERATED' && (
+                      {invoice.status === 'ISSUED' && (
                         <>
-                          <Button variant="outline" size="sm" title="Download PDF" onClick={() => handleDownloadPdf(invoice)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            title="Download PDF"
+                            onClick={() => handleDownloadPdf(invoice)}
+                          >
                             <Download className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="default" 
+                          <Button
+                            variant="default"
                             size="sm"
-                            onClick={() => updateStatus({ id: invoice.id, status: 'COMPLIANT' })}
-                            title="Mark as Verified"
+                            onClick={() => updateStatus({ id: invoice.id, status: 'PAID' })}
+                            title="Mark as Paid"
                           >
                             <CheckCircle className="h-4 w-4" />
                           </Button>
                         </>
                       )}
-                      {invoice.status === 'COMPLIANT' && (
-                        <Button variant="outline" size="sm" title="Download PDF" onClick={() => handleDownloadPdf(invoice)}>
+                      {invoice.status === 'PAID' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="Download PDF"
+                          onClick={() => handleDownloadPdf(invoice)}
+                        >
                           <Download className="h-4 w-4" />
                         </Button>
                       )}
@@ -119,4 +156,3 @@ export default function TaxInvoicesPage() {
     </div>
   );
 }
-

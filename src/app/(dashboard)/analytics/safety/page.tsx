@@ -11,28 +11,40 @@ export default function AnalyticsSafetyPage() {
   const { alerts: fraudAlerts, isLoading: fraudLoading } = useFraudDetection();
   const { cases: ageEscalations, isLoading: ageLoading } = useAgeEscalation();
 
-  if (bansLoading || fraudLoading || ageLoading) return <div className="">Loading Safety Data...</div>;
+  if (bansLoading || fraudLoading || ageLoading)
+    return <div className="">Loading Safety Data...</div>;
 
   const totalBans = restrictions.length;
-  const repeatOffenders = restrictions.filter(r => r.reason.toLowerCase().includes('repeat') || r.reason.toLowerCase().includes('multiple')).length;
-  const repeatOffenderRatio = totalBans > 0 ? ((repeatOffenders / totalBans) * 100).toFixed(1) : '0';
+  const repeatOffenders = restrictions.filter(
+    (r) => r.reason.toLowerCase().includes('repeat') || r.reason.toLowerCase().includes('multiple'),
+  ).length;
+  const repeatOffenderRatio =
+    totalBans > 0 ? ((repeatOffenders / totalBans) * 100).toFixed(1) : '0';
 
   const fraudHits = fraudAlerts.length;
-  const fraudSpoof = fraudAlerts.filter((a: any) => a.reason === 'GPS_SPOOFING' || a.reason === 'FAKE_SELFIE').length;
+  const fraudSpoof = fraudAlerts.filter(
+    (a: any) => a.reason === 'GPS_SPOOFING' || a.reason === 'FAKE_SELFIE',
+  ).length;
 
   const totalAgeEscalations = ageEscalations.length;
-  const resolvedAgeEscalations = ageEscalations.filter((e: any) => e.status === 'APPROVED' || e.status === 'REJECTED').length;
+  const resolvedAgeEscalations = ageEscalations.filter(
+    (e: any) => e.status === 'APPROVED' || e.status === 'REJECTED',
+  ).length;
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Safety Analytics" 
+      <PageHeader
+        title="Safety Analytics"
         description="Monitor platform safety, bans, fraud hits, and age verification escalations."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Bans & Restrictions</CardTitle></CardHeader>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Bans & Restrictions
+            </CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalBans}</div>
             <p className="text-xs text-muted-foreground mt-1">Total Active Restrictions</p>
@@ -44,7 +56,11 @@ export default function AnalyticsSafetyPage() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Fraud Detection Hits</CardTitle></CardHeader>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Fraud Detection Hits
+            </CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{fraudHits}</div>
             <p className="text-xs text-muted-foreground mt-1">Total Alerts (All Time)</p>
@@ -56,19 +72,26 @@ export default function AnalyticsSafetyPage() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Age & Minor Safety Escalations</CardTitle></CardHeader>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Age & Minor Safety Escalations
+            </CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAgeEscalations}</div>
             <p className="text-xs text-muted-foreground mt-1">Total Escalations</p>
             <div className="mt-4 flex items-center justify-between text-sm">
               <span>Resolution Rate:</span>
-              <span className="font-medium text-green-600">{totalAgeEscalations > 0 ? ((resolvedAgeEscalations/totalAgeEscalations)*100).toFixed(0) : 0}%</span>
+              <span className="font-medium text-green-600">
+                {totalAgeEscalations > 0
+                  ? ((resolvedAgeEscalations / totalAgeEscalations) * 100).toFixed(0)
+                  : 0}
+                %
+              </span>
             </div>
           </CardContent>
         </Card>
       </div>
-
     </div>
   );
 }
-

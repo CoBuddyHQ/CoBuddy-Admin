@@ -21,7 +21,9 @@ export default function ReportDetailPage() {
   const { detail, isLoading, updateStatus, isUpdating, assignToMe } = useReportDetail(reportId);
 
   const [isNoteOpen, setIsNoteOpen] = useState(false);
-  const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'RESOLVED' | 'ESCALATED'>('INVESTIGATING');
+  const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'RESOLVED' | 'ESCALATED'>(
+    'INVESTIGATING',
+  );
   const [note, setNote] = useState('');
   const [selectedEvidence, setSelectedEvidence] = useState<string | null>(null);
 
@@ -29,7 +31,7 @@ export default function ReportDetailPage() {
 
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
-    updateStatus({ status: newStatus, note, author: user?.name || 'System' });
+    updateStatus({ status: newStatus, note });
     setIsNoteOpen(false);
     setNote('');
   };
@@ -47,13 +49,13 @@ export default function ReportDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => router.push('/moderation/reports')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <PageHeader 
-          title={`Report: ${detail.id}`} 
-          description={`Category: ${detail.category}`} 
+        <PageHeader
+          title={`Report: ${detail.id}`}
+          description={`Category: ${detail.category}`}
           action={
             <div className="flex items-center gap-4">
               {!detail.assignedTo ? (
-                <Button variant="outline" size="sm" onClick={() => assignToMe({ id: detail.id, staffName: user?.name || 'Unknown Staff' })}>
+                <Button variant="outline" size="sm" onClick={() => assignToMe({ id: detail.id })}>
                   Assign to Me
                 </Button>
               ) : (
@@ -64,9 +66,15 @@ export default function ReportDetailPage() {
               )}
               {detail.status !== 'RESOLVED' ? (
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => openNoteDialog('INVESTIGATING')}>Mark Investigating</Button>
-                  <Button variant="secondary" onClick={() => openNoteDialog('ESCALATED')}>Escalate</Button>
-                  <Button variant="default" onClick={() => openNoteDialog('RESOLVED')}>Resolve</Button>
+                  <Button variant="outline" onClick={() => openNoteDialog('INVESTIGATING')}>
+                    Mark Investigating
+                  </Button>
+                  <Button variant="secondary" onClick={() => openNoteDialog('ESCALATED')}>
+                    Escalate
+                  </Button>
+                  <Button variant="default" onClick={() => openNoteDialog('RESOLVED')}>
+                    Resolve
+                  </Button>
                 </div>
               ) : (
                 <Badge variant="secondary">Resolved</Badge>
@@ -77,7 +85,6 @@ export default function ReportDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
@@ -88,27 +95,34 @@ export default function ReportDetailPage() {
                 <div>
                   <span className="text-muted-foreground">Reporter:</span>
                   <div className="flex items-center gap-2 mt-1">
-                    <User className="h-4 w-4" /> <span className="font-medium">{detail.reporterId}</span>
+                    <User className="h-4 w-4" />{' '}
+                    <span className="font-medium">{detail.reporterId}</span>
                   </div>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Reported User:</span>
                   <div className="flex items-center gap-2 mt-1">
-                    <User className="h-4 w-4 text-destructive" /> <span className="font-medium">{detail.reportedUserId}</span>
+                    <User className="h-4 w-4 text-destructive" />{' '}
+                    <span className="font-medium">{detail.reportedUserId}</span>
                   </div>
                 </div>
                 {detail.bookingId && (
                   <div className="col-span-2">
                     <span className="text-muted-foreground">Related Booking:</span>
                     <div className="flex items-center gap-2 mt-1">
-                      <FileText className="h-4 w-4" /> <span className="font-medium text-primary cursor-pointer hover:underline">{detail.bookingId}</span>
+                      <FileText className="h-4 w-4" />{' '}
+                      <span className="font-medium text-primary cursor-pointer hover:underline">
+                        {detail.bookingId}
+                      </span>
                     </div>
                   </div>
                 )}
               </div>
               <div className="pt-4 border-t">
                 <h4 className="font-medium mb-2">Description</h4>
-                <p className="text-sm bg-muted p-4 rounded-md whitespace-pre-wrap">{detail.description}</p>
+                <p className="text-sm bg-muted p-4 rounded-md whitespace-pre-wrap">
+                  {detail.description}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -147,10 +161,17 @@ export default function ReportDetailPage() {
               ) : (
                 <div className="space-y-2">
                   {detail.evidenceUrls.map((url, i) => (
-                    <div key={i} className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent transition-colors">
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent transition-colors"
+                    >
                       <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium truncate flex-1">{url.split('/').pop() || `Attachment ${i+1}`}</span>
-                      <Button variant="ghost" size="sm" onClick={() => setSelectedEvidence(url)}>View</Button>
+                      <span className="text-sm font-medium truncate flex-1">
+                        {url.split('/').pop() || `Attachment ${i + 1}`}
+                      </span>
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedEvidence(url)}>
+                        View
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -162,26 +183,35 @@ export default function ReportDetailPage() {
 
       <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Update Report Status</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Update Report Status</DialogTitle>
+          </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4 pt-4">
             <div className="flex items-center gap-2 mb-2 text-sm">
               New Status: <Badge variant="outline">{newStatus}</Badge>
             </div>
-            <Textarea 
-              placeholder="Add your investigation notes or reason..." 
-              value={note} 
-              onChange={e => setNote(e.target.value)} 
-              required 
+            <Textarea
+              placeholder="Add your investigation notes or reason..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              required
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsNoteOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={isUpdating}>Save & Update</Button>
+              <Button type="button" variant="outline" onClick={() => setIsNoteOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isUpdating}>
+                Save & Update
+              </Button>
             </div>
           </form>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={selectedEvidence !== null} onOpenChange={(open) => !open && setSelectedEvidence(null)}>
+      <Dialog
+        open={selectedEvidence !== null}
+        onOpenChange={(open) => !open && setSelectedEvidence(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>View Evidence</DialogTitle>
@@ -189,8 +219,17 @@ export default function ReportDetailPage() {
           <div className="space-y-4 pt-4">
             {selectedEvidence && (
               <div className="flex flex-col gap-4">
-                <span className="text-sm font-medium break-all">{selectedEvidence.split('/').pop()}</span>
-                <a href={selectedEvidence} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline text-sm">Open in new tab</a>
+                <span className="text-sm font-medium break-all">
+                  {selectedEvidence.split('/').pop()}
+                </span>
+                <a
+                  href={selectedEvidence}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-500 hover:underline text-sm"
+                >
+                  Open in new tab
+                </a>
               </div>
             )}
           </div>

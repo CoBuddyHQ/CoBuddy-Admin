@@ -8,7 +8,7 @@ let mockAlerts: SLAAlert[] = [
     category: 'BILLING',
     priority: 'HIGH',
     timeRemainingMs: -1800000, // 30 minutes breached
-    status: 'BREACHED'
+    status: 'BREACHED',
   },
   {
     id: 'SLA-102',
@@ -17,8 +17,8 @@ let mockAlerts: SLAAlert[] = [
     category: 'TECHNICAL',
     priority: 'URGENT',
     timeRemainingMs: 300000, // 5 minutes remaining
-    status: 'WARNING'
-  }
+    status: 'WARNING',
+  },
 ];
 
 const mockPerformance: AgentPerformance[] = [
@@ -28,7 +28,7 @@ const mockPerformance: AgentPerformance[] = [
     ticketsResolved: 45,
     averageResolutionTimeMs: 14400000, // 4 hours
     slaBreaches: 2,
-    activeTickets: 5
+    activeTickets: 5,
   },
   {
     agentId: 'AGT-002',
@@ -36,8 +36,8 @@ const mockPerformance: AgentPerformance[] = [
     ticketsResolved: 38,
     averageResolutionTimeMs: 7200000, // 2 hours
     slaBreaches: 0,
-    activeTickets: 3
-  }
+    activeTickets: 3,
+  },
 ];
 
 export const slaApi = {
@@ -48,8 +48,10 @@ export const slaApi = {
   getPerformance: async (): Promise<AgentPerformance[]> => {
     return [...mockPerformance];
   },
-  
+
   reassignTicket: async (ticketId: string, newAgentName: string): Promise<void> => {
-    mockAlerts = mockAlerts.map(a => a.ticketId === ticketId ? { ...a, agentName: newAgentName } : a);
-  }
+    mockAlerts = mockAlerts.map((a) =>
+      a.ticketId === ticketId ? { ...a, agentName: newAgentName } : a,
+    );
+  },
 };

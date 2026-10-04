@@ -9,7 +9,7 @@ let mockAlerts: GrowthAbuseAlert[] = [
     targetName: 'Sameer K.',
     details: '14 successful referrals to devices with identical IP and device fingerprints.',
     timestamp: new Date(Date.now() - 3600000).toISOString(),
-    status: 'OPEN'
+    status: 'OPEN',
   },
   {
     id: 'GA-002',
@@ -17,22 +17,27 @@ let mockAlerts: GrowthAbuseAlert[] = [
     severity: 'CRITICAL',
     targetId: 'BATCH-77',
     targetName: 'Subnet 192.168.x.x',
-    details: '50+ rapid signups detected from a single known datacenter IP range within 10 minutes.',
+    details:
+      '50+ rapid signups detected from a single known datacenter IP range within 10 minutes.',
     timestamp: new Date(Date.now() - 7200000).toISOString(),
-    status: 'INVESTIGATING'
-  }
+    status: 'INVESTIGATING',
+  },
 ];
 
 export const growthAbuseApi = {
   getAlerts: async (): Promise<GrowthAbuseAlert[]> => {
     return [...mockAlerts];
   },
-  
+
   updateStatus: async (id: string, status: GrowthAbuseAlert['status']): Promise<void> => {
-    mockAlerts = mockAlerts.map(a => a.id === id ? { ...a, status } : a);
+    mockAlerts = mockAlerts.map((a) => (a.id === id ? { ...a, status } : a));
   },
 
   takeAction: async (id: string, action: 'BLOCK_REFERRAL' | 'BAN_ACCOUNTS'): Promise<void> => {
-    mockAlerts = mockAlerts.map(a => a.id === id ? { ...a, status: 'ACTIONED', details: `${a.details} (Action Taken: ${action})` } : a);
-  }
+    mockAlerts = mockAlerts.map((a) =>
+      a.id === id
+        ? { ...a, status: 'ACTIONED', details: `${a.details} (Action Taken: ${action})` }
+        : a,
+    );
+  },
 };

@@ -7,7 +7,7 @@ let mockVenues: FeaturedVenue[] = [
     category: { en: 'Café', hi: 'कैफे' },
     city: 'Pune',
     photoUrl: 'https://via.placeholder.com/150',
-    isActive: true
+    isActive: true,
   },
   {
     id: 'VEN-002',
@@ -16,30 +16,29 @@ let mockVenues: FeaturedVenue[] = [
     category: { en: 'Shopping Mall', hi: 'शॉपिंग मॉल' },
     city: 'Pune',
     photoUrl: 'https://via.placeholder.com/150',
-    isActive: true
-  }
+    isActive: true,
+  },
 ];
-
 
 export const venuesApi = {
   getFeaturedVenues: async (): Promise<FeaturedVenue[]> => {
     return [...mockVenues];
   },
-  
+
   toggleVenueActive: async (id: string): Promise<void> => {
-    mockVenues = mockVenues.map(v => v.id === id ? { ...v, isActive: !v.isActive } : v);
+    mockVenues = mockVenues.map((v) => (v.id === id ? { ...v, isActive: !v.isActive } : v));
   },
 
   deleteVenue: async (id: string): Promise<void> => {
-    mockVenues = mockVenues.filter(v => v.id !== id);
+    mockVenues = mockVenues.filter((v) => v.id !== id);
   },
 
   createFeaturedVenue: async (data: Omit<FeaturedVenue, 'id' | 'isActive'>): Promise<void> => {
     const newVenue: FeaturedVenue = {
       ...data,
       id: `VEN-00${mockVenues.length + 1}`,
-      isActive: true
+      isActive: true,
     };
     mockVenues = [newVenue, ...mockVenues];
-  }
+  },
 };

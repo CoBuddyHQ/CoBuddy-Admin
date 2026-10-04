@@ -12,7 +12,8 @@ export const useTaxInvoices = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: TaxInvoice['status'] }) => taxInvoicesApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: TaxInvoice['status'] }) =>
+      taxInvoicesApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['tax-invoices'] });
       toast.success(`Invoice status updated to ${status}`);

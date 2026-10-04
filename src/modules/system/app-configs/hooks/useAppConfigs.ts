@@ -12,13 +12,13 @@ export const useAppConfigs = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['app-configs'] });
       toast.success('App configuration updated successfully');
-    }
+    },
   });
 
   return {
     config: query.data,
     isLoading: query.isLoading,
     updateConfig: updateMutation.mutate,
-    isUpdating: updateMutation.isPending
+    isUpdating: updateMutation.isPending,
   };
 };

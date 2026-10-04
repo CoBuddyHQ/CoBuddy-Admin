@@ -7,7 +7,15 @@ export interface Employee {
   email: string;
   phone: string;
   designation: string;
-  department: 'Trust & Safety' | 'Support' | 'Finance' | 'Legal' | 'Operations' | 'Engineering' | 'Management' | 'HR';
+  department:
+    | 'Trust & Safety'
+    | 'Support'
+    | 'Finance'
+    | 'Legal'
+    | 'Operations'
+    | 'Engineering'
+    | 'Management'
+    | 'HR';
   reportingManagerId?: string;
   roles: StaffRole[];
   cityScope?: string;
@@ -15,6 +23,7 @@ export interface Employee {
   lastLogin?: string;
   twoFactorEnabled: boolean;
   inviteStatus: 'pending' | 'accepted';
+  invitationDelivery?: 'SENT' | 'NOT_CONFIGURED' | 'FAILED';
 }
 
 export interface AddEmployeePayload {

@@ -9,7 +9,7 @@ let mockRequests: PrivacyRequest[] = [
     status: 'PENDING',
     legalHold: false,
     requestDate: '2023-10-25T10:00:00Z',
-    dueDate: '2023-11-24T10:00:00Z'
+    dueDate: '2023-11-24T10:00:00Z',
   },
   {
     id: 'REQ-102',
@@ -19,20 +19,20 @@ let mockRequests: PrivacyRequest[] = [
     status: 'PENDING',
     legalHold: true,
     requestDate: '2023-10-26T14:30:00Z',
-    dueDate: '2023-11-25T14:30:00Z'
-  }
+    dueDate: '2023-11-25T14:30:00Z',
+  },
 ];
 
 export const privacyApi = {
   getRequests: async (): Promise<PrivacyRequest[]> => {
     return [...mockRequests];
   },
-  
+
   updateStatus: async (id: string, status: PrivacyRequest['status']): Promise<void> => {
-    mockRequests = mockRequests.map(r => r.id === id ? { ...r, status } : r);
+    mockRequests = mockRequests.map((r) => (r.id === id ? { ...r, status } : r));
   },
 
   toggleLegalHold: async (id: string): Promise<void> => {
-    mockRequests = mockRequests.map(r => r.id === id ? { ...r, legalHold: !r.legalHold } : r);
-  }
+    mockRequests = mockRequests.map((r) => (r.id === id ? { ...r, legalHold: !r.legalHold } : r));
+  },
 };

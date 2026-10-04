@@ -2,14 +2,27 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useDisputes } from '@/modules/bookings/disputes/hooks/useDisputes';
 import { formatCurrency } from '@/lib/utils';
-import { AlertCircle, CheckCircle, RotateCcw, PenTool } from 'lucide-react';
+import { AlertCircle, CheckCircle, PenTool } from 'lucide-react';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -36,7 +49,7 @@ export default function BookingDisputesPage() {
   };
 
   const getReasonLabel = (code: string) => {
-    const r = disputeReasons.find(x => x.code === code);
+    const r = disputeReasons.find((x) => x.code === code);
     return r ? getLocalizedText(r.label, 'en') : code;
   };
 
@@ -50,7 +63,9 @@ export default function BookingDisputesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Active & Past Disputes</CardTitle>
-          <CardDescription>All booking disputes requiring attention or already resolved.</CardDescription>
+          <CardDescription>
+            All booking disputes requiring attention or already resolved.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -79,18 +94,27 @@ export default function BookingDisputesPage() {
                   </TableCell>
                   <TableCell className="max-w-xs truncate" title={dispute.reasonDetails}>
                     <div className="font-medium text-sm">{getReasonLabel(dispute.reasonCode)}</div>
-                    {dispute.reasonDetails && <div className="text-xs text-muted-foreground truncate">{dispute.reasonDetails}</div>}
+                    {dispute.reasonDetails && (
+                      <div className="text-xs text-muted-foreground truncate">
+                        {dispute.reasonDetails}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>{dispute.noticeGivenHours}h</TableCell>
                   <TableCell>{dispute.calculatedPenaltyPercent}%</TableCell>
                   <TableCell>{formatCurrency(dispute.amount)}</TableCell>
                   <TableCell>
-                    <Badge variant={
-                      dispute.status === 'OPEN' ? 'destructive' :
-                      dispute.status === 'INVESTIGATING' ? 'default' :
-                      dispute.status === 'ESCALATED' ? 'destructive' :
-                      'secondary'
-                    }>
+                    <Badge
+                      variant={
+                        dispute.status === 'OPEN'
+                          ? 'destructive'
+                          : dispute.status === 'INVESTIGATING'
+                            ? 'default'
+                            : dispute.status === 'ESCALATED'
+                              ? 'destructive'
+                              : 'secondary'
+                      }
+                    >
                       {dispute.status.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
@@ -98,25 +122,54 @@ export default function BookingDisputesPage() {
                     <div className="flex flex-wrap gap-2">
                       {(dispute.status === 'OPEN' || dispute.status === 'INVESTIGATING') && (
                         <>
-                          <Button size="sm" variant="default" onClick={() => updateStatus({ id: dispute.id, status: 'RESOLVED_REFUND' })}>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() =>
+                              updateStatus({ id: dispute.id, status: 'RESOLVED_REFUND' })
+                            }
+                          >
                             <CheckCircle className="h-4 w-4 mr-1" /> Approve
                           </Button>
-                          <Dialog open={overrideId === dispute.id} onOpenChange={(open) => !open && setOverrideId(null)}>
-                            <DialogTrigger render={
-                              <Button size="sm" variant="secondary" onClick={() => setOverrideId(dispute.id)}>
-                                <PenTool className="h-4 w-4 mr-1" /> Override
-                              </Button>
-                            } />
+                          <Dialog
+                            open={overrideId === dispute.id}
+                            onOpenChange={(open) => !open && setOverrideId(null)}
+                          >
+                            <DialogTrigger
+                              render={
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  onClick={() => setOverrideId(dispute.id)}
+                                >
+                                  <PenTool className="h-4 w-4 mr-1" /> Override
+                                </Button>
+                              }
+                            />
                             <DialogContent>
-                              <DialogHeader><DialogTitle>Override Penalty</DialogTitle></DialogHeader>
+                              <DialogHeader>
+                                <DialogTitle>Override Penalty</DialogTitle>
+                              </DialogHeader>
                               <form onSubmit={handleOverride} className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                   <Label>New Penalty Percentage (0-100)</Label>
-                                  <Input type="number" min="0" max="100" value={penalty} onChange={e => setPenalty(e.target.value)} required />
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={penalty}
+                                    onChange={(e) => setPenalty(e.target.value)}
+                                    required
+                                  />
                                 </div>
                                 <div className="space-y-2">
                                   <Label>Override Reason</Label>
-                                  <Input placeholder="Why are you overriding the calculated penalty?" value={reason} onChange={e => setReason(e.target.value)} required />
+                                  <Input
+                                    placeholder="Why are you overriding the calculated penalty?"
+                                    value={reason}
+                                    onChange={(e) => setReason(e.target.value)}
+                                    required
+                                  />
                                 </div>
                                 <div className="flex justify-end pt-4">
                                   <Button type="submit">Submit Override</Button>
@@ -124,7 +177,12 @@ export default function BookingDisputesPage() {
                               </form>
                             </DialogContent>
                           </Dialog>
-                          <Button size="sm" variant="outline" className="text-destructive" onClick={() => updateStatus({ id: dispute.id, status: 'ESCALATED' })}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-destructive"
+                            onClick={() => updateStatus({ id: dispute.id, status: 'ESCALATED' })}
+                          >
                             <AlertCircle className="h-4 w-4 mr-1" /> Escalate
                           </Button>
                         </>
@@ -140,4 +198,3 @@ export default function BookingDisputesPage() {
     </div>
   );
 }
-

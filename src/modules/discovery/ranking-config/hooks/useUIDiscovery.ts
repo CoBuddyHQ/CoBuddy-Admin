@@ -12,13 +12,13 @@ export const useUIDiscovery = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ui-discovery'] });
       toast.success('UI & Discovery settings updated');
-    }
+    },
   });
 
   return {
     settings: query.data,
     isLoading: query.isLoading,
     updateSettings: updateMutation.mutate,
-    isUpdating: updateMutation.isPending
+    isUpdating: updateMutation.isPending,
   };
 };

@@ -4,9 +4,16 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { useSLA } from '@/modules/support/sla-dashboard/hooks/useSLA';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Clock, UserMinus } from 'lucide-react';
+import { UserMinus } from 'lucide-react';
 
 export default function SLADashboardPage() {
   const { alerts, performance, isLoading, reassignTicket } = useSLA();
@@ -37,31 +44,42 @@ export default function SLADashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {alerts.map((alert) => (
-                <div key={alert.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={alert.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div>
                     <div className="font-medium text-sm">{alert.ticketId}</div>
-                    <div className="text-xs text-muted-foreground">Assigned to: {alert.agentName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Assigned to: {alert.agentName}
+                    </div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <Badge variant={alert.status === 'BREACHED' ? 'destructive' : 'secondary'}>
                       {alert.status === 'BREACHED' ? 'Breached' : 'Warning'}
                     </Badge>
-                    <span className={`text-xs font-mono ${alert.timeRemainingMs < 0 ? 'text-destructive' : 'text-amber-500'}`}>
+                    <span
+                      className={`text-xs font-mono ${alert.timeRemainingMs < 0 ? 'text-destructive' : 'text-amber-500'}`}
+                    >
                       {formatTime(alert.timeRemainingMs)}
                     </span>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     title="Reassign to Backup Queue"
-                    onClick={() => reassignTicket({ ticketId: alert.ticketId, newAgentName: 'Backup_Queue' })}
+                    onClick={() =>
+                      reassignTicket({ ticketId: alert.ticketId, newAgentName: 'Backup_Queue' })
+                    }
                   >
                     <UserMinus className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
               {alerts.length === 0 && (
-                <div className="text-sm text-muted-foreground text-center py-4">No active SLA alerts.</div>
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  No active SLA alerts.
+                </div>
               )}
             </div>
           </CardContent>
@@ -107,4 +125,3 @@ export default function SLADashboardPage() {
     </div>
   );
 }
-

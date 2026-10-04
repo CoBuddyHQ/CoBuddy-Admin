@@ -7,12 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
 export default function MatchmakingConfigPage() {
   const { config, isLoading, updateConfig, isUpdating } = useMatchmakingConfig();
-  
+
   const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
@@ -30,8 +36,8 @@ export default function MatchmakingConfigPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Search & Matchmaking Config" 
+      <PageHeader
+        title="Search & Matchmaking Config"
         description="Tune the algorithm governing how customers discover companions."
       />
 
@@ -43,25 +49,30 @@ export default function MatchmakingConfigPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              
               <div className="space-y-2">
                 <Label htmlFor="maxRadius">Maximum Search Radius (km)</Label>
-                <Input 
-                  id="maxRadius" 
-                  type="number" 
-                  min="5" 
-                  max="100" 
-                  value={formData.maxSearchRadiusKm} 
-                  onChange={e => setFormData({ ...formData, maxSearchRadiusKm: Number(e.target.value) })} 
+                <Input
+                  id="maxRadius"
+                  type="number"
+                  min="5"
+                  max="100"
+                  value={formData.maxSearchRadiusKm}
+                  onChange={(e) =>
+                    setFormData({ ...formData, maxSearchRadiusKm: Number(e.target.value) })
+                  }
                 />
-                <p className="text-xs text-muted-foreground">Companions beyond this distance will not appear in customer searches.</p>
+                <p className="text-xs text-muted-foreground">
+                  Companions beyond this distance will not appear in customer searches.
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label>Priority Algorithm</Label>
-                <Select 
-                  value={formData.priorityAlgorithm} 
-                  onValueChange={v => setFormData({ ...formData, priorityAlgorithm: v as string })}
+                <Select
+                  value={formData.priorityAlgorithm}
+                  onValueChange={(v) =>
+                    setFormData({ ...formData, priorityAlgorithm: v as string })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Algorithm" />
@@ -69,33 +80,41 @@ export default function MatchmakingConfigPage() {
                   <SelectContent>
                     <SelectItem value="RATING_BASED">Rating Based (Highest Rated First)</SelectItem>
                     <SelectItem value="DISTANCE_BASED">Distance Based (Closest First)</SelectItem>
-                    <SelectItem value="NEW_COMPANION_BOOST">New Companion Boost (Balanced)</SelectItem>
+                    <SelectItem value="NEW_COMPANION_BOOST">
+                      New Companion Boost (Balanced)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="minRating">Minimum Rating Threshold</Label>
-                <Input 
-                  id="minRating" 
-                  type="number" 
-                  min="1" 
-                  max="5" 
+                <Input
+                  id="minRating"
+                  type="number"
+                  min="1"
+                  max="5"
                   step="0.1"
-                  value={formData.minRatingThreshold} 
-                  onChange={e => setFormData({ ...formData, minRatingThreshold: Number(e.target.value) })} 
+                  value={formData.minRatingThreshold}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minRatingThreshold: Number(e.target.value) })
+                  }
                 />
-                <p className="text-xs text-muted-foreground">Companions below this rating are hidden from general search.</p>
+                <p className="text-xs text-muted-foreground">
+                  Companions below this rating are hidden from general search.
+                </p>
               </div>
 
               <div className="flex items-center justify-between border p-4 rounded-md">
                 <div className="space-y-0.5">
                   <Label className="text-base">Allow Cross-City Booking</Label>
-                  <p className="text-sm text-muted-foreground">Allows customers to book companions in a different city (for travel).</p>
+                  <p className="text-sm text-muted-foreground">
+                    Allows customers to book companions in a different city (for travel).
+                  </p>
                 </div>
-                <Switch 
-                  checked={formData.allowCrossCityBooking} 
-                  onCheckedChange={v => setFormData({ ...formData, allowCrossCityBooking: v })} 
+                <Switch
+                  checked={formData.allowCrossCityBooking}
+                  onCheckedChange={(v) => setFormData({ ...formData, allowCrossCityBooking: v })}
                 />
               </div>
 
@@ -109,4 +128,3 @@ export default function MatchmakingConfigPage() {
     </div>
   );
 }
-

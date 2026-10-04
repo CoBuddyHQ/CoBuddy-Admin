@@ -1,10 +1,27 @@
+import axios from '@/lib/api/client';
 import { CancelledBooking } from './types';
 
-const mockCancelled: CancelledBooking[] = [
-  { id: 'CB-201', sessionId: 'SESS-195', companionName: 'Alice', userName: 'John', cancelledBy: 'CUSTOMER', reasonCode: 'other', reasonDetails: 'Change of plans', penaltyApplied: 500, refundAmount: 2000, dateCancelled: new Date(Date.now() - 43200000).toISOString() },
-  { id: 'CB-202', sessionId: 'SESS-190', companionName: 'Bob', userName: 'Jane', cancelledBy: 'COMPANION', reasonCode: 'emergency', reasonDetails: 'Emergency', penaltyApplied: 1000, refundAmount: 3000, dateCancelled: new Date(Date.now() - 86400000).toISOString() },
-];
-
 export const cancelledBookingsApi = {
-  getBookings: async (): Promise<CancelledBooking[]> => Promise.resolve([...mockCancelled]),
+  getBookings: async (): Promise<CancelledBooking[]> => {
+    const response = await axios.get('/operations/cancelled-bookings');
+    const rows = response.data.data?.data ?? response.data.data ?? [];
+    return rows.map((booking: any) => ({
+      id: booking.id,
+      sessionId: booking.bookingRef,
+      companionName: booking.companion?.name ?? 'Unassigned',
+      userName: booking.customer?.name ?? 'Unknown',
+      cancelledBy:
+        booking.status === 'CUSTOMER_CANCELLED' || booking.status === 'NO_SHOW_CUSTOMER'
+          ? 'CUSTOMER'
+          : booking.status === 'ADMIN_CANCELLED'
+            ? 'SYSTEM'
+            : 'COMPANION',
+      reasonCode:
+        booking.customerCancelReasonId ?? booking.companionCancelReasonId ?? booking.status,
+      reasonDetails: booking.adminCancelNote ?? undefined,
+      penaltyApplied: 0,
+      refundAmount: Number(booking.disputes?.[0]?.refundAmount ?? 0),
+      dateCancelled: booking.statusChangedAt,
+    }));
+  },
 };

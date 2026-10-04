@@ -18,26 +18,22 @@ export function ListDetailTemplate({
   listControls,
   listContent,
   detailPanel,
-  isDetailOpen
+  isDetailOpen,
 }: ListDetailTemplateProps) {
   return (
-    <div className="flex flex-1 min-h-0">
-      <div className={`flex-1 transition-all duration-300 ${isDetailOpen ? 'mr-6 pr-6 border-r' : ''}`}>
+    <div className="flex flex-1 min-h-0 min-w-0 w-full gap-6">
+      <div className={`min-w-0 flex-1 ${isDetailOpen ? 'hidden xl:block' : ''}`}>
         <PageHeader title={title} description={description} action={headerAction} />
-        
+
         {listControls && (
-          <div className="flex items-center gap-4 mb-4 bg-background p-3 rounded-md border">
-            {listControls}
-          </div>
+          <div className="flex flex-wrap items-center gap-4 mb-4">{listControls}</div>
         )}
-        
-        <div className="bg-background rounded-md border flex-1 overflow-auto">
-          {listContent}
-        </div>
+
+        <div className="min-w-0 flex-1 overflow-auto">{listContent}</div>
       </div>
-      
+
       {isDetailOpen && (
-        <div className="w-[450px] shrink-0 bg-background border rounded-md shadow-sm overflow-auto">
+        <div className="w-full xl:w-[450px] min-w-0 shrink-0 bg-background xl:border-l overflow-auto">
           {detailPanel}
         </div>
       )}

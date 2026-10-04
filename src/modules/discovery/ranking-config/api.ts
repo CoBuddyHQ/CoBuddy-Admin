@@ -12,7 +12,7 @@ export const uiDiscoveryApi = {
   updateSettings: async (settings: UIDiscoverySettings): Promise<void> => {
     mockSettings = { ...settings };
     return Promise.resolve();
-  }
+  },
 };
 
 let mockWeights: RankingWeights = {
@@ -23,7 +23,7 @@ let mockWeights: RankingWeights = {
 };
 
 let mockPromoted: PromotedCompanion[] = [
-  { id: 'C-001', name: 'Riya S.', promotedUntil: '2026-08-15' }
+  { id: 'C-001', name: 'Riya S.', promotedUntil: '2026-08-15' },
 ];
 
 export const rankingConfigApi = {
@@ -34,11 +34,11 @@ export const rankingConfigApi = {
   },
   getPromoted: async (): Promise<PromotedCompanion[]> => Promise.resolve([...mockPromoted]),
   addPromoted: async (c: Omit<PromotedCompanion, 'id'>): Promise<void> => {
-    mockPromoted.push({ ...c, id: `C-${Math.floor(Math.random()*1000)}` });
+    mockPromoted.push({ ...c, id: `C-${Math.floor(Math.random() * 1000)}` });
     return Promise.resolve();
   },
   removePromoted: async (id: string): Promise<void> => {
-    mockPromoted = mockPromoted.filter(p => p.id !== id);
+    mockPromoted = mockPromoted.filter((p) => p.id !== id);
     return Promise.resolve();
-  }
+  },
 };

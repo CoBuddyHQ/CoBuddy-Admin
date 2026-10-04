@@ -7,7 +7,7 @@ export enum StaffRole {
   SUPPORT_LEAD = 'SUPPORT_LEAD',
   LEGAL_ADMIN = 'LEGAL_ADMIN',
   CITY_OPS_MANAGER = 'CITY_OPS_MANAGER',
-  HR_ADMIN = 'HR_ADMIN'
+  HR_ADMIN = 'HR_ADMIN',
 }
 
 export interface StaffUser {

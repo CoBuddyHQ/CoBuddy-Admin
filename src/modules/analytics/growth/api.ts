@@ -11,7 +11,7 @@ const mockData: GrowthStats = {
     { date: '2026-08-03', newSignups: 90, activeUsers: 5100 },
     { date: '2026-08-04', newSignups: 150, activeUsers: 5600 },
     { date: '2026-08-05', newSignups: 200, activeUsers: 6000 },
-  ]
+  ],
 };
 
 export const growthApi = {

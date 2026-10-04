@@ -1,7 +1,7 @@
 /**
  * IMPORTANT SECURITY NOTE:
  * This is a DEV-ONLY tool meant for quickly switching roles during prototyping.
- * It MUST be completely removed or strictly gated behind an environment check 
+ * It MUST be completely removed or strictly gated behind an environment check
  * (e.g. process.env.NODE_ENV !== 'production') before any real production deployment.
  * Allowing users to arbitrarily assume any staff identity is a critical security vulnerability.
  */
@@ -12,7 +12,13 @@ import { useAuthStore } from '@/store/authStore';
 import { employeeApi } from '@/modules/system/employees/api';
 import { Employee } from '@/modules/system/employees/types';
 import { StaffUser } from '@/types/role.types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function RoleSwitcher() {
   const { user, login } = useAuthStore();
@@ -25,7 +31,7 @@ export function RoleSwitcher() {
 
   const handleSwitch = async (employeeId: string | null) => {
     if (!employeeId) return;
-    const matchedEmployee = employees.find(e => e.id === employeeId);
+    const matchedEmployee = employees.find((e) => e.id === employeeId);
     if (!matchedEmployee) return;
 
     const staffUser: StaffUser = {
@@ -35,10 +41,10 @@ export function RoleSwitcher() {
       roles: matchedEmployee.roles,
       cityScope: matchedEmployee.cityScope ? [matchedEmployee.cityScope] : undefined,
     };
-    
+
     await employeeApi.updateLastLogin(staffUser.id);
     login(staffUser);
-    
+
     // Optional reload to reset any local component states tied to previous role
     window.location.reload();
   };
@@ -56,7 +62,7 @@ export function RoleSwitcher() {
             <SelectValue placeholder="Switch Role..." />
           </SelectTrigger>
           <SelectContent>
-            {employees.map(emp => (
+            {employees.map((emp) => (
               <SelectItem key={emp.id} value={emp.id} className="text-xs">
                 {emp.name} ({emp.roles[0]})
               </SelectItem>

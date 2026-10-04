@@ -4,6 +4,7 @@ export const STATUS_LABELS: Record<string, string> = {
   AUTO_REJECTED: 'Auto-Rejected',
   APPROVED: 'Approved',
   REJECTED: 'Rejected',
+  REQUEST_RESUBMISSION: 'Resubmission Requested',
 };
 
 export const DEFAULT_THRESHOLDS = {

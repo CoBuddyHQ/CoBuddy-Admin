@@ -1,71 +1,62 @@
 import { CompanionApplication, ApplicationDecisionPayload } from './types';
+import axios from '@/lib/api/client';
 
-const mockApplications: CompanionApplication[] = [
-  {
-    id: 'APP-1002',
-    applicantName: 'Neha Gupta',
-    email: 'neha.g@example.com',
-    phone: '+91 9876543211',
-    city: 'Mumbai',
-    status: 'PENDING',
-    submittedAt: new Date().toISOString(),
-    dateOfBirth: '1995-06-15',
-    gender: 'Female',
-    bio: 'Looking forward to showing people around my beautiful city.',
-    categories: ['CITY_TOUR', 'SHOPPING'],
-    spokenLanguages: ['en', 'hi'],
-    proposedHourlyRate: 700,
-    photoUrls: ['https://placehold.co/150x150?text=Photo+1', 'https://placehold.co/150x150?text=Photo+2'],
-    workPreferences: { communicationStyle: 'chatty', activityPace: 'relaxed' },
-    backgroundCheckStatus: 'PENDING'
-  },
-  {
-    id: 'APP-1001',
-    applicantName: 'Rahul Singh',
-    email: 'rahul.s@example.com',
-    phone: '+91 9876543212',
-    city: 'Delhi',
-    status: 'IN_REVIEW',
-    submittedAt: new Date(Date.now() - 86400000).toISOString(),
-    assignedTo: 'Admin User',
-    trustScore: 85,
-    dateOfBirth: '1992-04-20',
-    gender: 'Male',
-    bio: 'History buff and foodie.',
-    categories: ['HERITAGE', 'FOOD'],
-    spokenLanguages: ['en', 'hi', 'bn'],
-    proposedHourlyRate: 850,
-    photoUrls: ['https://placehold.co/150x150?text=Photo+1'],
-    workPreferences: { communicationStyle: 'balanced', activityPace: 'energetic' },
-    backgroundCheckStatus: 'PASSED'
-  }
-];
+const mapApplication = (item: any): CompanionApplication => ({
+  id: item.id,
+  applicantName: `${item.firstName} ${item.lastName}`,
+  email: item.email || '',
+  phone: item.phone,
+  city: item.cityId,
+  status: item.applicationStatus as CompanionApplication['status'],
+  submittedAt: item.createdAt,
+  interviewNotes: item.reviewNotes,
+  backgroundCheckStatus: 'PENDING',
+  dateOfBirth: '',
+  gender: '',
+  bio: '',
+  categories: [],
+  spokenLanguages: [],
+  proposedHourlyRate: 0,
+  photoUrls: item.portfolioUrls || [],
+  workPreferences: {},
+});
 
 export const companionAppApi = {
   getApplications: async (): Promise<CompanionApplication[]> => {
-    return Promise.resolve([...mockApplications]);
+    const response = await axios.get('/companion-applications', {
+      params: { page: 1, pageSize: 100 },
+    });
+    const items = response.data.data?.data ?? response.data.data ?? [];
+    return items.map(mapApplication);
   },
 
   getApplication: async (id: string): Promise<CompanionApplication> => {
-    const app = mockApplications.find(a => a.id === id);
-    if (!app) throw new Error('Application not found');
-    return Promise.resolve({ ...app });
+    const response = await axios.get(`/companion-applications/${id}`);
+    return mapApplication(response.data.data);
   },
 
-  assignApplication: async (id: string, staffName: string): Promise<CompanionApplication> => {
-    const app = mockApplications.find(a => a.id === id);
-    if (!app) throw new Error('Application not found');
-    app.assignedTo = staffName;
-    app.status = 'IN_REVIEW';
-    return Promise.resolve(app);
+  assignApplication: async (id: string, _staffName: string): Promise<CompanionApplication> => {
+    const response = await axios.patch(`/companion-applications/${id}/status`, {
+      status: 'IN_REVIEW',
+    });
+    return mapApplication(response.data.data);
   },
 
   submitDecision: async (payload: ApplicationDecisionPayload): Promise<CompanionApplication> => {
-    const app = mockApplications.find(a => a.id === payload.id);
-    if (!app) throw new Error('Application not found');
-    app.status = payload.decision === 'APPROVE' ? 'APPROVED' : 
-                 payload.decision === 'REJECT' ? 'REJECTED' : 'WAITLISTED';
-    app.interviewNotes = payload.notes;
-    return Promise.resolve(app);
-  }
+    if (payload.decision === 'APPROVE') {
+      const response = await axios.post(`/companion-applications/${payload.id}/approve`);
+      return mapApplication(response.data.data?.application ?? response.data.data);
+    } else if (payload.decision === 'REJECT') {
+      const response = await axios.post(`/companion-applications/${payload.id}/reject`, {
+        reason: payload.notes,
+      });
+      return mapApplication(response.data.data);
+    } else {
+      const response = await axios.patch(`/companion-applications/${payload.id}/status`, {
+        status: 'WAITLISTED',
+        reviewNotes: payload.notes,
+      });
+      return mapApplication(response.data.data);
+    }
+  },
 };

@@ -23,12 +23,12 @@ export function ConfigFormTemplate({
   sections,
   onSave,
   onCancel,
-  isSaving = false
+  isSaving = false,
 }: ConfigFormTemplateProps) {
   return (
     <div className="max-w-4xl space-y-6">
       <PageHeader title={title} description={description} />
-      
+
       <div className="space-y-6">
         {sections.map((section, index) => (
           <div key={index} className="bg-background rounded-md border p-6">
@@ -36,13 +36,11 @@ export function ConfigFormTemplate({
             {section.description && (
               <p className="text-sm text-muted-foreground mb-4">{section.description}</p>
             )}
-            <div className="space-y-4">
-              {section.children}
-            </div>
+            <div className="space-y-4">{section.children}</div>
           </div>
         ))}
       </div>
-      
+
       <div className="flex flex-wrap items-center gap-4 bg-background p-4 rounded-md border">
         <Button onClick={onSave} disabled={isSaving}>
           {isSaving ? 'Saving...' : 'Save Changes'}

@@ -3,25 +3,32 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { employeeApi } from '@/modules/system/employees/api';
-import { auditLogsApi } from '@/modules/system/audit-logs/api';
+import { authApi } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Shield } from 'lucide-react';
 import { StaffUser } from '@/types/role.types';
 
 export default function LoginPage() {
   const router = useRouter();
   const { isAuthenticated, login } = useAuthStore();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [step, setStep] = useState<'CREDENTIALS' | '2FA'>('CREDENTIALS');
   const [otp, setOtp] = useState('');
-  const [pendingUser, setPendingUser] = useState<StaffUser | null>(null);
-  
+  const [mfaToken, setMfaToken] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
   // If already authenticated, redirect to dashboard
   useEffect(() => {
     if (isAuthenticated) {
@@ -31,41 +38,38 @@ export default function LoginPage() {
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     setError('');
-    
-    // Note: Real password verification happens once a backend exists.
-    // For now, we only check if the email exists in the mock employee list.
-    const employees = await employeeApi.getEmployees();
-    const matchedEmployee = employees.find(emp => emp.email.toLowerCase() === email.toLowerCase());
+    setSubmitting(true);
 
-    if (!matchedEmployee) {
-      setError('Invalid email or password');
-      return;
-    }
-
-    if (matchedEmployee.status === 'suspended') {
-      setError('This account has been suspended. Contact your administrator.');
-      return;
-    }
-
-    const staffUser: StaffUser = {
-      id: matchedEmployee.id,
-      name: matchedEmployee.name,
-      email: matchedEmployee.email,
-      roles: matchedEmployee.roles,
-      cityScope: matchedEmployee.cityScope ? [matchedEmployee.cityScope] : undefined,
-    };
-
-    if (matchedEmployee.twoFactorEnabled) {
-      setPendingUser(staffUser);
-      setStep('2FA');
-    } else {
-      await finalizeLogin(staffUser);
+    try {
+      const response = await authApi.login(email, password);
+      await finalizeLogin(response.data.data);
+    } catch (error: any) {
+      const details = error?.response?.data?.error?.details;
+      if (details?.requires2fa && details.mfaToken) {
+        setMfaToken(details.mfaToken);
+        setStep('2FA');
+        setPassword('');
+        return;
+      }
+      if (!error?.response) {
+        setError('Cannot connect to the admin server. Start the backend and try again.');
+        return;
+      }
+      setError(
+        error?.response?.data?.error?.message ||
+          error?.response?.data?.message ||
+          'Invalid email or password',
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handle2FASubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     setError('');
 
     if (otp.length !== 6) {
@@ -73,22 +77,40 @@ export default function LoginPage() {
       return;
     }
 
-    // Note: No real OTP verification yet. Accepting any 6 digits as valid.
-    if (pendingUser) {
-      await finalizeLogin(pendingUser);
+    if (mfaToken) {
+      setSubmitting(true);
+      try {
+        const response = await authApi.verify2FA(mfaToken, otp);
+        await finalizeLogin(response.data.data);
+      } catch (error: any) {
+        setError(
+          error?.response?.data?.error?.message ||
+            error?.response?.data?.message ||
+            'Invalid authentication code',
+        );
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
-  const finalizeLogin = async (user: StaffUser) => {
-    await employeeApi.updateLastLogin(user.id);
-    await auditLogsApi.logAction({
-      adminId: user.id,
-      adminName: user.name,
-      action: 'LOGIN',
-      moduleAffected: 'System',
-      details: 'User logged in',
-      ipAddress: '127.0.0.1' // Mock IP
-    });
+  const resetMfa = () => {
+    setStep('CREDENTIALS');
+    setMfaToken(null);
+    setOtp('');
+    setError('');
+  };
+
+  const finalizeLogin = async (session: any) => {
+    const user: StaffUser = {
+      id: session.profile.id,
+      name: session.profile.name,
+      email: session.profile.email,
+      roles: session.profile.roles,
+      cityScope: session.profile.cityScope,
+    };
+    localStorage.setItem('admin_token', session.accessToken);
+    if (session.refreshToken) localStorage.setItem('admin_refresh_token', session.refreshToken);
     login(user);
     router.replace('/');
   };
@@ -106,66 +128,98 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">CoBuddy Admin</CardTitle>
           <CardDescription>
-            {step === 'CREDENTIALS' 
+            {step === 'CREDENTIALS'
               ? 'Enter your credentials to access the admin panel'
-              : 'Enter the 6-digit code from your authenticator app'
-            }
+              : 'Enter the 6-digit code from your authenticator app'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">
-              {error}
-            </div>
+            <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm mb-4">{error}</div>
           )}
-          
+
           {step === 'CREDENTIALS' ? (
             <form onSubmit={handleCredentialsSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="email">Email</label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="admin@cobuddy.com" 
+                <label className="text-sm font-medium" htmlFor="email">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@cobuddy.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required 
+                  autoComplete="username"
+                  disabled={submitting}
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="password">Password</label>
-                <Input 
-                  id="password" 
-                  type="password" 
+                <label className="text-sm font-medium" htmlFor="password">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required 
+                  autoComplete="current-password"
+                  disabled={submitting}
+                  required
                 />
               </div>
-              <Button type="submit" className="w-full">Sign In</Button>
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-sm"
+                  onClick={() => router.push('/forgot-password')}
+                >
+                  Forgot password?
+                </Button>
+              </div>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? 'Signing in...' : 'Sign In'}
+              </Button>
             </form>
           ) : (
             <form onSubmit={handle2FASubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="otp">Authentication Code</label>
-                <Input 
-                  id="otp" 
-                  type="text" 
-                  placeholder="123456" 
+                <label className="text-sm font-medium" htmlFor="otp">
+                  Authentication Code
+                </label>
+                <Input
+                  id="otp"
+                  type="text"
+                  placeholder="123456"
                   maxLength={6}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  required 
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  disabled={submitting}
+                  required
                 />
               </div>
-              <Button type="submit" className="w-full">Verify & Sign In</Button>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? 'Verifying...' : 'Verify & Sign In'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={submitting}
+                onClick={resetMfa}
+              >
+                Use another account
+              </Button>
             </form>
           )}
         </CardContent>
         <CardFooter className="flex justify-center border-t p-4">
-          <p className="text-xs text-muted-foreground text-center">
-            Internal Operations Portal
-          </p>
+          <p className="text-xs text-muted-foreground text-center">Internal Operations Portal</p>
         </CardFooter>
       </Card>
     </div>

@@ -12,7 +12,8 @@ export const usePrivacy = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: PrivacyRequest['status'] }) => privacyApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: PrivacyRequest['status'] }) =>
+      privacyApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['privacy-requests'] });
       toast.success(`Request marked as ${status}`);

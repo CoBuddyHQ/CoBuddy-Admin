@@ -1,13 +1,20 @@
 export type ApplicantType = 'CUSTOMER' | 'COMPANION';
-export type VerificationStatus = 'PENDING_MANUAL_REVIEW' | 'AUTO_APPROVED' | 'AUTO_REJECTED' | 'APPROVED' | 'REJECTED';
+export type VerificationStatus =
+  | 'PENDING_MANUAL_REVIEW'
+  | 'AUTO_APPROVED'
+  | 'AUTO_REJECTED'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'REQUEST_RESUBMISSION';
 
 export interface VerificationCase {
   id: string;
+  caseRef?: string;
   applicantName: string;
   applicantType: ApplicantType;
-  faceMatchScore: number;
-  livenessPass: boolean;
-  documentValid: boolean;
+  faceMatchScore: number | null;
+  livenessPass: boolean | null;
+  documentValid: boolean | null;
   status: VerificationStatus;
   submittedAt: string;
   documentType: string;
@@ -15,6 +22,20 @@ export interface VerificationCase {
   selfieUrl: string;
   backgroundDeclarationUrl?: string; // Companion only
   auditTrail: AuditEvent[];
+}
+
+export type VerificationFilter = VerificationStatus | 'ALL';
+
+export interface VerificationPage {
+  data: VerificationCase[];
+  meta: {
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    totalItems: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
 }
 
 export interface AuditEvent {

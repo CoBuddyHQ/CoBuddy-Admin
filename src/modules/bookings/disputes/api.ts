@@ -1,90 +1,68 @@
 import { BookingDispute } from './types';
 import { refundsApi } from '../../financial/refunds/api';
+import axios from '@/lib/api/client';
 
 export function getRefundPercentForNotice(noticeHours: number, tiers: any[]): number {
-  const tier = tiers.find(t => 
-    noticeHours >= t.noticeHoursMin && 
-    (t.noticeHoursMax === null || noticeHours < t.noticeHoursMax)
+  const tier = tiers.find(
+    (item) =>
+      noticeHours >= item.noticeHoursMin &&
+      (item.noticeHoursMax === null || noticeHours < item.noticeHoursMax),
   );
   return tier ? tier.refundPercent : 0;
 }
 
-let mockDisputes: BookingDispute[] = [
-  {
-    id: 'DISP-001',
-    bookingId: 'B-1001',
-    customerId: 'CUST-123',
-    companionId: 'COMP-456',
-    raisedBy: 'CUSTOMER',
-    reasonCode: 'no_show',
-    reasonDetails: 'Companion did not show up',
-    status: 'OPEN',
-    amount: 1500,
-    noticeGivenHours: 1,
-    // Will be computed dynamically from refundsApi tiers
-    calculatedPenaltyPercent: 0,
-    createdAt: '2026-08-05T14:30:00Z'
-  },
-  {
-    id: 'DISP-002',
-    bookingId: 'B-1005',
-    customerId: 'CUST-890',
-    companionId: 'COMP-112',
-    raisedBy: 'COMPANION',
-    reasonCode: 'disrespectful',
-    reasonDetails: 'Customer was disrespectful',
-    status: 'INVESTIGATING',
-    amount: 3000,
-    noticeGivenHours: 12,
-    calculatedPenaltyPercent: 0,
-    createdAt: '2026-08-06T09:15:00Z'
-  },
-  {
-    id: 'DISP-003',
-    bookingId: 'B-1008',
-    customerId: 'CUST-102',
-    companionId: 'COMP-999',
-    raisedBy: 'CUSTOMER',
-    reasonCode: 'emergency',
-    reasonDetails: 'Family emergency, cancelled 36 hours before.',
-    status: 'OPEN',
-    amount: 5000,
-    noticeGivenHours: 36,
-    calculatedPenaltyPercent: 0,
-    createdAt: '2026-08-10T10:00:00Z'
-  },
-  {
-    id: 'DISP-004',
-    bookingId: 'B-1009',
-    customerId: 'CUST-205',
-    companionId: 'COMP-444',
-    raisedBy: 'CUSTOMER',
-    reasonCode: 'other',
-    reasonDetails: 'Plans changed, gave 50 hours notice.',
-    status: 'OPEN',
-    amount: 2500,
-    noticeGivenHours: 50,
-    calculatedPenaltyPercent: 0,
-    createdAt: '2026-08-11T09:00:00Z'
-  }
-];
+const toUiStatus = (status: string, note?: string): BookingDispute['status'] => {
+  if (note?.startsWith('[ESCALATED]')) return 'ESCALATED';
+  if (status === 'PROCESSED') return 'RESOLVED_REFUND';
+  if (status === 'REJECTED') return 'RESOLVED_NO_REFUND';
+  if (status === 'APPROVED') return 'INVESTIGATING';
+  return 'OPEN';
+};
 
 export const disputesApi = {
   getDisputes: async (): Promise<BookingDispute[]> => {
-    const settings = await refundsApi.getSettings();
-    return mockDisputes.map(d => {
-      // If it has been overridden or resolved, keep the override, else compute from tier
-      if (d.status === 'RESOLVED_REFUND' || d.overrideReason) return d;
-      const penalty = getRefundPercentForNotice(d.noticeGivenHours, settings.cancellationRefundTiers);
-      return { ...d, calculatedPenaltyPercent: penalty };
+    const [response, settings] = await Promise.all([
+      axios.get('/bookings/disputes'),
+      refundsApi.getSettings(),
+    ]);
+    const rows = response.data.data?.data ?? response.data.data ?? [];
+    return rows.map((item: any) => {
+      const booking = item.booking ?? {};
+      const noticeGivenHours = Math.max(
+        0,
+        Math.round(
+          (new Date(booking.startTime).getTime() - new Date(item.createdAt).getTime()) / 3_600_000,
+        ),
+      );
+      const overridePercent = item.resolutionNote?.match(/Penalty override\\s+([\\d.]+)%/)?.[1];
+      return {
+        id: item.id,
+        bookingId: booking.bookingRef ?? item.bookingId,
+        customerId: booking.customer?.id ?? '',
+        companionId: booking.companion?.id ?? '',
+        raisedBy: item.raisedBy === 'COMPANION' ? 'COMPANION' : 'CUSTOMER',
+        reasonCode: item.disputeReasonId,
+        reasonDetails: item.description,
+        status: toUiStatus(item.status, item.resolutionNote),
+        amount: Number(booking.bookingAmount ?? item.refundAmount ?? 0),
+        noticeGivenHours,
+        calculatedPenaltyPercent: overridePercent
+          ? Number(overridePercent)
+          : getRefundPercentForNotice(noticeGivenHours, settings.cancellationRefundTiers),
+        overrideReason: overridePercent ? item.resolutionNote : undefined,
+        createdAt: item.createdAt,
+      };
     });
   },
-  
+
   updateDisputeStatus: async (id: string, status: BookingDispute['status']): Promise<void> => {
-    mockDisputes = mockDisputes.map(d => d.id === id ? { ...d, status } : d);
+    await axios.patch('/bookings/disputes/' + id + '/status', { status });
   },
 
   overridePenalty: async (id: string, newPenalty: number, reason: string): Promise<void> => {
-    mockDisputes = mockDisputes.map(d => d.id === id ? { ...d, calculatedPenaltyPercent: newPenalty, overrideReason: reason, status: 'RESOLVED_REFUND' } : d);
-  }
+    await axios.post('/bookings/disputes/' + id + '/penalty-override', {
+      percent: newPenalty,
+      reason,
+    });
+  },
 };

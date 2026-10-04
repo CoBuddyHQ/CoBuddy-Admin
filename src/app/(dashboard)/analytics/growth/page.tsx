@@ -12,27 +12,53 @@ export default function GrowthDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="User Growth & Retention" 
+      <PageHeader
+        title="User Growth & Retention"
         description="Track user acquisition, companion onboarding, and overall retention metrics."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Total Registered Users</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Registered Users
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
+          </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">New Users (This Month)</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold text-green-600">+{stats.newUsersThisMonth.toLocaleString()}</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              New Users (This Month)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              +{stats.newUsersThisMonth.toLocaleString()}
+            </div>
+          </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Active Companions</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{stats.activeCompanions.toLocaleString()}</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Active Companions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeCompanions.toLocaleString()}</div>
+          </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">30-Day Retention Rate</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{stats.retentionRate}%</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              30-Day Retention Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.retentionRate}%</div>
+          </CardContent>
         </Card>
       </div>
 
@@ -43,7 +69,13 @@ export default function GrowthDashboardPage() {
         <CardContent>
           <AreaChart
             className="h-80 mt-4"
-            data={stats.chartData.map(d => ({ ...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }))}
+            data={stats.chartData.map((d) => ({
+              ...d,
+              date: new Date(d.date).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              }),
+            }))}
             index="date"
             categories={['newSignups', 'activeUsers']}
             colors={['cyan', 'indigo']}
@@ -54,4 +86,3 @@ export default function GrowthDashboardPage() {
     </div>
   );
 }
-

@@ -13,7 +13,7 @@ const mockData: SessionMetrics = {
     { hour: '18:00', sessions: 250, cancellations: 15 },
     { hour: '20:00', sessions: 310, cancellations: 20 },
     { hour: '22:00', sessions: 200, cancellations: 18 },
-  ]
+  ],
 };
 
 export const sessionsApi = {

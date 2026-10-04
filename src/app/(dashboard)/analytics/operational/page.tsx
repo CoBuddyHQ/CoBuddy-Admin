@@ -14,7 +14,8 @@ export default function SessionMetricsPage() {
   const { tickets, isLoading: ticketsLoading } = useTickets();
   const { alerts, isLoading: slaLoading } = useSLA();
 
-  if (sessionsLoading || compsLoading || ticketsLoading || slaLoading || !metrics) return <div className="">Loading Analytics Data...</div>;
+  if (sessionsLoading || compsLoading || ticketsLoading || slaLoading || !metrics)
+    return <div className="">Loading Analytics Data...</div>;
 
   // 1. Booking Funnel
   // Requested = totalSessionsToday * 1.3, Accepted = totalSessionsToday, Completed = totalSessionsToday * (1 - cancellationRate)
@@ -24,45 +25,67 @@ export default function SessionMetricsPage() {
   const funnelData = [
     { stage: 'Requested', count: requested },
     { stage: 'Accepted', count: accepted },
-    { stage: 'Completed', count: completed }
+    { stage: 'Completed', count: completed },
   ];
 
   // 2. Ticket Volume & SLA Breach
-  const openTickets = tickets.filter(t => t.status !== 'RESOLVED' && t.status !== 'CLOSED').length;
+  const openTickets = tickets.filter(
+    (t) => t.status !== 'RESOLVED' && t.status !== 'CLOSED',
+  ).length;
   const breachedCount = alerts.filter((a: any) => a.status === 'BREACHED').length;
-  const slaBreachPct = tickets.length > 0 ? ((breachedCount / tickets.length) * 100).toFixed(1) : '0';
+  const slaBreachPct =
+    tickets.length > 0 ? ((breachedCount / tickets.length) * 100).toFixed(1) : '0';
 
   // 3. Discovery Distribution
   const totalBookings = companions.reduce((sum, c) => sum + c.totalSessions, 0);
   const sortedComps = [...companions].sort((a, b) => b.totalSessions - a.totalSessions);
   const top10Count = Math.max(1, Math.ceil(sortedComps.length * 0.1));
-  const top10Bookings = sortedComps.slice(0, top10Count).reduce((sum, c) => sum + c.totalSessions, 0);
+  const top10Bookings = sortedComps
+    .slice(0, top10Count)
+    .reduce((sum, c) => sum + c.totalSessions, 0);
   const remainingBookings = totalBookings - top10Bookings;
   const discoveryData = [
     { name: 'Top 10% Companions', bookings: top10Bookings },
-    { name: 'Remaining 90%', bookings: remainingBookings }
+    { name: 'Remaining 90%', bookings: remainingBookings },
   ];
-
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Session Metrics" 
+      <PageHeader
+        title="Session Metrics"
         description="Track booking volumes, duration, and cancellation trends."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Total Sessions (Today)</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{metrics.totalSessionsToday.toLocaleString()}</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Sessions (Today)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metrics.totalSessionsToday.toLocaleString()}</div>
+          </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Avg. Session Duration</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{metrics.avgDurationMinutes} mins</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Avg. Session Duration
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metrics.avgDurationMinutes} mins</div>
+          </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Cancellation Rate</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold text-destructive">{metrics.cancellationRate}%</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Cancellation Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">{metrics.cancellationRate}%</div>
+          </CardContent>
         </Card>
       </div>
 
@@ -139,4 +162,3 @@ export default function SessionMetricsPage() {
     </div>
   );
 }
-

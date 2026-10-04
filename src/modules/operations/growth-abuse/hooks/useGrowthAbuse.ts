@@ -12,7 +12,8 @@ export const useGrowthAbuse = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: GrowthAbuseAlert['status'] }) => growthAbuseApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: GrowthAbuseAlert['status'] }) =>
+      growthAbuseApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['growth-abuse-alerts'] });
       toast.success(`Alert status updated to ${status}`);
@@ -20,7 +21,8 @@ export const useGrowthAbuse = () => {
   });
 
   const takeActionMutation = useMutation({
-    mutationFn: ({ id, action }: { id: string; action: 'BLOCK_REFERRAL' | 'BAN_ACCOUNTS' }) => growthAbuseApi.takeAction(id, action),
+    mutationFn: ({ id, action }: { id: string; action: 'BLOCK_REFERRAL' | 'BAN_ACCOUNTS' }) =>
+      growthAbuseApi.takeAction(id, action),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['growth-abuse-alerts'] });
       toast.success('Action successfully executed');

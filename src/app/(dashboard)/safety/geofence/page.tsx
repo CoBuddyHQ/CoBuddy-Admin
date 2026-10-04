@@ -3,27 +3,22 @@
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useGeofenceAlerts } from '@/modules/safety/geofence/hooks/useGeofenceAlerts';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChevronDown, MapPin } from 'lucide-react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
-import { useRouter } from 'next/navigation';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown, MapPin } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function GeofencePage() {
   const { alerts, isLoading, updateStatus } = useGeofenceAlerts();
-  const router = useRouter();
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Geofence Breach Alerts" 
+      <PageHeader
+        title="Geofence Breach Alerts"
         description="Monitor instances where a companion deviates significantly from the expected booking location."
       />
 
@@ -44,7 +39,7 @@ export default function GeofencePage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {alerts.map(a => (
+              {alerts.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell>
                     <div className="font-medium">{a.id}</div>
@@ -60,7 +55,15 @@ export default function GeofencePage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={a.breachSeverity === 'HIGH' ? 'destructive' : a.breachSeverity === 'MEDIUM' ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={
+                        a.breachSeverity === 'HIGH'
+                          ? 'destructive'
+                          : a.breachSeverity === 'MEDIUM'
+                            ? 'default'
+                            : 'secondary'
+                      }
+                    >
                       {a.breachSeverity}
                     </Badge>
                   </TableCell>
@@ -75,8 +78,17 @@ export default function GeofencePage() {
                           Update <ChevronDown className="ml-2 h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => updateStatus({ id: a.id, status: 'RESOLVED' })}>Mark Resolved</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => updateStatus({ id: a.id, status: 'ESCALATED' })} className="text-destructive font-medium">Escalate to SOS</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => updateStatus({ id: a.id, status: 'RESOLVED' })}
+                          >
+                            Mark Resolved
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => updateStatus({ id: a.id, status: 'ESCALATED' })}
+                            className="text-destructive font-medium"
+                          >
+                            Escalate to SOS
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
@@ -90,4 +102,3 @@ export default function GeofencePage() {
     </div>
   );
 }
-

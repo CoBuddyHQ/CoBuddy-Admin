@@ -50,7 +50,7 @@ export class FraudDetectionService {
     const flag = await this.prisma.fraudFlag.findUnique({ where: { id } });
     if (!flag) throw new NotFoundException('Fraud flag not found');
 
-    let userInfo: any = null;
+    let userInfo: any;
     if (flag.userType === 'CUSTOMER') {
       userInfo = await this.prisma.customer.findUnique({
         where: { id: flag.userId },

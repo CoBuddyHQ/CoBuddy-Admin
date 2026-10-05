@@ -403,7 +403,7 @@ If you see `property should not exist` errors, the backend uses strict validatio
 ```bash
 cd cobuddy-backend
 npm run build
-npm run start:prod
+npm run start:dev
 ```
 
 ### Frontend

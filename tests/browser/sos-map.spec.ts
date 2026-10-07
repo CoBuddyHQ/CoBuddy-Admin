@@ -33,45 +33,50 @@ async function setup(page: Page, roles = ['SAFETY_OPERATOR']) {
   await page.addInitScript(() => localStorage.setItem('admin_token', 'sos-test-access'));
   // Keep browser tests independent of Google credentials and billable requests.
   await page.route('https://maps.googleapis.com/**', (route) => route.abort());
-  await page.route('**/api/**', async (route) => {
-    const url = new URL(route.request().url());
-    const path = url.pathname.replace(/^.*\/api/, '');
-    const respond = (data: unknown, status = 200) =>
-      route.fulfill({
-        status,
-        json: { data },
-        headers: { 'access-control-allow-origin': '*' },
-      });
-    if (path === '/auth/me')
-      return respond({
-        id: 'safety-test',
-        name: 'Safety Operator',
-        email: 'safety@example.invalid',
-        roles,
-        cityScopeIds: [],
-      });
-    if (path === '/safety/sos') {
-      state.reads++;
-      expect(url.searchParams.get('activeOnly')).toBe('true');
-      return respond(state.fail ? null : state.alerts, state.fail ? 503 : 200);
-    }
-    if (path.endsWith('/status')) {
-      const body = route.request().postDataJSON();
-      state.writes.push(body);
-      if (state.failWrite) return respond(null, 503);
-      const id = path.split('/')[3];
-      state.alerts = state.alerts.map((alert) =>
-        alert.id === id
-          ? {
-              ...alert,
-              status: body.status === 'RESOLVED' ? 'RESOLVED_FALSE_ALARM' : body.status,
-            }
-          : alert,
-      );
-      return respond({});
-    }
-    return respond([]);
-  });
+  await page.route(
+    (url) =>
+      url.pathname.startsWith('/api/') &&
+      ['localhost', '127.0.0.1', 'api.example.invalid'].includes(url.hostname),
+    async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^.*\/api/, '');
+      const respond = (data: unknown, status = 200) =>
+        route.fulfill({
+          status,
+          json: { data },
+          headers: { 'access-control-allow-origin': '*' },
+        });
+      if (path === '/auth/me')
+        return respond({
+          id: 'safety-test',
+          name: 'Safety Operator',
+          email: 'safety@example.invalid',
+          roles,
+          cityScopeIds: [],
+        });
+      if (path === '/safety/sos') {
+        state.reads++;
+        expect(url.searchParams.get('activeOnly')).toBe('true');
+        return respond(state.fail ? null : state.alerts, state.fail ? 503 : 200);
+      }
+      if (path.endsWith('/status')) {
+        const body = route.request().postDataJSON();
+        state.writes.push(body);
+        if (state.failWrite) return respond(null, 503);
+        const id = path.split('/')[3];
+        state.alerts = state.alerts.map((alert) =>
+          alert.id === id
+            ? {
+                ...alert,
+                status: body.status === 'RESOLVED' ? 'RESOLVED_FALSE_ALARM' : body.status,
+              }
+            : alert,
+        );
+        return respond({});
+      }
+      return respond([]);
+    },
+  );
   return state;
 }
 
@@ -164,4 +169,23 @@ test('staff without SOS permission cannot request or view emergency locations', 
   await expect(page.getByText('You do not have access to SOS alerts.')).toBeVisible();
   expect(state.reads).toBe(0);
   await expect(page.getByRole('region', { name: 'Live SOS map' })).toHaveCount(0);
+});
+
+test('a stalled Maps initialization reaches its deadline without hiding the SOS queue', async ({
+  page,
+}) => {
+  test.setTimeout(35000);
+  await setup(page);
+  await page.route('https://maps.googleapis.com/**', (route) =>
+    route.fulfill({
+      contentType: 'application/javascript',
+      body: '/* Intentionally no Maps initialization callback. */',
+    }),
+  );
+  await page.goto('/safety/sos-dashboard');
+  await expect(page.getByRole('article')).toHaveCount(3);
+  await expect(page.getByText(/Google Maps is (not configured|unavailable)\./)).toBeVisible({
+    timeout: 25000,
+  });
+  await expect(page.getByRole('article')).toHaveCount(3);
 });

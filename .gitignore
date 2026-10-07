@@ -14,6 +14,8 @@
 /coverage
 /test-results/
 /playwright-report/
+/.local-logs/
+/.local-backups/
 
 # next.js
 /.next/

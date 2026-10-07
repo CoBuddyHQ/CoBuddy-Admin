@@ -26,15 +26,119 @@ function load(relativePath, imports = {}) {
   return exports;
 }
 
-test('production blocks demo routes including direct links and nested paths', () => {
+test('disputes use one authorized endpoint and preserve structured state and refund details', async () => {
+  const requests = [];
+  const { disputesApi } = load('src/modules/bookings/disputes/api.ts', {
+    '@/lib/api/client': {
+      get: async (url) => {
+        requests.push(url);
+        return {
+          data: {
+            data: [
+              {
+                id: 'd/1',
+                version: 3,
+                workflowStatus: 'ESCALATED',
+                overridePercent: 25,
+                overrideReason: 'Reviewed evidence',
+                refundAmount: '25.01',
+                booking: { bookingRef: 'B-1', bookingAmount: '100.03' },
+              },
+            ],
+          },
+        };
+      },
+      patch: async (url, body) => requests.push({ url, body }),
+      post: async (url, body) => requests.push({ url, body }),
+    },
+  });
+  const disputes = await disputesApi.getDisputes();
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0], '/bookings/disputes');
+  assert.equal(disputes[0].status, 'ESCALATED');
+  assert.equal(disputes[0].refundPercent, 25);
+  assert.equal(disputes[0].refundAmount, 25.01);
+  assert.equal(disputes[0].overrideReason, 'Reviewed evidence');
+  await disputesApi.updateDisputeStatus('d/1', 3, 'REFUND_PENDING');
+  assert.equal(requests[1].url, '/bookings/disputes/d%2F1/status');
+  assert.equal(requests[1].body.version, 3);
+  assert.equal(requests[1].body.status, 'REFUND_PENDING');
+});
+
+test('booking map preserves unlocated bookings, accepts zero, and rejects out-of-range coordinates', async () => {
+  const { liveMapApi } = load('src/modules/operations/live-map/api.ts', {
+    '@/lib/api/client': {
+      get: async () => ({
+        data: {
+          data: [
+            { id: 'zero', venue: { lat: 0, lng: 0 } },
+            { id: 'missing' },
+            { id: 'bad', venue: { lat: 91, lng: 0 } },
+            { id: 'snapshot', venueSnapshot: { lat: 19, lng: 73 } },
+          ],
+        },
+      }),
+    },
+  });
+  const rows = await liveMapApi.getLiveBookings();
+  assert.equal(rows.length, 4);
+  assert.equal(rows[0].latitude, 0);
+  assert.equal(rows[1].latitude, null);
+  assert.equal(rows[2].latitude, null);
+  assert.equal(rows[3].latitude, 19);
+});
+
+test('unfinished adapters reject every operation instead of inventing results or successful writes', async () => {
+  const areas = [
+    'discovery/events',
+    'discovery/ranking-config',
+    'legal/data-privacy',
+    'legal/legal-requests',
+    'marketing/notifications',
+    'operations/city-launch',
+    'operations/growth-abuse',
+    'operations/venues',
+    'platform-config/policy-docs',
+    'platform-config/training',
+    'support/sla-dashboard',
+    'support/tickets',
+  ];
+  const unavailable = load('src/lib/unavailable-feature.ts');
+  for (const area of areas) {
+    const exports = load('src/modules/' + area + '/api.ts', {
+      '@/lib/unavailable-feature': unavailable,
+    });
+    for (const api of Object.values(exports)) {
+      for (const operation of Object.values(api))
+        await assert.rejects(operation(), /not available in this release/);
+    }
+  }
+});
+
+test('default seed never creates demo identities or business activity', () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, '..', 'cobuddy-backend/prisma/seed.ts'),
+    'utf8',
+  );
+  assert.doesNotMatch(
+    source,
+    /prisma\.(staffEmployee|customer|companion|booking|wallet|refund|verificationCase|venue)\./,
+  );
+  assert.doesNotMatch(source, /SEED_DEMO_PASSWORD|passwordHash/);
+});
+
+test('unimplemented routes are blocked in all environments, including direct links', () => {
   const { isRouteReleased, UNRELEASED_ROUTES } = load('src/lib/release.ts');
   for (const route of UNRELEASED_ROUTES) {
     assert.equal(isRouteReleased(route, 'production'), false);
     assert.equal(isRouteReleased(route + '/detail', 'production'), false);
-    assert.equal(isRouteReleased(route, 'development'), true);
+    assert.equal(isRouteReleased(route, 'development'), false);
   }
   assert.equal(isRouteReleased('/financial/escrow', 'production'), true);
   assert.equal(isRouteReleased('/system/master-data', 'production'), true);
+  assert.equal(isRouteReleased('/analytics/growth', 'production'), true);
+  assert.equal(isRouteReleased('/analytics/operational', 'production'), true);
+  assert.equal(isRouteReleased('/analytics/financial', 'production'), true);
 });
 
 test('SOS preserves escalated and investigating alerts and requests only open records', async () => {

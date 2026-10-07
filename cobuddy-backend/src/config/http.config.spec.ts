@@ -9,6 +9,9 @@ describe('HTTP transport hardening', () => {
     server.get('/ip', (req, res) => {
       res.json({ ip: req.ip });
     });
+    server.get('/query', (req, res) => {
+      res.json(req.query);
+    });
     server.post('/body', (req, res) => {
       res.json(req.body);
     });
@@ -68,5 +71,23 @@ describe('HTTP transport hardening', () => {
       .type('form')
       .send(Array.from({ length: 101 }, (_, i) => 'p' + i + '=value').join('&'))
       .expect(413);
+  });
+  it('preserves bracket-array filters alongside pagination', async () => {
+    const response = await request(app())
+      .get('/query?page=1&pageSize=200&roles[]=SUPPORT_AGENT&roles[]=CITY_OPS_MANAGER')
+      .expect(200);
+    expect(response.body).toEqual({
+      page: '1',
+      pageSize: '200',
+      roles: ['SUPPORT_AGENT', 'CITY_OPS_MANAGER'],
+    });
+  });
+  it('does not allow query input to pollute object prototypes', async () => {
+    const response = await request(app())
+      .get('/query?__proto__[polluted]=yes&constructor[prototype][polluted]=yes&page=1')
+      .expect(200);
+    expect(response.body.page).toBe('1');
+    expect(Object.getPrototypeOf({})).not.toHaveProperty('polluted');
+    expect(Object.prototype.hasOwnProperty.call(response.body, '__proto__')).toBe(false);
   });
 });

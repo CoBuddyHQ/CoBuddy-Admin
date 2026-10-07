@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { searchAreaSuggestions } from '@/lib/mockPlacesAutocomplete';
+import { useState } from 'react';
 import { City, Interest, Language, AppLanguage } from '../types';
 import { Switch } from '@/components/ui/switch';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
@@ -41,31 +40,15 @@ export function CityList({
 }: CityListProps) {
   const [manageCity, setManageCity] = useState<City | null>(null);
   const [newAreaName, setNewAreaName] = useState<Record<string, string>>({});
-  const [suggestions, setSuggestions] = useState<{ name: string; lat: number; lng: number }[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<{ lat?: number; lng?: number }>({});
 
   const { config } = useSystemConfig();
   const defaultHours = config?.serviceHours || { openTime: '06:00', closeTime: '23:00' };
 
-  useEffect(() => {
-    if (!manageCity || !newAreaName['en']) {
-      setSuggestions([]);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      const results = await searchAreaSuggestions(newAreaName['en'], manageCity.id);
-      setSuggestions(results);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [newAreaName['en'], manageCity]);
-
   const handleAddArea = (e: React.FormEvent) => {
     e.preventDefault();
     if (manageCity && newAreaName['en']) {
-      onAddArea(manageCity.id, newAreaName, selectedLocation.lat, selectedLocation.lng);
+      onAddArea(manageCity.id, newAreaName);
       setNewAreaName({});
-      setSelectedLocation({});
-      setSuggestions([]);
     }
   };
 
@@ -258,28 +241,10 @@ export function CityList({
                         value={newAreaName[lang.code] || ''}
                         onChange={(e) => {
                           setNewAreaName({ ...newAreaName, [lang.code]: e.target.value });
-                          if (lang.code === 'en') setSelectedLocation({}); // Reset on manual edit
                         }}
                         required={lang.code === 'en'}
                         autoComplete="off"
                       />
-                      {lang.code === 'en' && suggestions.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-48 overflow-auto">
-                          {suggestions.map((s, idx) => (
-                            <div
-                              key={idx}
-                              className="px-3 py-2 text-sm cursor-pointer hover:bg-muted"
-                              onClick={() => {
-                                setNewAreaName({ ...newAreaName, en: s.name });
-                                setSelectedLocation({ lat: s.lat, lng: s.lng });
-                                setSuggestions([]);
-                              }}
-                            >
-                              {s.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   ))}
                 <Button type="submit" className="w-full" disabled={!newAreaName['en']}>

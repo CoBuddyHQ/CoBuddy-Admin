@@ -1,86 +1,109 @@
 'use client';
 
+import { useState } from 'react';
+import { Navigation, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useLiveMap } from '@/modules/operations/live-map/hooks/useLiveMap';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BookingGoogleMap } from '@/modules/operations/live-map/components/BookingGoogleMap';
 import { Badge } from '@/components/ui/badge';
-import { MapPin } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/button';
 
 export default function LiveMapPage() {
-  const { markers, isLoading } = useLiveMap();
-
-  if (isLoading) return <div className="">Loading Live Map...</div>;
+  const { markers, isLoading, isError, isFetching, refetch, updatedAt } = useLiveMap();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = markers.find((item) => item.id === selectedId);
+  if (isLoading) return <div role="status">Loading active bookings...</div>;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Live Booking Map"
-        description="Real-time map view of all ongoing sessions (heatmaps & pinpoints)."
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
-        {/* Left Side: Status Summary */}
-        <div className="space-y-4 overflow-y-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Sessions ({markers.length})</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {markers.map((m) => (
-                <div
-                  key={m.id}
-                  className="p-3 border rounded-md flex justify-between items-center bg-card"
-                >
-                  <div>
-                    <div className="font-medium text-sm">{m.sessionId}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {m.companionName} w/ {m.userName}
-                    </div>
-                  </div>
-                  <Badge
-                    variant={
-                      m.status === 'EXTENDED'
-                        ? 'secondary'
-                        : m.status === 'ARRIVING'
-                          ? 'outline'
-                          : 'default'
-                    }
-                  >
-                    {m.status}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <PageHeader title="Live Booking Map" />
+        <Button
+          size="icon"
+          variant="outline"
+          title="Refresh bookings"
+          aria-label="Refresh bookings"
+          disabled={isFetching}
+          onClick={() => void refetch()}
+        >
+          <RefreshCw className={isFetching ? 'animate-spin' : ''} />
+        </Button>
+      </div>
+      {isError && (
+        <div role="alert" className="flex flex-wrap items-center gap-3 text-sm text-destructive">
+          {updatedAt
+            ? 'Updates interrupted. Showing the last received bookings.'
+            : 'Could not load active bookings.'}
+          <Button variant="outline" onClick={() => void refetch()}>
+            Retry
+          </Button>
         </div>
-
-        {/* Right Side: Map Placeholder */}
-        <Card className="lg:col-span-2 flex flex-col h-full min-h-[500px]">
-          <CardHeader>
-            <CardTitle>Map View</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 bg-muted/50 flex items-center justify-center relative overflow-hidden rounded-b-xl border-t">
-            <div className="text-center text-muted-foreground z-10 bg-background/80 p-4 rounded-md shadow-sm backdrop-blur-sm">
-              <MapPin className="h-10 w-10 mx-auto mb-2 opacity-50 text-primary" />
-              <p className="font-medium">Mapbox / Google Maps Integration Required</p>
-              <p className="text-sm">Currently showing {markers.length} mock pins.</p>
-            </div>
-
-            {/* Draw mock pins on map background */}
-            <div className="absolute inset-0 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=19.0760,72.8777&zoom=11&size=800x600&sensor=false&style=feature:all|element:labels|visibility:off')] bg-cover bg-center opacity-30 dark:invert"></div>
-
-            {markers.map((a, i) => (
-              <div
-                key={a.id}
-                className={`absolute p-2 rounded-full cursor-pointer hover:scale-125 transition-transform z-20 ${a.status === 'IN_PROGRESS' ? 'bg-primary' : a.status === 'ARRIVING' ? 'bg-amber-500' : 'bg-purple-500'}`}
-                style={{ top: `${40 + i * 15}%`, left: `${30 + i * 20}%` }}
-                title={`${a.companionName} (${a.status})`}
-              >
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
+      )}
+      {updatedAt > 0 && (
+        <p className="text-xs text-muted-foreground">
+          Last received: {new Date(updatedAt).toLocaleTimeString()}
+        </p>
+      )}
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(240px,1fr)_minmax(0,2fr)]">
+        <section aria-label="Active bookings" className="min-w-0">
+          <h2 className="mb-3 text-base font-semibold">Active Sessions ({markers.length})</h2>
+          {markers.length >= 500 && (
+            <p role="status" className="mb-3 text-sm text-amber-700">
+              Showing the latest 500 sessions. Additional sessions may not be displayed.
+            </p>
+          )}
+          {!isError && !markers.length && (
+            <p className="py-4 text-sm text-muted-foreground">No active sessions.</p>
+          )}
+          <ul className="divide-y">
+            {markers.map((item) => (
+              <li key={item.id} className="py-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(item.id)}
+                  aria-pressed={selectedId === item.id}
+                  className={`w-full min-w-0 space-y-2 rounded-sm p-2 text-left focus-visible:outline-2 ${selectedId === item.id ? 'bg-muted' : 'hover:bg-muted/60'}`}
+                >
+                  <span className="block break-all text-sm font-medium">{item.sessionId}</span>
+                  <span className="block break-words text-xs text-muted-foreground">
+                    {item.companionName} / {item.userName}
+                  </span>
+                  <Badge variant={item.status === 'ARRIVING' ? 'outline' : 'secondary'}>
+                    {item.status.replaceAll('_', ' ')}
+                  </Badge>
+                  {item.latitude === null && (
+                    <span className="block text-xs text-muted-foreground">
+                      Venue location unavailable
+                    </span>
+                  )}
+                </button>
+              </li>
             ))}
-          </CardContent>
-        </Card>
+          </ul>
+        </section>
+        <div className="min-w-0">
+          <BookingGoogleMap markers={markers} selectedId={selectedId} onSelect={setSelectedId} />
+          {selected && (
+            <section aria-label="Selected booking venue" className="space-y-3 border-b py-4">
+              <h3 className="break-all text-sm font-semibold">{selected.sessionId}</h3>
+              <p className="text-sm text-muted-foreground">
+                {selected.latitude !== null && selected.longitude !== null
+                  ? `Venue coordinates: ${selected.latitude.toFixed(6)}, ${selected.longitude.toFixed(6)}`
+                  : 'Venue location unavailable'}
+              </p>
+              {selected.latitude !== null && selected.longitude !== null && (
+                <a
+                  className={buttonVariants({ variant: 'outline' })}
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${selected.latitude},${selected.longitude}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Navigation /> Directions to venue
+                </a>
+              )}
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );

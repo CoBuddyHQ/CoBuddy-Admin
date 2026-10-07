@@ -1,44 +1,27 @@
+import { unavailableFeature } from '@/lib/unavailable-feature';
 import { UIDiscoverySettings, RankingWeights, PromotedCompanion } from './types';
-
-let mockSettings: UIDiscoverySettings = {
-  enableDarkThemeDefault: false,
-  homeScreenLayout: 'GRID',
-  featuredSectionTitle: 'Trending Companions',
-  maxFeaturedCompanions: 10,
-};
-
 export const uiDiscoveryApi = {
-  getSettings: async (): Promise<UIDiscoverySettings> => Promise.resolve({ ...mockSettings }),
-  updateSettings: async (settings: UIDiscoverySettings): Promise<void> => {
-    mockSettings = { ...settings };
-    return Promise.resolve();
+  getSettings: async (): Promise<UIDiscoverySettings> => {
+    return unavailableFeature('discovery/ranking-config');
+  },
+  updateSettings: async (_settings: UIDiscoverySettings): Promise<void> => {
+    return unavailableFeature('discovery/ranking-config');
   },
 };
-
-let mockWeights: RankingWeights = {
-  trustScoreWeight: 50,
-  distanceWeight: 30,
-  availabilityWeight: 20,
-  newCompanionBoostPercent: 15,
-};
-
-let mockPromoted: PromotedCompanion[] = [
-  { id: 'C-001', name: 'Riya S.', promotedUntil: '2026-08-15' },
-];
-
 export const rankingConfigApi = {
-  getWeights: async (): Promise<RankingWeights> => Promise.resolve({ ...mockWeights }),
-  updateWeights: async (weights: RankingWeights): Promise<void> => {
-    mockWeights = { ...weights };
-    return Promise.resolve();
+  getWeights: async (): Promise<RankingWeights> => {
+    return unavailableFeature('discovery/ranking-config');
   },
-  getPromoted: async (): Promise<PromotedCompanion[]> => Promise.resolve([...mockPromoted]),
-  addPromoted: async (c: Omit<PromotedCompanion, 'id'>): Promise<void> => {
-    mockPromoted.push({ ...c, id: `C-${Math.floor(Math.random() * 1000)}` });
-    return Promise.resolve();
+  updateWeights: async (_weights: RankingWeights): Promise<void> => {
+    return unavailableFeature('discovery/ranking-config');
   },
-  removePromoted: async (id: string): Promise<void> => {
-    mockPromoted = mockPromoted.filter((p) => p.id !== id);
-    return Promise.resolve();
+  getPromoted: async (): Promise<PromotedCompanion[]> => {
+    return unavailableFeature('discovery/ranking-config');
+  },
+  addPromoted: async (_c: Omit<PromotedCompanion, 'id'>): Promise<void> => {
+    return unavailableFeature('discovery/ranking-config');
+  },
+  removePromoted: async (_id: string): Promise<void> => {
+    return unavailableFeature('discovery/ranking-config');
   },
 };

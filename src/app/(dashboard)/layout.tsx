@@ -7,7 +7,6 @@ import { useAuthStore } from '@/store/authStore';
 import { authApi, clearAuthSession } from '@/lib/api/client';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
-import { RoleSwitcher } from '@/components/layout/RoleSwitcher';
 import { Button } from '@/components/ui/button';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -106,7 +105,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
         </main>
       </div>
-      {process.env.NODE_ENV !== 'production' && <RoleSwitcher />}
     </div>
   );
 }

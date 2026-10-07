@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-04T05:24:16.950Z",
-  "operationCount": 222,
-  "passed": 313,
+  "generatedAt": "2026-10-07T08:08:25.146Z",
+  "operationCount": 225,
+  "passed": 319,
   "failed": 0,
   "skipped": 0,
   "checks": [
@@ -1101,6 +1101,21 @@
       "detail": "HTTP 401"
     },
     {
+      "name": "Anonymous GET /api/analytics/growth",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/analytics/sessions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/analytics/market",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
       "name": "Login rejects invalid input",
       "passed": true
     },
@@ -1461,6 +1476,21 @@
       "detail": "HTTP 200"
     },
     {
+      "name": "Authenticated GET /api/analytics/growth",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/analytics/sessions",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/analytics/market",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
       "name": "Moderator customer module permission",
       "passed": true
     },
@@ -1499,7 +1529,7 @@
     {
       "name": "Concurrent reviewers can commit only one KYC decision",
       "passed": true,
-      "detail": "409, 201"
+      "detail": "201, 409"
     },
     {
       "name": "A committed KYC decision records exactly one reviewer audit event",

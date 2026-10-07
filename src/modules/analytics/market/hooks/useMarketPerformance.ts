@@ -7,5 +7,7 @@ export const useMarketPerformance = () => {
   return {
     performance: query.data || [],
     isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
   };
 };

@@ -1,138 +1,45 @@
-# CoBuddy Admin Panel
+# CoBuddy Admin
 
-A comprehensive admin dashboard for managing the CoBuddy companion booking platform. This project includes frontend (Next.js) and backend (NestJS) with full integration for core modules.
+Next.js admin frontend with a NestJS 11 / Express 5, Prisma, PostgreSQL and Redis backend.
 
-## 🚀 Tech Stack
+**Release status:** engineering handover in progress, not approved for production.
+See [HANDOVER_READINESS_REPORT.md](HANDOVER_READINESS_REPORT.md) for current test
+evidence, completed fixes and remaining integrations. Passing a build is not
+production sign-off.
 
-### Frontend
-- **Next.js 16.3.6** with App Router and Turbopack
-- **React 19.2.8**
-- **TypeScript**
-- **Axios** for API calls
-- **Zustand** for state management
-- **Tailwind CSS** for styling
+## Local Setup
 
-### Backend
-- **NestJS 10.4.x**
-- **TypeScript**
-- **Prisma 5.22.0** with PostgreSQL
-- **Redis** for caching
-- **JWT** for authentication (access/refresh tokens)
-- **@nestjs/throttler** for rate limiting
-- **Swagger** for API documentation
-- **bcrypt** for password hashing
-- **otplib** for 2FA
+Use Node.js 24 and npm with the committed lockfiles. Docker Desktop must be running
+before starting PostgreSQL and Redis.
 
-## 📁 Project Structure
-
-```
-CoBuddy-Admin/
-├── cobuddy-backend/          # NestJS Backend
-│   ├── src/
-│   │   ├── modules/          # Feature modules
-│   │   │   ├── financial/    # Financial management
-│   │   │   ├── moderation/    # Content moderation
-│   │   │   ├── safety-api/    # Safety operations
-│   │   │   ├── verification/  # KYC verification
-│   │   │   ├── trust-score/   # Trust scoring system
-│   │   │   ├── companions/    # Companion management
-│   │   │   ├── customers/     # Customer management
-│   │   │   ├── employees/     # Staff management
-│   │   │   ├── wallets/       # Wallet & escrow
-│   │   │   └── system/        # System configuration
-│   │   ├── common/            # Shared utilities
-│   │   │   ├── guards/        # Auth & permission guards
-│   │   │   ├── decorators/    # Custom decorators
-│   │   │   └── dto/           # Common DTOs
-│   │   ├── main.ts            # Application entry point
-│   │   └── app.module.ts      # Root module
-│   ├── prisma/
-│   │   ├── schema.prisma      # Database schema
-│   │   └── seed.ts            # Database seeding
-│   └── package.json
-├── src/                       # Next.js Frontend
-│   ├── app/
-│   │   ├── (dashboard)/       # Dashboard pages
-│   │   │   ├── moderation/    # Moderation pages
-│   │   │   ├── safety/        # Safety pages
-│   │   │   ├── financial/     # Financial pages
-│   │   │   ├── operations/    # Operations pages
-│   │   │   ├── verification/  # Verification pages
-│   │   │   ├── support/       # Support pages
-│   │   │   ├── system/        # System pages
-│   │   │   └── ...
-│   │   └── login/             # Login page
-│   ├── modules/               # Frontend modules
-│   │   ├── moderation/        # Moderation API & hooks
-│   │   ├── safety/            # Safety API & hooks
-│   │   ├── financial/         # Financial API & hooks
-│   │   ├── operations/        # Operations API & hooks
-│   │   ├── verification/      # Verification API & hooks
-│   │   └── ...
-│   ├── lib/
-│   │   ├── api/
-│   │   │   └── client.ts      # Axios API client
-│   │   └── auth/
-│   │       └── permissions.ts # Permission definitions
-│   └── components/            # Reusable components
-├── .env.local                 # Frontend environment variables
-├── package.json
-└── README.md
+```sh
+npm ci
+npm --prefix cobuddy-backend ci
+npm --prefix cobuddy-backend run docker:up
+npm --prefix cobuddy-backend run prisma:generate
+npm --prefix cobuddy-backend run prisma:migrate-deploy
+npm --prefix cobuddy-backend run db:seed
 ```
 
-## 🛠️ Setup Instructions
+Before running database commands, create `cobuddy-backend/.env` from its
+`.env.example` and configure the local database, Redis, authentication and CORS
+settings. Create root `.env.local` from `.env.example` for the frontend. Existing
+environment files must not be overwritten or committed.
 
-### Prerequisites
-- Node.js 18+ (v24.21.0 recommended)
-- PostgreSQL database
-- Redis server (optional, for caching)
+`db:seed` initializes the English UI language only. It does not create sample
+people, bookings, transactions, staff, credentials or business policies. Configure
+real cities and reference data through Master Data. Use `admin:bootstrap` with
+privately supplied bootstrap credentials on a new database; see
+[DEPLOYMENT.md](DEPLOYMENT.md#database-and-first-admin). No default password is
+shipped or displayed on the login page.
 
-### 1. Clone the Repository
-```bash
-git clone <repository-url>
-cd CoBuddy-Admin
+Run these in separate terminals:
+
+```sh
+npm --prefix cobuddy-backend run start:dev
 ```
 
-### 2. Backend Setup
-
-```bash
-cd cobuddy-backend
-
-# Install dependencies
-npm install
-
-# Set up environment variables (create .env file)
-cp .env.example .env
-# Edit .env with your database credentials
-
-# Generate Prisma client
-npx prisma generate
-
-# Run database migrations
-npx prisma migrate dev
-
-# Seed the database with sample data
-npm run db:seed
-
-# Start backend in development mode
-npm run start:dev
-```
-
-Backend will run on `http://localhost:4000/api`
-Swagger documentation available at `http://localhost:4000/swagger`
-
-### 3. Frontend Setup
-
-```bash
-cd ..
-
-# Install dependencies
-npm install
-
-# Create .env.local file
-echo "NEXT_PUBLIC_API_URL=http://localhost:4000/api" > .env.local
-
-# Start frontend in development mode
+```sh
 npm run dev
 ```
 

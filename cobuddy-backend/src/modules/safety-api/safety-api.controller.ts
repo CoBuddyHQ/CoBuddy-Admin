@@ -1,10 +1,16 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { IncidentStatus } from '@prisma/client';
 import { AllowModule } from '@/common/decorators/auth.decorators';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { AuthStaffPayload, CurrentUser } from '@/common/decorators/current-user.decorator';
 import { SafetyApiService } from './safety-api.service';
 import { SosAlertQueryDto } from './dto/sos-alert-query.dto';
+import {
+  AdvanceEmergencyDto,
+  UpdateAgeEscalationDto,
+  UpdateGeofenceDto,
+  UpdateIncidentDto,
+  UpdateSosDto,
+} from './dto/safety-write.dto';
 
 @Controller()
 export class SafetyApiController {
@@ -26,7 +32,7 @@ export class SafetyApiController {
   })
   updateSos(
     @Param('id') id: string,
-    @Body() body: { status: string; note?: string },
+    @Body() body: UpdateSosDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
     return this.service.updateSosStatus(id, body.status, body.note, user);
@@ -54,7 +60,7 @@ export class SafetyApiController {
   })
   updateIncident(
     @Param('id') id: string,
-    @Body() body: { status: IncidentStatus; note?: string },
+    @Body() body: UpdateIncidentDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
     return this.service.updateIncident(id, body.status, body.note, user);
@@ -88,7 +94,7 @@ export class SafetyApiController {
   })
   updateGeofenceAlert(
     @Param('id') id: string,
-    @Body() body: { status: string },
+    @Body() body: UpdateGeofenceDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
     return this.service.updateGeofenceStatus(id, body.status, user);
@@ -110,7 +116,7 @@ export class SafetyApiController {
   })
   updateAgeEscalation(
     @Param('id') id: string,
-    @Body() body: { status: string; resolutionNote?: string },
+    @Body() body: UpdateAgeEscalationDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
     return this.service.updateAgeEscalation(id, body.status, body.resolutionNote, user);
@@ -132,7 +138,7 @@ export class SafetyApiController {
   })
   advanceEmergencyWorkflow(
     @Param('id') id: string,
-    @Body() body: { status: string; actionDetail: string; handler?: string },
+    @Body() body: AdvanceEmergencyDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
     return this.service.advanceEmergencyWorkflow(id, body.status, body.actionDetail, user);

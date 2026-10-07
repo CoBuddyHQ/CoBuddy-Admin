@@ -11,5 +11,9 @@ export const useLiveMap = () => {
   return {
     markers: query.data || [],
     isLoading: query.isLoading,
+    isError: query.isError,
+    isFetching: query.isFetching,
+    refetch: query.refetch,
+    updatedAt: query.dataUpdatedAt,
   };
 };

@@ -169,6 +169,16 @@ export class RefundsService {
         where: { id: booking.customerId },
         data: { walletBalance: wallet.balance },
       });
+      await tx.bookingDispute.updateMany({
+        where: { refundId: id, workflowStatus: 'REFUND_PENDING' },
+        data: {
+          workflowStatus: 'RESOLVED_REFUND',
+          status: RefundStatus.PROCESSED,
+          resolvedAt: new Date(),
+          resolvedBy: user.sub,
+          version: { increment: 1 },
+        },
+      });
       const updated = await tx.refund.findUnique({ where: { id } });
 
       return { refund: updated, transaction: txn };
@@ -177,18 +187,31 @@ export class RefundsService {
     return { data: result, message: 'Refund processed and credited to customer wallet' };
   }
 
-  async reject(id: string, dto: RejectRefundDto, _user: AuthStaffPayload) {
+  async reject(id: string, dto: RejectRefundDto, user: AuthStaffPayload) {
     const refund = await this.prisma.refund.findUnique({ where: { id } });
     if (!refund) throw new NotFoundException('Refund not found');
     if (refund.status === RefundStatus.PROCESSED)
       throw new BadRequestException('Cannot reject a processed refund');
 
-    const claim = await this.prisma.refund.updateMany({
-      where: { id, status: { in: [RefundStatus.REQUESTED, RefundStatus.APPROVED] } },
-      data: { status: RefundStatus.REJECTED, reason: dto.reason },
+    await this.prisma.$transaction(async (tx) => {
+      const claim = await tx.refund.updateMany({
+        where: { id, status: { in: [RefundStatus.REQUESTED, RefundStatus.APPROVED] } },
+        data: { status: RefundStatus.REJECTED, reason: dto.reason },
+      });
+      if (claim.count !== 1)
+        throw new BadRequestException('Refund cannot be rejected in its current state');
+      await tx.bookingDispute.updateMany({
+        where: { refundId: id, workflowStatus: 'REFUND_PENDING' },
+        data: {
+          workflowStatus: 'RESOLVED_NO_REFUND',
+          status: RefundStatus.REJECTED,
+          resolutionNote: dto.reason,
+          resolvedAt: new Date(),
+          resolvedBy: user.sub,
+          version: { increment: 1 },
+        },
+      });
     });
-    if (claim.count !== 1)
-      throw new BadRequestException('Refund cannot be rejected in its current state');
     return {
       data: await this.prisma.refund.findUnique({ where: { id } }),
       message: 'Refund rejected',

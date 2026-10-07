@@ -790,22 +790,38 @@ model SessionAuditLog {
   @@index([bookingId, timestamp(sort: Asc)])
 }
 
+enum BookingDisputeStatus {
+  OPEN
+  INVESTIGATING
+  ESCALATED
+  REFUND_PENDING
+  RESOLVED_REFUND
+  RESOLVED_NO_REFUND
+  REFUND_REVIEW_REQUIRED
+}
+
 model BookingDispute {
-  id              String       @id @default(uuid())
-  bookingId       String       @unique
+  id              String               @id @default(uuid())
+  bookingId       String               @unique
   disputeReasonId String
   raisedBy        String
-  status          RefundStatus @default(REQUESTED)
+  status          RefundStatus         @default(REQUESTED)
+  workflowStatus  BookingDisputeStatus @default(OPEN)
+  version         Int                  @default(0)
+  refundId        String?              @unique
+  overridePercent Float?
+  overrideReason  String?
   description     String
   evidenceUrls    String[]
   resolutionNote  String?
-  refundAmount    Decimal?     @db.Decimal(10, 2)
+  refundAmount    Decimal?             @db.Decimal(10, 2)
   resolvedAt      DateTime?
   resolvedBy      String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   booking Booking @relation(fields: [bookingId], references: [id])
+  refund  Refund? @relation(fields: [refundId], references: [id], onDelete: Restrict)
 
   @@index([status])
   @@index([createdAt(sort: Desc)])
@@ -891,18 +907,19 @@ model Payout {
 }
 
 model Refund {
-  id              String       @id @default(uuid())
+  id              String          @id @default(uuid())
   bookingId       String
   requestedById   String
   requestedByType String
-  amount          Decimal      @db.Decimal(10, 2)
-  status          RefundStatus @default(REQUESTED)
+  amount          Decimal         @db.Decimal(10, 2)
+  status          RefundStatus    @default(REQUESTED)
   reason          String
   approvedById    String?
   processedAt     DateTime?
   gatewayRefundId String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  dispute         BookingDispute?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@index([bookingId])
   @@index([status])

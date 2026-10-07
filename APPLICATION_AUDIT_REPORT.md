@@ -1,12 +1,19 @@
 # CoBuddy Admin Application Audit
 
-**Latest status (2026-09-30):** Verification workflow finishing, frontend/backend
-hardening, formatting, builds and targeted regression checks completed. The full project is **not ready for
-production launch**: unfinished integrations and 6 backend production dependency
-findings (all moderate; none high or critical) remain. Development tooling adds
-further findings. See the verification finishing continuation at the end of this report
-and `DEPLOYMENT.md`. Earlier sections are historical observations, not current
-release approval.
+**Latest status (2026-10-07):** Dispute authorization/refund-state bugs, map
+placeholders and SOS fixture routing have been fixed. Analytics now queries the
+database; runtime dummy adapters, the demo seed and role impersonation UI have
+been removed. Unfinished modules remain disabled, not completed. Current checks
+include 25 frontend tests, 425 backend tests, 319 API smoke checks, 22 real
+dispute/analytics checks and 11 Redis/two-instance checks. The NestJS 11 / Express 5
+and Jest 30 migration is applied, and frontend/backend production audits pass with
+zero findings. The Financial Analytics currency-formatter crash is fixed and
+live login/API/chart rendering was verified. The full project is **not approved
+for production**: tooling advisories, unfinished modules, provider integrations,
+data cleanup and staging acceptance remain.
+See [the current handover report](HANDOVER_READINESS_REPORT.md) for current
+verification and release conditions. Earlier sections below are historical
+observations, not current release approval.
 
 **Audit date:** 2026-09-27  
 **Scope:** Frontend, backend startup, live API surface, Prisma/PostgreSQL wiring, admin login, and password recovery  

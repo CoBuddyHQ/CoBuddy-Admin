@@ -2,6 +2,9 @@
 
 NestJS + Prisma + PostgreSQL + Redis admin backend for CoBuddy companion booking platform.
 
+Current release scope and acceptance evidence: [Handover report](../HANDOVER_READINESS_REPORT.md).
+The old demo seed has been removed; existing database records are not automatically deleted.
+
 ---
 
 ## ⚡ Quick Start (5 min mein chalu karo)
@@ -10,7 +13,7 @@ NestJS + Prisma + PostgreSQL + Redis admin backend for CoBuddy companion booking
 
 | Tool | Version Required |
 |---|---|
-| [Node.js](https://nodejs.org/) | 20+ (LTS recommended) |
+| [Node.js](https://nodejs.org/) | 24 |
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Latest |
 | [pnpm](https://pnpm.io/) / npm | Built-in npm works fine |
 
@@ -32,15 +35,15 @@ docker ps
 
 ```bash
 cd cobuddy-backend
-npm install
+npm ci
 ```
 
 ### Step 4 — Prisma setup (Generate client + DB schema + Seed data)
 
 ```bash
 npm run prisma:generate        # 1. TypeScript client generate
-npx prisma db push             # 2. Schema ko PostgreSQL mein push (no migration)
-npm run db:seed                # 3. Demo data seed karo (10 cities, admin, staff, etc.)
+npm run prisma:migrate-deploy  # 2. Apply committed migrations
+npm run db:seed                # 3. English reference language only; no demo accounts
 ```
 
 ### Step 5 — Backend dev server chalao
@@ -74,7 +77,8 @@ npm run start:dev
 | `npx prisma db push` | Schema ko direct DB mein sync (dev mode — no migration files) |
 | `npm run prisma:migrate-dev` | Migration file create + apply (`migrations/` mein store) |
 | `npm run prisma:migrate-deploy` | Production mein saved migrations apply |
-| `npm run db:seed` | `prisma/seed.ts` se demo data insert |
+| `npm run db:seed` | Initialize essential reference data, without demo people or transactions |
+| `npm run db:inventory-demo` | Read-only inventory of legacy seed candidates |
 | `npm run prisma:studio` | Browser mein Prisma Studio (DB visual GUI) — http://localhost:5555 |
 
 ### ▶️ Server / Build Commands
@@ -196,7 +200,7 @@ Agar aap DBeaver / TablePlus / pgAdmin use karte ho:
 
 | Layer | Technology |
 |---|---|
-| Framework | NestJS 10 (Express platform) |
+| Framework | NestJS 11.2.7 (Express 5.2.1 platform) |
 | ORM | Prisma 5 |
 | Database | PostgreSQL 16 |
 | Cache / Queue | Redis 7 (BullMQ, throttler) |
@@ -222,7 +226,7 @@ cobuddy-backend/
 ├── prisma/
 │   ├── schema.prisma             # ✅ Single source of truth — data model
 │   ├── migrations/               # Prisma migration files
-│   └── seed.ts                   # Demo data (npm run db:seed)
+│   └── seed.ts                   # Reference data only (npm run db:seed)
 ├── src/
 │   ├── main.ts                   # Bootstrap: CORS, Helmet, global prefix, pipes, Swagger
 │   ├── app.module.ts             # Root module (sab submodules yahin register)

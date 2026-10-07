@@ -250,8 +250,8 @@ export class SafetyApiService {
           ...item,
           userName: user?.name ?? item.userId,
           dobMismatchDetails: item.reviewNote ?? 'Age verification requires manual review.',
-          idEstimate: 0,
-          selfieEstimate: 0,
+          idEstimate: null,
+          selfieEstimate: null,
           associatedRecordLink: '/verification',
           timestamp: item.createdAt,
         };

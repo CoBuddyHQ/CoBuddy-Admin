@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { BookingStatus, Prisma, RefundStatus, SOSStatus } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.module';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
 import { MatchmakingConfigDto } from './dto/matchmaking-config.dto';
+import { OverrideDisputeRefundDto, UpdateDisputeStatusDto } from './dto/dispute.dto';
 
 const bookingInclude = {
   customer: { select: { id: true, name: true } },
@@ -10,9 +16,6 @@ const bookingInclude = {
   venue: true,
   disputes: { select: { refundAmount: true } },
 };
-
-type DisputeUiStatus =
-  'OPEN' | 'INVESTIGATING' | 'RESOLVED_REFUND' | 'RESOLVED_NO_REFUND' | 'ESCALATED';
 
 @Injectable()
 export class OperationsApiService {
@@ -189,51 +192,114 @@ export class OperationsApiService {
     return { data, message: 'Booking disputes fetched' };
   }
 
-  async updateDisputeStatus(id: string, status: DisputeUiStatus, note?: string, userId?: string) {
-    const statusMap: Record<DisputeUiStatus, RefundStatus> = {
-      OPEN: RefundStatus.REQUESTED,
-      INVESTIGATING: RefundStatus.APPROVED,
-      RESOLVED_REFUND: RefundStatus.PROCESSED,
-      RESOLVED_NO_REFUND: RefundStatus.REJECTED,
-      ESCALATED: RefundStatus.APPROVED,
-    };
-    if (!statusMap[status]) throw new BadRequestException('Invalid dispute status');
-    const existing = await this.prisma.bookingDispute.findUnique({ where: { id } });
-    if (!existing) throw new NotFoundException('Booking dispute not found');
-    const resolutionNote = note
-      ? (status === 'ESCALATED' ? '[ESCALATED] ' : '') + note
-      : existing.resolutionNote;
-    const data = await this.prisma.bookingDispute.update({
-      where: { id },
-      data: {
-        status: statusMap[status],
-        resolutionNote,
-        ...(status.startsWith('RESOLVED_') ? { resolvedAt: new Date(), resolvedBy: userId } : {}),
-      },
-    });
-    return { data, message: 'Booking dispute updated' };
-  }
-
-  async overrideDisputePenalty(id: string, percent: number, reason: string, userId: string) {
-    if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
-      throw new BadRequestException('Penalty percent must be between 0 and 100');
-    }
-    if (!reason?.trim()) throw new BadRequestException('An override reason is required');
-    const existing = await this.prisma.bookingDispute.findUnique({
-      where: { id },
+  private async writableDispute(
+    tx: Prisma.TransactionClient,
+    id: string,
+    version: number,
+    user: AuthStaffPayload,
+  ) {
+    const existing = await tx.bookingDispute.findFirst({
+      where: { id, booking: this.bookingScope(user) },
       include: { booking: { select: { bookingAmount: true } } },
     });
     if (!existing) throw new NotFoundException('Booking dispute not found');
-    const refundAmount = Number(existing.booking.bookingAmount) * (percent / 100);
-    const data = await this.prisma.bookingDispute.update({
-      where: { id },
-      data: {
-        refundAmount,
-        resolutionNote: 'Penalty override ' + percent + '%: ' + reason.trim(),
-        status: RefundStatus.APPROVED,
-        resolvedBy: userId,
+    if (existing.version !== version)
+      throw new ConflictException('Dispute changed; reload before updating');
+    if (!['OPEN', 'INVESTIGATING', 'ESCALATED'].includes(existing.workflowStatus)) {
+      throw new ConflictException(
+        'This dispute is closed or has a refund awaiting finance processing',
+      );
+    }
+    return existing;
+  }
+
+  async updateDisputeStatus(id: string, dto: UpdateDisputeStatusDto, user: AuthStaffPayload) {
+    const data = await this.prisma.$transaction(
+      async (tx) => {
+        const existing = await this.writableDispute(tx, id, dto.version, user);
+        let refundId: string | undefined;
+        if (dto.status === 'REFUND_PENDING') {
+          if (!existing.refundAmount?.gt(0) || existing.overridePercent === null) {
+            throw new BadRequestException(
+              'Set and review a positive refund amount before requesting a refund',
+            );
+          }
+          const otherRefund = await tx.refund.findFirst({
+            where: {
+              bookingId: existing.bookingId,
+              status: { in: ['REQUESTED', 'APPROVED', 'PROCESSED'] },
+            },
+          });
+          if (otherRefund)
+            throw new ConflictException(
+              'A refund already exists for this booking; review it in Finance',
+            );
+          const refund = await tx.refund.create({
+            data: {
+              bookingId: existing.bookingId,
+              requestedById: user.sub,
+              requestedByType: 'STAFF',
+              amount: existing.refundAmount,
+              reason: existing.overrideReason ?? existing.description,
+            },
+          });
+          refundId = refund.id;
+        }
+        if (dto.status === 'RESOLVED_NO_REFUND' && !dto.note?.trim()) {
+          throw new BadRequestException('A resolution note is required');
+        }
+        const claim = await tx.bookingDispute.updateMany({
+          where: { id, version: dto.version, booking: this.bookingScope(user) },
+          data: {
+            workflowStatus: dto.status,
+            status:
+              dto.status === 'RESOLVED_NO_REFUND' ? RefundStatus.REJECTED : RefundStatus.APPROVED,
+            version: { increment: 1 },
+            refundId,
+            ...(dto.note !== undefined ? { resolutionNote: dto.note.trim() } : {}),
+            ...(dto.status === 'RESOLVED_NO_REFUND'
+              ? { resolvedAt: new Date(), resolvedBy: user.sub }
+              : {}),
+          },
+        });
+        if (claim.count !== 1)
+          throw new ConflictException('Dispute changed; reload before updating');
+        return tx.bookingDispute.findUnique({ where: { id } });
       },
-    });
-    return { data, message: 'Dispute penalty updated' };
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+    return {
+      data,
+      message:
+        dto.status === 'REFUND_PENDING'
+          ? 'Refund requested for finance review'
+          : 'Booking dispute updated',
+    };
+  }
+
+  async overrideDisputePenalty(id: string, dto: OverrideDisputeRefundDto, user: AuthStaffPayload) {
+    const data = await this.prisma.$transaction(
+      async (tx) => {
+        const existing = await this.writableDispute(tx, id, dto.version, user);
+        const refundAmount = existing.booking.bookingAmount
+          .mul(dto.percent)
+          .div(100)
+          .toDecimalPlaces(2);
+        const claim = await tx.bookingDispute.updateMany({
+          where: { id, version: dto.version, booking: this.bookingScope(user) },
+          data: {
+            refundAmount,
+            overridePercent: dto.percent,
+            overrideReason: dto.reason.trim(),
+            version: { increment: 1 },
+          },
+        });
+        if (claim.count !== 1)
+          throw new ConflictException('Dispute changed; reload before updating');
+        return tx.bookingDispute.findUnique({ where: { id } });
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+    return { data, message: 'Dispute refund amount updated' };
   }
 }

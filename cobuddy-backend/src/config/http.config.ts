@@ -4,6 +4,8 @@ import { HttpException } from '@nestjs/common';
 
 export function configureHttpServer(server: Express, trustedProxies: string[]) {
   server.disable('x-powered-by');
+  // Preserve bracket-array filters when upgrading from Express 4 to Express 5.
+  server.set('query parser', 'extended');
   server.set('trust proxy', trustedProxies.length ? trustedProxies : false);
   // Set response metadata before body parsing, including parser failures.
   server.use((req: Request & { id?: string }, res, next) => {

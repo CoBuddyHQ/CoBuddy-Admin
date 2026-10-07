@@ -15,9 +15,13 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        maps: [missing-key, configured-key]
     env:
       NEXT_TELEMETRY_DISABLED: '1'
       NEXT_PUBLIC_API_URL: https://api.example.invalid/api
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ matrix.maps == 'configured-key' && 'browser-test-key-not-a-real-google-key' || '' }}
     steps:
       - uses: actions/checkout@v7
         with:

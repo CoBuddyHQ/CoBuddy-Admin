@@ -3,7 +3,7 @@ export interface LiveBookingMarker {
   sessionId: string;
   companionName: string;
   userName: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   status: 'ARRIVING' | 'IN_PROGRESS' | 'EXTENDED';
 }

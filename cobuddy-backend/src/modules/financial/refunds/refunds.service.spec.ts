@@ -23,6 +23,7 @@ describe('Refund processing ledger safety', () => {
       },
       walletTransaction: { create: jest.fn(async ({ data }: any) => data) },
       customer: { update: jest.fn() },
+      bookingDispute: { updateMany: jest.fn() },
     };
     const db: any = {
       refund: { findUnique: jest.fn(async () => ({ ...refund, status })) },
@@ -63,5 +64,11 @@ describe('Refund processing ledger safety', () => {
       where: { id: 'customer-1' },
       data: { walletBalance: ledger.balanceAfter },
     });
+    expect(tx.bookingDispute.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { refundId: 'refund-1', workflowStatus: 'REFUND_PENDING' },
+        data: expect.objectContaining({ workflowStatus: 'RESOLVED_REFUND' }),
+      }),
+    );
   });
 });

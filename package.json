@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "check:production-config": "npm --prefix cobuddy-backend run build && node scripts/check-production-config.mjs",
     "build:production": "npm run check:production-config && npm run audit:production && npm run build",

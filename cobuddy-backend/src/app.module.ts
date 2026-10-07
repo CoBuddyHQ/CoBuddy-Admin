@@ -32,6 +32,7 @@ import { VerificationModule } from '@/modules/verification/verification.module';
 import { OperationsApiModule } from '@/modules/operations-api/operations-api.module';
 import { SafetyApiModule } from '@/modules/safety-api/safety-api.module';
 import { ConfigService } from '@nestjs/config';
+import { AnalyticsModule } from '@/modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { ConfigService } from '@nestjs/config';
     VerificationModule,
     OperationsApiModule,
     SafetyApiModule,
+    AnalyticsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -79,9 +79,9 @@ export default function AgeEscalationPage() {
                   <TableCell>
                     <div className="max-w-xs whitespace-normal text-sm">{c.dobMismatchDetails}</div>
                   </TableCell>
-                  <TableCell>{c.idEstimate}</TableCell>
+                  <TableCell>{c.idEstimate ?? 'Not available'}</TableCell>
                   <TableCell>
-                    <span className="text-destructive font-bold">{c.selfieEstimate}</span>
+                    <span className="font-medium">{c.selfieEstimate ?? 'Not available'}</span>
                   </TableCell>
                   <TableCell>
                     <Badge

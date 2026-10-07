@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useUIDiscovery } from '@/modules/discovery/ranking-config/hooks/useUIDiscovery';
 import { useRankingConfig } from '@/modules/discovery/ranking-config/hooks/useRankingConfig';
-import { useMatchmakingConfig } from '@/modules/operations/matchmaking/hooks/useMatchmakingConfig';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +39,6 @@ export default function DiscoveryRankingPage() {
     addPromoted,
     removePromoted,
   } = useRankingConfig();
-  const { config: matchConfig, isLoading: isLoadingMatch } = useMatchmakingConfig();
 
   const [uiFormData, setUiFormData] = useState<any>(null);
   const [weightsFormData, setWeightsFormData] = useState<any>(null);
@@ -60,10 +58,8 @@ export default function DiscoveryRankingPage() {
     isUISettingsLoading ||
     isLoadingWeights ||
     isLoadingPromoted ||
-    isLoadingMatch ||
     !uiFormData ||
-    !weightsFormData ||
-    !matchConfig
+    !weightsFormData
   ) {
     return <div className="">Loading settings...</div>;
   }
@@ -189,106 +185,6 @@ export default function DiscoveryRankingPage() {
             </form>
 
             <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Algorithm Preview</CardTitle>
-                  <CardDescription>Estimated top results based on current weights.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {(() => {
-                      const mockCandidates = [
-                        {
-                          id: '1',
-                          name: 'Sarah M.',
-                          trustScore: 98,
-                          distanceKm: 2,
-                          availability: 90,
-                          isNew: false,
-                        },
-                        {
-                          id: '2',
-                          name: 'Rahul K.',
-                          trustScore: 95,
-                          distanceKm: 1,
-                          availability: 80,
-                          isNew: false,
-                        },
-                        {
-                          id: '3',
-                          name: 'Anjali T.',
-                          trustScore: 85,
-                          distanceKm: 3,
-                          availability: 95,
-                          isNew: true,
-                        },
-                        {
-                          id: '4',
-                          name: 'Vikram P.',
-                          trustScore: 90,
-                          distanceKm: 5,
-                          availability: 70,
-                          isNew: false,
-                        },
-                        {
-                          id: '5',
-                          name: 'Pooja R.',
-                          trustScore: 70,
-                          distanceKm: 0.5,
-                          availability: 100,
-                          isNew: false,
-                        },
-                      ];
-
-                      const tWeight =
-                        matchConfig.priorityAlgorithm === 'RATING_BASED'
-                          ? 100
-                          : Number(weightsFormData.trustScoreWeight) || 0;
-                      const dWeight =
-                        matchConfig.priorityAlgorithm === 'DISTANCE_BASED'
-                          ? 100
-                          : Number(weightsFormData.distanceWeight) || 0;
-                      const aWeight = Number(weightsFormData.availabilityWeight) || 0;
-                      const boostPct =
-                        matchConfig.priorityAlgorithm === 'NEW_COMPANION_BOOST'
-                          ? 50
-                          : Number(weightsFormData.newCompanionBoostPercent) || 0;
-
-                      const scored = mockCandidates
-                        .filter((c) => c.distanceKm <= matchConfig.maxSearchRadiusKm)
-                        .filter((c) => c.trustScore / 20 >= matchConfig.minRatingThreshold)
-                        .map((c) => {
-                          const distScore = Math.max(0, 100 - c.distanceKm * 10);
-                          const baseScore =
-                            (c.trustScore * tWeight +
-                              distScore * dWeight +
-                              c.availability * aWeight) /
-                            100;
-                          const finalScore = c.isNew ? baseScore * (1 + boostPct / 100) : baseScore;
-                          return { ...c, score: finalScore };
-                        });
-
-                      scored.sort((a, b) => b.score - a.score);
-
-                      return scored.map((c, idx) => (
-                        <div
-                          key={c.id}
-                          className={`p-3 rounded flex justify-between ${c.isNew ? 'bg-muted/50 border-l-2 border-primary' : 'bg-muted/50'}`}
-                        >
-                          <span>
-                            {idx + 1}. {c.name} (
-                            {c.isNew ? 'New Boost' : `${c.trustScore} Trust, ${c.distanceKm}km`})
-                          </span>
-                          <span className="font-medium text-green-600">
-                            {c.score.toFixed(1)} pts
-                          </span>
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                </CardContent>
-              </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Manual Promotions</CardTitle>

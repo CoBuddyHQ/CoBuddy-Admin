@@ -5,6 +5,7 @@ import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { AuthStaffPayload, CurrentUser } from '@/common/decorators/current-user.decorator';
 import { OperationsApiService } from './operations-api.service';
 import { MatchmakingConfigDto } from './dto/matchmaking-config.dto';
+import { OverrideDisputeRefundDto, UpdateDisputeStatusDto } from './dto/dispute.dto';
 
 @Controller()
 export class OperationsApiController {
@@ -128,14 +129,10 @@ export class OperationsApiController {
   })
   updateDisputeStatus(
     @Param('id') id: string,
-    @Body()
-    body: {
-      status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED_REFUND' | 'RESOLVED_NO_REFUND' | 'ESCALATED';
-      note?: string;
-    },
+    @Body() body: UpdateDisputeStatusDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
-    return this.service.updateDisputeStatus(id, body.status, body.note, user.sub);
+    return this.service.updateDisputeStatus(id, body, user);
   }
 
   @Post('bookings/disputes/:id/penalty-override')
@@ -148,9 +145,9 @@ export class OperationsApiController {
   })
   overridePenalty(
     @Param('id') id: string,
-    @Body() body: { percent: number; reason: string },
+    @Body() body: OverrideDisputeRefundDto,
     @CurrentUser() user: AuthStaffPayload,
   ) {
-    return this.service.overrideDisputePenalty(id, body.percent, body.reason, user.sub);
+    return this.service.overrideDisputePenalty(id, body, user);
   }
 }

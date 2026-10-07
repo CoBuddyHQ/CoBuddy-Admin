@@ -1,7 +1,7 @@
-// These workflows still depend on demo data or an unconfigured provider.
+// These workflows lack a complete, verified backend or required provider integration.
 // Remove a route only after its persistence, permissions and integration tests pass.
 export const UNRELEASED_ROUTES = [
-  '/analytics',
+  '/analytics/safety',
   '/discovery',
   '/legal',
   '/marketing',
@@ -13,7 +13,6 @@ export const UNRELEASED_ROUTES = [
   '/moderation/flagged-chats',
 ] as const;
 
-export function isRouteReleased(pathname: string, environment = process.env.NODE_ENV): boolean {
-  if (environment !== 'production') return true;
+export function isRouteReleased(pathname: string, _environment = process.env.NODE_ENV): boolean {
   return !UNRELEASED_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'));
 }

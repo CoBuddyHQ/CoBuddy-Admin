@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/lib/api/client';
@@ -17,9 +17,16 @@ import {
 import { Shield } from 'lucide-react';
 import { StaffUser } from '@/types/role.types';
 
+const subscribeToHydration = () => () => {};
+
 export default function LoginPage() {
   const router = useRouter();
   const { isAuthenticated, login } = useAuthStore();
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -151,7 +158,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="username"
-                  disabled={submitting}
+                  disabled={submitting || !isHydrated}
                   required
                 />
               </div>
@@ -165,7 +172,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  disabled={submitting}
+                  disabled={submitting || !isHydrated}
                   required
                 />
               </div>
@@ -179,7 +186,7 @@ export default function LoginPage() {
                   Forgot password?
                 </Button>
               </div>
-              <Button type="submit" className="w-full" disabled={submitting}>
+              <Button type="submit" className="w-full" disabled={submitting || !isHydrated}>
                 {submitting ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>

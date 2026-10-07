@@ -4,25 +4,31 @@
 
 This repository is not a completed all-module product. The core API and admin
 screens have working integrations, but support, discovery, marketing, legal,
-training/policies, analytics, city launch, venues and growth abuse still contain
-demo implementations. Production navigation and direct dashboard access to those
-screens are blocked by `src/lib/release.ts`. Flagged-chat review is also blocked
+training/policies, safety analytics, city launch, venues and growth abuse remain
+unfinished. Their in-memory dummy implementations have been removed. Navigation
+and direct dashboard access are blocked in every environment by `src/lib/release.ts`.
+Growth, operational and city financial analytics now query the real database.
+Flagged-chat review is also blocked
 until a storage provider is integrated. Hiding a screen is not an API permission
 boundary: the backend must continue enforcing staff roles and city scope.
 
-The latest network-backed JSON audit on 2026-09-30 reports 6 backend production
-dependency findings, all moderate; none are high or critical. Frontend production
-dependencies report none. Including development tooling, the backend still has
-19 findings (4 high, 12 moderate, 3 low). Resolve these with reviewed updates and
-repeat the checks before deploying. The CI and production-build audit gates now
-reject moderate or higher findings; they currently fail and must not be bypassed.
+The latest network-backed production audits report zero findings for both frontend
+and backend. Including development tooling, the backend has 20 moderate affected-
+package findings and the frontend has 9 high findings. These are not independent
+exploit counts. The remaining chains involve `sprintf-js` and `braces`; track
+upstream patches rather than accepting automatic tool/framework downgrades.
+The CI and production-build audit gates still reject moderate or higher production
+findings and currently pass. Repeat audits on the actual deployment lockfiles.
 
-Scoped same-major overrides patch lodash (4.18.1), js-yaml (4.3.2), multer (2.4.0),
-body-parser (1.20.6) and qs (6.16.0). NestJS 10 and Express 4 remain installed.
-Do not run `npm audit fix --force`: the remaining NestJS core advisory requires a
-reviewed framework update. The proposed NestJS 11 / Express 5 migration has not
-been approved or applied. Its breaking changes are described in the official
-[NestJS migration guide](https://docs.nestjs.com/v11/migration-guide).
+The backend now uses NestJS 11.2.7, Express 5.2.1, Jest 30.5.2 and the compatible
+`@nest-lab/throttler-storage-redis` adapter. Query parsing explicitly preserves
+bracket-array filters. Redis commands have bounded timeouts/retries and do not
+fall back to unrestricted requests when the store fails. The migration follows
+the official [NestJS guide](https://docs.nestjs.com/v11/migration-guide).
+Swagger's YAML dependency is patched to 5.4.3. Frontend `sharp` is patched to
+0.35.5 for the [upstream image-library advisory](https://github.com/advisories/GHSA-wq5f-xc86-pv6w).
+Use Node.js 24 and install the corresponding lockfiles together; do not run
+`npm audit fix --force`.
 
 The escrow screen now shows real booking allocations and a separate wallet
 directory. Wallet freezing and withdrawal limits are not implemented and are no
@@ -82,8 +88,14 @@ With a disposable local PostgreSQL/Redis environment and backend `.env`, run
 and sessions plus uniquely named KYC cases and removes its fixtures; do not point
 it at production. It checks anonymous access controls, authenticated collection
 reads, selected session/permission behavior, and isolated KYC writes including
-concurrent decisions and transaction rollback. It does not validate every write
-or third-party provider.
+concurrent decisions and transaction rollback. It also exercises the dispute and
+wallet workflow and production Redis throttling across two local HTTP instances.
+The rate-limit test uses expiring UUID-namespaced keys and removes only those keys;
+it never flushes Redis. It does not validate every write or third-party provider.
+Run build/verification and API tests sequentially because both rebuild backend
+`dist`. Stop a backend watch process before running the build-based tests.
+Keep backups and application logs out of Playwright's output directory; test runs
+clean `test-results/playwright`. `.local-backups` and `.local-logs` are git-ignored.
 
 `.github/workflows/verify.yml` runs frontend verification and backend checks with
 isolated PostgreSQL/Redis services on pushes and pull requests. Require both jobs
@@ -132,8 +144,8 @@ npm run build:production
 The preflight compiles the backend and validates its production configuration plus
 the frontend's explicit HTTPS API hostname and `/api` path. It reads process
 environment variables, not local `.env` files, and never prints their values.
-`build:production` adds the dependency audit and frontend build, so it currently
-stops on unresolved advisories. Ordinary `npm run build` is useful for local tests
+`build:production` adds the dependency audit and frontend build. The audit now
+passes; actual deployment configuration is still required. Ordinary `npm run build` is useful for local tests
 but is not release approval. Preflight does not test credentials, connectivity,
 provider delivery or infrastructure; run staging acceptance separately.
 
@@ -160,6 +172,20 @@ never include networks from which untrusted clients can reach the API directly.
 See the official [Express proxy guide](https://expressjs.com/en/guide/behind-proxies/).
 
 ## Database and First Admin
+
+The current `db:seed` initializes the English reference language only. It does not
+create accounts or sample business data. Set real policies and master data before
+onboarding users. `db:inventory-demo` is a read-only candidate inventory, not a
+deletion command; historical seed identifiers do not establish provenance.
+
+Migration `20261005000100_dispute_refund_workflow` is additive. Back up the database
+before applying it. It introduces structured dispute state, optimistic versions,
+override fields and a unique refund link. Existing `PROCESSED` disputes are marked
+`REFUND_REVIEW_REQUIRED` rather than credited again. Review their actual ledger and
+settlement evidence separately. Deploy the matching API and frontend together:
+dispute mutations now require a version and no longer accept direct paid-state
+changes. The finance processor resolves linked disputes within the wallet-credit
+transaction. This migration cannot verify historical bank payments.
 
 1. Take and verify a database backup before an existing deployment is upgraded.
 2. Run `npm --prefix cobuddy-backend run prisma:migrate-deploy` once per release.

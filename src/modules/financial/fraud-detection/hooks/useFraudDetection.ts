@@ -12,7 +12,8 @@ export const useFraudDetection = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: FraudAlert['status'] }) => fraudApi.updateAlertStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: FraudAlert['status'] }) =>
+      fraudApi.updateAlertStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['fraud-alerts'] });
       toast.success(`Fraud alert marked as ${status}`);

@@ -6,31 +6,61 @@ import { BookingDispute } from '../types';
 export const useDisputes = () => {
   const queryClient = useQueryClient();
 
-  const { data: disputes = [], isLoading } = useQuery({
+  const {
+    data: disputes = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ['disputes'],
-    queryFn: disputesApi.getDisputes
+    queryFn: disputesApi.getDisputes,
   });
 
-  const { mutate: updateStatus } = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: BookingDispute['status'] }) => disputesApi.updateDisputeStatus(id, status),
+  const { mutateAsync: updateStatus, isPending: updating } = useMutation({
+    mutationFn: ({
+      id,
+      version,
+      status,
+      note,
+    }: {
+      id: string;
+      version: number;
+      status: BookingDispute['status'];
+      note?: string;
+    }) => disputesApi.updateDisputeStatus(id, version, status, note),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disputes'] });
       toast.success('Dispute status updated successfully');
-    }
+    },
+    onError: () => toast.error('Could not update dispute. Refresh and try again.'),
   });
 
-  const { mutate: overridePenalty } = useMutation({
-    mutationFn: ({ id, penalty, reason }: { id: string, penalty: number, reason: string }) => disputesApi.overridePenalty(id, penalty, reason),
+  const { mutateAsync: overridePenalty, isPending: overriding } = useMutation({
+    mutationFn: ({
+      id,
+      version,
+      penalty,
+      reason,
+    }: {
+      id: string;
+      version: number;
+      penalty: number;
+      reason: string;
+    }) => disputesApi.overridePenalty(id, version, penalty, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disputes'] });
-      toast.success('Penalty overridden successfully');
-    }
+      toast.success('Refund amount updated');
+    },
+    onError: () => toast.error('Could not update refund amount. Refresh and try again.'),
   });
 
   return {
     disputes,
     isLoading,
+    isError,
+    refetch,
+    isPending: updating || overriding,
     updateStatus,
-    overridePenalty
+    overridePenalty,
   };
 };

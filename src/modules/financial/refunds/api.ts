@@ -1,36 +1,39 @@
+import axios from '@/lib/api/client';
 import { RefundRequest, BookingSettings } from './types';
+import type { Paginated } from '@/types/pagination';
 
-let mockSettings: BookingSettings = {
-  minBookingDurationMins: 60,
-  maxBookingDurationMins: 480,
-  cancellationGracePeriodMins: 30,
-  autoCancelUnacceptedMins: 15,
-  cancellationRefundTiers: [
-    { id: 't1', noticeHoursMin: 48, noticeHoursMax: null, refundPercent: 100 },
-    { id: 't2', noticeHoursMin: 24, noticeHoursMax: 48, refundPercent: 50 },
-    { id: 't3', noticeHoursMin: 0, noticeHoursMax: 24, refundPercent: 0 }
-  ]
-};
-
-const mockRefunds: RefundRequest[] = [
-  { id: 'REF-100', bookingId: 'BKG-555', userId: 'UserA', userName: 'Alice', amount: 3500, reason: 'Companion did not show up.', evidenceUrls: [], status: 'PENDING', requestedAt: new Date().toISOString() },
-];
+const mapRefund = (item: any): RefundRequest => ({
+  id: item.id,
+  bookingId: item.bookingId,
+  userId: item.requestedById,
+  userName: item.requestedById,
+  amount: Number(item.amount ?? 0),
+  reason: item.reason,
+  evidenceUrls: [],
+  status: item.status,
+  requestedAt: item.createdAt,
+});
 
 export const refundsApi = {
-  getRefunds: async (): Promise<RefundRequest[]> => Promise.resolve([...mockRefunds]),
-  processRefund: async (id: string, action: 'APPROVE' | 'REJECT'): Promise<void> => {
-    const r = mockRefunds.find(x => x.id === id);
-    if (r) {
-      r.status = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
-      // If approved, in real life it would trigger payment gateway refund. We simulate it going straight to PROCESSED eventually, but here we just leave as APPROVED or jump to PROCESSED.
-      if (action === 'APPROVE') r.status = 'PROCESSED';
-    }
-    return Promise.resolve();
+  getRefunds: async (page = 1): Promise<Paginated<RefundRequest>> => {
+    const response = await axios.get('/financial/refunds', { params: { page, pageSize: 20 } });
+    const items = response.data.data?.data ?? response.data.data ?? [];
+    return { data: items.map(mapRefund), meta: response.data.meta };
   },
-  
-  getSettings: async (): Promise<BookingSettings> => Promise.resolve({ ...mockSettings }),
+  processRefund: async (id: string, action: 'APPROVE' | 'REJECT' | 'PROCESS'): Promise<void> => {
+    if (action === 'APPROVE') {
+      await axios.post('/financial/refunds/' + id + '/approve', {});
+    } else if (action === 'REJECT') {
+      await axios.post('/financial/refunds/' + id + '/reject', { reason: 'Rejected by admin' });
+    } else {
+      await axios.post('/financial/refunds/' + id + '/process');
+    }
+  },
+  getSettings: async (): Promise<BookingSettings> => {
+    const response = await axios.get('/financial/refunds/settings/booking');
+    return response.data.data;
+  },
   updateSettings: async (settings: BookingSettings): Promise<void> => {
-    mockSettings = { ...settings };
-    return Promise.resolve();
-  }
+    await axios.put('/financial/refunds/settings/booking', settings);
+  },
 };

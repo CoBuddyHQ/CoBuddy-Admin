@@ -17,7 +17,8 @@ export const useTraining = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: TrainingLesson['status'] }) => trainingApi.updateLessonStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: TrainingLesson['status'] }) =>
+      trainingApi.updateLessonStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['training-lessons'] });
       toast.success(`Lesson ${status === 'PUBLISHED' ? 'published' : 'moved to drafts'}`);
@@ -33,7 +34,8 @@ export const useTraining = () => {
   });
 
   const createLessonMutation = useMutation({
-    mutationFn: (data: Omit<TrainingLesson, 'id' | 'status' | 'completionCount' | 'lastUpdated'>) => trainingApi.createLesson(data),
+    mutationFn: (data: Omit<TrainingLesson, 'id' | 'status' | 'completionCount' | 'lastUpdated'>) =>
+      trainingApi.createLesson(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['training-lessons'] });
       toast.success('Lesson created successfully');

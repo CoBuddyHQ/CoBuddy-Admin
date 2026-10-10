@@ -11,8 +11,8 @@ export default function CompanionApplicationsPage() {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState('PENDING');
   const { applications } = useCompanionApplications();
-  
-  const filteredApps = applications.filter(a => {
+
+  const filteredApps = applications.filter((a) => {
     if (statusFilter === 'ALL') return true;
     return a.status === statusFilter;
   });
@@ -23,9 +23,9 @@ export default function CompanionApplicationsPage() {
       description="Manage onboarding pipeline for new companions."
       listControls={
         <div className="flex gap-2">
-          {['PENDING', 'IN_REVIEW', 'APPROVED', 'WAITLISTED', 'ALL'].map(filter => (
-            <Button 
-              key={filter} 
+          {['PENDING', 'IN_REVIEW', 'APPROVED', 'WAITLISTED', 'ALL'].map((filter) => (
+            <Button
+              key={filter}
               variant={statusFilter === filter ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setStatusFilter(filter)}
@@ -37,7 +37,7 @@ export default function CompanionApplicationsPage() {
       }
       isDetailOpen={false}
       listContent={
-        <CompanionApplicationsTable 
+        <CompanionApplicationsTable
           applications={filteredApps}
           onSelectApp={(id) => router.push(`/companion-applications/${id}`)}
         />

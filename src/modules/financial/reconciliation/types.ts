@@ -1,11 +1,14 @@
-export type WebhookStatus = 'FAILED' | 'RECONCILED' | 'PENDING' | 'MISMATCH' | 'FLAGGED';
+export type ReconciliationMatchStatus = 'MATCHED' | 'MISMATCHED' | 'PENDING';
 
 export interface ReconciliationRecord {
-  id: string; // Razorpay Txn ID
+  id: string;
   internalLedgerId: string;
+  internalTxnId?: string;
+  gatewayTxnId?: string;
   amount: number;
-  razorpayAmount: number;
-  status: WebhookStatus;
-  date: string;
-  errorMessage?: string;
+  gatewayAmount?: number;
+  gateway?: string;
+  matchStatus: ReconciliationMatchStatus;
+  reconciliationDate: string;
+  mismatchNote?: string;
 }

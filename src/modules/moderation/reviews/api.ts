@@ -1,17 +1,35 @@
 import { ReviewItem } from './types';
+import axios from '@/lib/api/client';
 
-const mockReviews: ReviewItem[] = [
-  { id: 'REV-001', reviewerId: 'UserX', revieweeId: 'CompY', rating: 1, text: 'Terrible experience, requested refund.', tags: ['rude_unprofessional'], flagReason: 'Contains personal attack', timestamp: new Date().toISOString(), status: 'PENDING_REVIEW' },
-  { id: 'REV-002', reviewerId: 'CompZ', revieweeId: 'UserW', rating: 5, text: 'Great customer!', tags: ['respectful'], timestamp: new Date(Date.now() - 50000).toISOString(), status: 'APPROVED' },
-];
+const mapReview = (item: any): ReviewItem => ({
+  id: item.id,
+  reviewerId: item.byCustomerId || item.byCompanionId,
+  revieweeId: item.toCompanionId || item.toCustomerId,
+  rating: item.rating,
+  text: item.text ?? '',
+  tags: item.tagCodes ?? [],
+  flagReason: item.moderationNote,
+  timestamp: item.createdAt,
+  status: item.moderationStatus === 'PENDING' ? 'PENDING_REVIEW' : item.moderationStatus,
+});
 
 export const reviewsApi = {
-  getReviews: async (): Promise<ReviewItem[]> => Promise.resolve([...mockReviews]),
-  moderateReview: async (id: string, action: 'APPROVE' | 'REMOVE', warning?: string): Promise<void> => {
-    const r = mockReviews.find(x => x.id === id);
-    if (r) {
-      r.status = action === 'APPROVE' ? 'APPROVED' : 'REMOVED';
+  getReviews: async (): Promise<ReviewItem[]> => {
+    const res = await axios.get('/moderation/reviews', { params: { page: 1, pageSize: 100 } });
+    const items = res.data.data?.data ?? res.data.data ?? [];
+    return items.map(mapReview);
+  },
+  moderateReview: async (
+    id: string,
+    action: 'APPROVE' | 'REMOVE',
+    warning?: string,
+  ): Promise<void> => {
+    if (action === 'APPROVE') {
+      await axios.post(`/moderation/reviews/${id}/approve`);
+    } else {
+      await axios.post(`/moderation/reviews/${id}/remove`, {
+        reason: warning ?? 'Policy violation',
+      });
     }
-    return Promise.resolve();
-  }
+  },
 };

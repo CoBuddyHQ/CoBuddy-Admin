@@ -2,49 +2,28 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { escrowApi } from '../api';
 import { toast } from 'sonner';
 
-export const useEscrow = () => {
+export const useEscrow = (escrowPage: number, walletPage: number) => {
   const queryClient = useQueryClient();
-
   const recordsQuery = useQuery({
-    queryKey: ['escrow-records'],
-    queryFn: escrowApi.getRecords,
+    queryKey: ['escrow-records', escrowPage],
+    queryFn: () => escrowApi.getRecords(escrowPage),
   });
-
-  const configQuery = useQuery({
-    queryKey: ['escrow-config'],
-    queryFn: escrowApi.getWithdrawalLimits,
+  const walletsQuery = useQuery({
+    queryKey: ['wallets', walletPage],
+    queryFn: () => escrowApi.getWallets(walletPage),
   });
-
   const releaseMutation = useMutation({
-    mutationFn: ({ id, amount }: { id: string; amount: number }) => escrowApi.releaseEscrow(id, amount),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['escrow-records'] });
-      toast.success('Funds released from escrow');
+    mutationFn: escrowApi.releaseEscrow,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['escrow-records'] }),
+        queryClient.invalidateQueries({ queryKey: ['wallets'] }),
+        queryClient.invalidateQueries({ queryKey: ['revenue-stats'] }),
+      ]);
+      toast.success('Escrow released');
     },
+    onError: () =>
+      toast.error('Escrow could not be released. Refresh and check the booking status.'),
   });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: 'ACTIVE' | 'FROZEN' }) => escrowApi.updateStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['escrow-records'] });
-      toast.success('Wallet status updated');
-    },
-  });
-
-  const updateConfigMutation = useMutation({
-    mutationFn: escrowApi.updateWithdrawalLimits,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['escrow-config'] });
-      toast.success('Withdrawal limits updated');
-    },
-  });
-
-  return {
-    records: recordsQuery.data ?? [],
-    isLoading: recordsQuery.isLoading,
-    config: configQuery.data,
-    releaseEscrow: releaseMutation.mutate,
-    updateStatus: updateStatusMutation.mutate,
-    updateConfig: updateConfigMutation.mutate,
-  };
+  return { recordsQuery, walletsQuery, releaseMutation };
 };

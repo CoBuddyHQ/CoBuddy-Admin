@@ -4,10 +4,10 @@ export interface SosAlert {
   userName: string;
   userType: 'CUSTOMER' | 'COMPANION';
   sessionId: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   timestamp: string;
-  status: 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED';
+  status: 'ACTIVE' | 'ACKNOWLEDGED' | 'INVESTIGATING' | 'ESCALATED' | 'RESOLVED' | 'UNKNOWN';
   audioCaptureUrl?: string;
   phone: string;
   otherPartyName: string;
@@ -15,3 +15,5 @@ export interface SosAlert {
   venue: string;
   activity: string;
 }
+
+export type SosStatusUpdate = 'ACKNOWLEDGED' | 'RESOLVED';

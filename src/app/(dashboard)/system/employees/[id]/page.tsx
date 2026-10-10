@@ -13,27 +13,27 @@ import { LoginHistoryCard } from '@/modules/system/audit-logs/components/LoginHi
 import { ShieldOff, KeyRound } from 'lucide-react';
 import { EditRolesModal } from '@/modules/system/employees/components/EditRolesModal';
 import { useState } from 'react';
-import { Employee } from '@/modules/system/employees/types';
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { employees, isLoading, toggleStatus, forceLogout, updateRoles, isUpdatingRoles } = useEmployees();
+  const { employees, isLoading, toggleStatus, forceLogout, updateRoles, isUpdatingRoles } =
+    useEmployees();
   const { cities } = useMasterData();
   const [isEditingRoles, setIsEditingRoles] = useState(false);
 
   if (isLoading) return <div className="">Loading...</div>;
-  const employee = employees.find(e => e.id === id);
+  const employee = employees.find((e) => e.id === id);
   if (!employee) return <div className="">Employee not found</div>;
 
-  const cityName = employee.cityScope 
+  const cityName = employee.cityScope
     ? cities.find((c: any) => c.id === employee.cityScope)?.name.en || employee.cityScope
     : 'Global / None';
 
-  const reportingManager = employee.reportingManagerId 
-    ? employees.find(e => e.id === employee.reportingManagerId)
+  const reportingManager = employee.reportingManagerId
+    ? employees.find((e) => e.id === employee.reportingManagerId)
     : null;
 
-  const directReports = employees.filter(e => e.reportingManagerId === employee.id);
+  const directReports = employees.filter((e) => e.reportingManagerId === employee.id);
 
   return (
     <div className="space-y-6">
@@ -41,7 +41,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         title={`Employee: ${employee.name}`}
         description="Detailed view of employee profile and access."
         action={
-          <Link href="/system/employees" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">
+          <Link
+            href="/system/employees"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+          >
             Back to Directory
           </Link>
         }
@@ -107,7 +110,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 <div className="col-span-full">
                   <div className="text-sm text-muted-foreground mb-2">Assigned Roles</div>
                   <div className="flex flex-wrap gap-2">
-                    {employee.roles.map(r => (
+                    {employee.roles.map((r) => (
                       <Badge key={r} variant="secondary">
                         {r.replace(/_/g, ' ')}
                       </Badge>
@@ -118,9 +121,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   <div className="text-sm text-muted-foreground mb-1">Security</div>
                   <div className="text-sm">
                     {employee.twoFactorEnabled ? (
-                      <span className="text-green-600 flex items-center"><KeyRound className="w-4 h-4 mr-1"/> 2FA Enabled</span>
+                      <span className="text-green-600 flex items-center">
+                        <KeyRound className="w-4 h-4 mr-1" /> 2FA Enabled
+                      </span>
                     ) : (
-                      <span className="text-orange-500 flex items-center"><ShieldOff className="w-4 h-4 mr-1"/> 2FA Pending / Disabled</span>
+                      <span className="text-orange-500 flex items-center">
+                        <ShieldOff className="w-4 h-4 mr-1" /> 2FA Pending / Disabled
+                      </span>
                     )}
                   </div>
                 </div>
@@ -139,15 +146,24 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               {reportingManager ? (
                 <div className="flex flex-col">
                   <div className="font-medium text-lg">
-                    <Link href={`/system/employees/${reportingManager.id}`} className="hover:underline text-primary">
+                    <Link
+                      href={`/system/employees/${reportingManager.id}`}
+                      className="hover:underline text-primary"
+                    >
                       {reportingManager.name}
                     </Link>{' '}
-                    <span className="text-sm text-muted-foreground font-normal">({reportingManager.employeeId})</span>
+                    <span className="text-sm text-muted-foreground font-normal">
+                      ({reportingManager.employeeId})
+                    </span>
                   </div>
-                  <div className="text-sm text-muted-foreground">{reportingManager.designation}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {reportingManager.designation}
+                  </div>
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground">This employee does not report to anyone (Top Level).</div>
+                <div className="text-sm text-muted-foreground">
+                  This employee does not report to anyone (Top Level).
+                </div>
               )}
             </CardContent>
           </Card>
@@ -160,20 +176,32 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             <CardContent>
               {directReports.length > 0 ? (
                 <div className="space-y-4">
-                  {directReports.map(report => (
-                    <div key={report.id} className="flex flex-col border-b pb-3 last:border-0 last:pb-0">
+                  {directReports.map((report) => (
+                    <div
+                      key={report.id}
+                      className="flex flex-col border-b pb-3 last:border-0 last:pb-0"
+                    >
                       <div className="font-medium">
-                        <Link href={`/system/employees/${report.id}`} className="hover:underline text-primary">
+                        <Link
+                          href={`/system/employees/${report.id}`}
+                          className="hover:underline text-primary"
+                        >
                           {report.name}
                         </Link>{' '}
-                        <span className="text-sm text-muted-foreground font-normal">({report.employeeId})</span>
+                        <span className="text-sm text-muted-foreground font-normal">
+                          ({report.employeeId})
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground">{report.designation} • {report.department}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {report.designation} • {report.department}
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground">No employees report to this manager.</div>
+                <div className="text-sm text-muted-foreground">
+                  No employees report to this manager.
+                </div>
               )}
             </CardContent>
           </Card>
@@ -191,22 +219,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-4">
-                <Button 
-                  variant="outline"
-                  onClick={() => setIsEditingRoles(true)}
-                >
+                <Button variant="outline" onClick={() => setIsEditingRoles(true)}>
                   Edit Roles
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => toggleStatus({ id: employee.id, currentStatus: employee.status })}
                 >
                   {employee.status === 'active' ? 'Suspend Access' : 'Restore Access'}
                 </Button>
-                <Button 
-                  variant="destructive"
-                  onClick={() => forceLogout(employee.id)}
-                >
+                <Button variant="destructive" onClick={() => forceLogout(employee.id)}>
                   Force Logout All Sessions
                 </Button>
               </div>
@@ -214,13 +236,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       {isEditingRoles && (
-        <EditRolesModal 
-          employee={employee} 
-          onClose={() => setIsEditingRoles(false)} 
+        <EditRolesModal
+          employee={employee}
+          onClose={() => setIsEditingRoles(false)}
           onSave={(empId, data) => updateRoles({ id: empId, data })}
-          isUpdating={isUpdatingRoles} 
+          isUpdating={isUpdatingRoles}
         />
       )}
     </div>

@@ -5,15 +5,14 @@ import { useReviews } from '@/modules/moderation/reviews/hooks/useReviews';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import { useState } from 'react';
@@ -23,16 +22,30 @@ export default function ReviewsPage() {
   const { reviewTags, isLoading: masterDataLoading } = useMasterData();
   const [tagFilter, setTagFilter] = useState<string>('ALL');
 
-  const filteredReviews = tagFilter === 'ALL' 
-    ? reviews 
-    : reviews.filter(r => r.tags.includes(tagFilter));
+  const filteredReviews =
+    tagFilter === 'ALL' ? reviews : reviews.filter((r) => r.tags.includes(tagFilter));
 
   const getTagBadge = (code: string) => {
-    const tag = reviewTags.find(t => t.code === code);
-    if (!tag) return <Badge key={code} variant="secondary">{code}</Badge>;
+    const tag = reviewTags.find((t) => t.code === code);
+    if (!tag)
+      return (
+        <Badge key={code} variant="secondary">
+          {code}
+        </Badge>
+      );
     const label = getLocalizedText(tag.label, 'en');
     return (
-      <Badge key={code} variant={tag.polarity === 'PRAISE' ? 'default' : tag.polarity === 'CONCERN' ? 'destructive' : 'secondary'} className="mr-1 mt-1 text-xs">
+      <Badge
+        key={code}
+        variant={
+          tag.polarity === 'PRAISE'
+            ? 'default'
+            : tag.polarity === 'CONCERN'
+              ? 'destructive'
+              : 'secondary'
+        }
+        className="mr-1 mt-1 text-xs"
+      >
         {label}
       </Badge>
     );
@@ -40,8 +53,8 @@ export default function ReviewsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Reviews Moderation" 
+      <PageHeader
+        title="Reviews Moderation"
         description="Review flagged ratings and comments."
         action={
           <div className="flex items-center gap-2">
@@ -52,8 +65,10 @@ export default function ReviewsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All Tags</SelectItem>
-                {reviewTags.map(t => (
-                  <SelectItem key={t.code} value={t.code}>{getLocalizedText(t.label, 'en')}</SelectItem>
+                {reviewTags.map((t) => (
+                  <SelectItem key={t.code} value={t.code}>
+                    {getLocalizedText(t.label, 'en')}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -78,7 +93,7 @@ export default function ReviewsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredReviews.map(r => (
+              {filteredReviews.map((r) => (
                 <TableRow key={r.id}>
                   <TableCell>{r.id}</TableCell>
                   <TableCell>{r.reviewerId}</TableCell>
@@ -92,22 +107,42 @@ export default function ReviewsPage() {
                   <TableCell>
                     <div className="min-w-[300px] max-w-md whitespace-normal">
                       <p className="text-sm font-medium leading-relaxed">{r.text}</p>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {r.tags.map(getTagBadge)}
-                      </div>
-                      {r.flagReason && <p className="text-xs text-destructive mt-1">Flag: {r.flagReason}</p>}
+                      <div className="flex flex-wrap gap-1 mt-2">{r.tags.map(getTagBadge)}</div>
+                      {r.flagReason && (
+                        <p className="text-xs text-destructive mt-1">Flag: {r.flagReason}</p>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={r.status === 'PENDING_REVIEW' ? 'destructive' : r.status === 'APPROVED' ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={
+                        r.status === 'PENDING_REVIEW'
+                          ? 'destructive'
+                          : r.status === 'APPROVED'
+                            ? 'default'
+                            : 'secondary'
+                      }
+                    >
                       {r.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     {r.status === 'PENDING_REVIEW' && (
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => moderateReview({ id: r.id, action: 'APPROVE' })}>Approve</Button>
-                        <Button variant="destructive" size="sm" onClick={() => moderateReview({ id: r.id, action: 'REMOVE' })}>Remove</Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => moderateReview({ id: r.id, action: 'APPROVE' })}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => moderateReview({ id: r.id, action: 'REMOVE' })}
+                        >
+                          Remove
+                        </Button>
                       </div>
                     )}
                   </TableCell>
@@ -120,4 +155,3 @@ export default function ReviewsPage() {
     </div>
   );
 }
-

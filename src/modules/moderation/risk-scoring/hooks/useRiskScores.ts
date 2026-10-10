@@ -8,17 +8,18 @@ export const useRiskScores = () => {
   const query = useQuery({ queryKey: ['risk-scores'], queryFn: riskScoringApi.getScores });
 
   const reclassifyMutation = useMutation({
-    mutationFn: ({ userId, level }: { userId: string, level: any }) => riskScoringApi.reclassify(userId, level),
+    mutationFn: ({ userId, level }: { userId: string; level: any }) =>
+      riskScoringApi.reclassify(userId, level),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['risk-scores'] });
       toast.success('Risk level manually reclassified');
-    }
+    },
   });
 
   return {
     scores: query.data || [],
     isLoading: query.isLoading,
     reclassify: reclassifyMutation.mutate,
-    isReclassifying: reclassifyMutation.isPending
+    isReclassifying: reclassifyMutation.isPending,
   };
 };

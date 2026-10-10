@@ -4,7 +4,14 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { useCompanions } from '@/modules/companions/hooks/useCompanions';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Ban, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -24,7 +31,9 @@ export default function CompanionsPage() {
       <Card>
         <CardHeader>
           <CardTitle>All Companions</CardTitle>
-          <CardDescription>View performance, approve applications, or manage accounts.</CardDescription>
+          <CardDescription>
+            View performance, approve applications, or manage accounts.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -45,7 +54,10 @@ export default function CompanionsPage() {
               {companions.map((companion) => (
                 <TableRow key={companion.id}>
                   <TableCell>
-                    <Link href={`/companions/${companion.id}`} className="font-medium hover:underline text-primary">
+                    <Link
+                      href={`/companions/${companion.id}`}
+                      className="font-medium hover:underline text-primary"
+                    >
                       {companion.name}
                     </Link>
                     <div className="text-xs text-muted-foreground">{companion.id}</div>
@@ -56,10 +68,15 @@ export default function CompanionsPage() {
                   </TableCell>
                   <TableCell>{companion.joinDate}</TableCell>
                   <TableCell>
-                    <Badge variant={
-                      companion.verificationStatus === 'VERIFIED' ? 'default' : 
-                      companion.verificationStatus === 'REJECTED' ? 'destructive' : 'secondary'
-                    }>
+                    <Badge
+                      variant={
+                        companion.verificationStatus === 'VERIFIED'
+                          ? 'default'
+                          : companion.verificationStatus === 'REJECTED'
+                            ? 'destructive'
+                            : 'secondary'
+                      }
+                    >
                       {companion.verificationStatus}
                     </Badge>
                   </TableCell>
@@ -67,8 +84,8 @@ export default function CompanionsPage() {
                     <div className="flex items-center gap-2">
                       <div className="text-sm font-medium">{companion.trustScore}/100</div>
                       <div className="w-16 h-2 bg-secondary rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full ${companion.trustScore >= 80 ? 'bg-green-500' : companion.trustScore >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`} 
+                        <div
+                          className={`h-full ${companion.trustScore >= 80 ? 'bg-green-500' : companion.trustScore >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
                           style={{ width: `${companion.trustScore}%` }}
                         />
                       </div>
@@ -77,18 +94,23 @@ export default function CompanionsPage() {
                   <TableCell>{companion.totalSessions}</TableCell>
                   <TableCell>₹{companion.totalEarnings.toLocaleString()}</TableCell>
                   <TableCell>
-                    <Badge variant={
-                      companion.status === 'ACTIVE' ? 'outline' : 
-                      companion.status === 'BANNED' ? 'destructive' : 'secondary'
-                    }>
+                    <Badge
+                      variant={
+                        companion.status === 'ACTIVE'
+                          ? 'outline'
+                          : companion.status === 'BANNED'
+                            ? 'destructive'
+                            : 'secondary'
+                      }
+                    >
                       {companion.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       {companion.status === 'ACTIVE' ? (
-                        <Button 
-                          variant="destructive" 
+                        <Button
+                          variant="destructive"
                           size="sm"
                           onClick={() => updateStatus({ id: companion.id, status: 'SUSPENDED' })}
                           title="Suspend User"
@@ -96,8 +118,8 @@ export default function CompanionsPage() {
                           <Ban className="h-4 w-4 mr-1" /> Suspend
                         </Button>
                       ) : (
-                        <Button 
-                          variant="default" 
+                        <Button
+                          variant="default"
                           size="sm"
                           onClick={() => updateStatus({ id: companion.id, status: 'ACTIVE' })}
                           title="Restore User"
@@ -116,4 +138,3 @@ export default function CompanionsPage() {
     </div>
   );
 }
-

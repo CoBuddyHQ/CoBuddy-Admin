@@ -1,36 +1,43 @@
 import { ReportSummary, ReportDetail } from './types';
+import axios from '@/lib/api/client';
 
-const mockReports: ReportSummary[] = [
-  { id: 'REP-001', reporterId: 'UserA', reportedUserId: 'CompB', category: 'Inappropriate Behavior', status: 'OPEN', timestamp: new Date().toISOString(), bookingId: 'BKG-991' },
-  { id: 'REP-002', reporterId: 'CompC', reportedUserId: 'UserD', category: 'No Show', status: 'INVESTIGATING', timestamp: new Date(Date.now() - 86400000).toISOString(), bookingId: 'BKG-992', assignedTo: 'Admin User' },
-];
-
-const mockDetail: ReportDetail = {
-  ...mockReports[0],
-  description: 'The companion was rude and asked for direct payment.',
-  evidenceUrls: ['https://example.com/screenshot1.jpg'],
-  investigatorNotes: []
-};
+const mapReport = (item: any): ReportSummary => ({
+  id: item.id,
+  reporterId: item.reporterId,
+  reportedUserId: item.reportedUserId,
+  category: item.categoryCode,
+  status: item.status,
+  timestamp: item.createdAt,
+  bookingId: item.bookingId,
+  assignedTo: item.assignedTo?.name,
+});
 
 export const reportApi = {
-  getReports: async (): Promise<ReportSummary[]> => Promise.resolve([...mockReports]),
+  getReports: async (): Promise<ReportSummary[]> => {
+    const res = await axios.get('/moderation/reports', { params: { page: 1, pageSize: 100 } });
+    const items = res.data.data?.data ?? res.data.data ?? [];
+    return items.map(mapReport);
+  },
   getDetail: async (id: string): Promise<ReportDetail> => {
-    const sum = mockReports.find(r => r.id === id);
-    if (sum) return Promise.resolve({ ...mockDetail, ...sum, id });
-    return Promise.resolve({ ...mockDetail, id });
+    const res = await axios.get(`/moderation/reports/${id}`);
+    const item = res.data.data;
+    return {
+      ...mapReport(item),
+      description: item.description,
+      evidenceUrls: item.evidenceUrls ?? [],
+      investigatorNotes: Array.isArray(item.notes)
+        ? item.notes.map((n: any) => ({ timestamp: n.at, note: n.note, author: n.by }))
+        : [],
+    };
   },
-  updateStatus: async (id: string, status: ReportSummary['status'], note?: string, author?: string): Promise<void> => {
-    const report = mockReports.find(r => r.id === id);
-    if (report) report.status = status;
-    if (note && author && id === mockDetail.id) {
-      mockDetail.investigatorNotes.push({ timestamp: new Date().toISOString(), note, author });
-      mockDetail.status = status;
-    }
-    return Promise.resolve();
+  updateStatus: async (
+    id: string,
+    status: ReportSummary['status'],
+    note?: string,
+  ): Promise<void> => {
+    await axios.patch(`/moderation/reports/${id}/status`, { status, note });
   },
-  assignToMe: async (id: string, staffName: string): Promise<void> => {
-    const report = mockReports.find(r => r.id === id);
-    if (report) report.assignedTo = staffName;
-    return Promise.resolve();
-  }
+  assignToMe: async (id: string): Promise<void> => {
+    await axios.post(`/moderation/reports/${id}/assign-me`);
+  },
 };

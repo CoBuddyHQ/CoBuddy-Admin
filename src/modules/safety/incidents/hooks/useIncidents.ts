@@ -3,8 +3,6 @@ import { incidentsApi } from '../api';
 import { toast } from 'sonner';
 
 export const useIncidents = () => {
-  const queryClient = useQueryClient();
-
   const query = useQuery({ queryKey: ['incidents'], queryFn: incidentsApi.getIncidents });
 
   return {
@@ -18,17 +16,17 @@ export const useIncidentDetail = (id: string) => {
 
   const query = useQuery({
     queryKey: ['incident', id],
-    queryFn: () => incidentsApi.getDetail(id)
+    queryFn: () => incidentsApi.getDetail(id),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ status, note, author }: { status: any, note?: string, author?: string }) => 
+    mutationFn: ({ status, note, author }: { status: any; note?: string; author?: string }) =>
       incidentsApi.updateStatus(id, status, note, author),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['incidents'] });
       queryClient.invalidateQueries({ queryKey: ['incident', id] });
       toast.success('Incident updated successfully');
-    }
+    },
   });
 
   const toggleEvidenceMutation = useMutation({
@@ -36,7 +34,7 @@ export const useIncidentDetail = (id: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['incident', id] });
       toast.success('Evidence preservation updated');
-    }
+    },
   });
 
   return {
@@ -45,6 +43,6 @@ export const useIncidentDetail = (id: string) => {
     updateStatus: updateMutation.mutate,
     isUpdating: updateMutation.isPending,
     togglePreserveEvidence: toggleEvidenceMutation.mutate,
-    isTogglingEvidence: toggleEvidenceMutation.isPending
+    isTogglingEvidence: toggleEvidenceMutation.isPending,
   };
 };

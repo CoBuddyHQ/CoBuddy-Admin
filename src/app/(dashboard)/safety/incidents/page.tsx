@@ -9,14 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useMasterData } from '@/modules/system/master-data/hooks/useMasterData';
 import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import { ShieldAlert } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function IncidentsPage() {
   const { incidents, isLoading } = useIncidents();
@@ -41,19 +34,26 @@ export default function IncidentsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {incidents.map(inc => (
+            {incidents.map((inc) => (
               <TableRow key={inc.id}>
                 <TableCell>{inc.id}</TableCell>
                 <TableCell>
-                  {incidentTypes.find(t => t.code === inc.type) ? getLocalizedText(incidentTypes.find(t => t.code === inc.type)!.label, 'en') : inc.type}
+                  {incidentTypes.find((t) => t.code === inc.type)
+                    ? getLocalizedText(incidentTypes.find((t) => t.code === inc.type)!.label, 'en')
+                    : inc.type}
                 </TableCell>
                 <TableCell>{inc.involvedParties.join(' & ')}</TableCell>
                 <TableCell>{new Date(inc.timestamp).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Badge variant={
-                    inc.status === 'OPEN' ? 'destructive' : 
-                    inc.status === 'ESCALATED_LEGAL' ? 'default' : 'secondary'
-                  }>
+                  <Badge
+                    variant={
+                      inc.status === 'OPEN'
+                        ? 'destructive'
+                        : inc.status === 'ESCALATED_LEGAL'
+                          ? 'default'
+                          : 'secondary'
+                    }
+                  >
                     {inc.status}
                   </Badge>
                 </TableCell>
@@ -61,7 +61,11 @@ export default function IncidentsPage() {
                   {inc.legalEscalation && <ShieldAlert className="h-5 w-5 text-destructive" />}
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => router.push(`/safety/incidents/${inc.id}`)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/safety/incidents/${inc.id}`)}
+                  >
                     Investigate
                   </Button>
                 </TableCell>

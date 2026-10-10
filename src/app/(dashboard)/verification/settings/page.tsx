@@ -1,110 +1,168 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ConfigFormTemplate } from '@/components/templates/ConfigFormTemplate';
+import { ArrowLeft, RefreshCw, Save } from 'lucide-react';
+import { isAxiosError } from 'axios';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { useVerificationSettings } from '@/modules/verification/hooks/useVerificationSettings';
+import type { AutomationThresholds } from '@/modules/verification/types';
+import { useAuthStore } from '@/store/authStore';
+import { hasPermission } from '@/lib/auth/permissions';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export default function VerificationSettingsPage() {
   const router = useRouter();
-  const { settings, isLoading, saveSettings, isSaving } = useVerificationSettings();
-  
-  const [formData, setFormData] = useState({
-    autoApproveThreshold: 90,
-    autoRejectThreshold: 30,
-    livenessRequired: true,
-    enabledProvider: 'HYPERVERGE' as any,
-  });
+  const user = useAuthStore((state) => state.user);
+  const permitted = hasPermission(user?.roles ?? [], 'verification');
+  const query = useVerificationSettings(permitted);
+  const [draft, setDraft] = useState<AutomationThresholds | null>(null);
+  const form = draft ?? query.settings;
 
-  useEffect(() => {
-    if (settings) {
-      setFormData(settings);
+  if (!permitted) return <p role="alert">You do not have access to verification settings.</p>;
+  if (query.error)
+    return (
+      <div role="alert" className="space-y-3">
+        <p>Unable to load verification settings.</p>
+        <Button variant="outline" disabled={query.isFetching} onClick={() => void query.refetch()}>
+          <RefreshCw className="h-4 w-4" /> Retry
+        </Button>
+      </div>
+    );
+  if (query.isLoading || !form) return <p role="status">Loading verification settings...</p>;
+
+  const valid =
+    Number.isInteger(form.autoApproveThreshold) &&
+    Number.isInteger(form.autoRejectThreshold) &&
+    form.autoRejectThreshold >= 0 &&
+    form.autoApproveThreshold <= 100 &&
+    form.autoRejectThreshold < form.autoApproveThreshold;
+  const saveMessage = isAxiosError(query.saveError)
+    ? query.saveError.response?.data?.error?.message
+    : undefined;
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!form || !valid || query.isSaving) return;
+    try {
+      await query.saveSettings(form);
+      setDraft(null);
+    } catch {
+      // Keep the operator's draft available for correction or retry.
     }
-  }, [settings]);
-
-  if (isLoading) return <div>Loading settings...</div>;
-
-  const handleSave = () => {
-    saveSettings(formData);
-  };
+  }
 
   return (
-    <ConfigFormTemplate
-      title="Verification Automation Settings"
-      description="Configure thresholds and rules for auto-approving/rejecting KYC documents."
-      onSave={handleSave}
-      onCancel={() => router.push('/verification')}
-      isSaving={isSaving}
-      sections={[
-        {
-          title: "Provider Configuration",
-          description: "Select the primary third-party KYC provider.",
-          children: (
-            <div className="space-y-2 max-w-sm">
-              <Select 
-                value={formData.enabledProvider} 
-                onValueChange={(v) => setFormData(p => ({ ...p, enabledProvider: v as any }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="HYPERVERGE">HyperVerge (Default)</SelectItem>
-                  <SelectItem value="IDFY">IDfy</SelectItem>
-                  <SelectItem value="SIGNZY">Signzy</SelectItem>
-                  <SelectItem value="KARZA">Karza Technologies</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )
-        },
-        {
-          title: "Automation Thresholds",
-          description: "Set confidence score requirements for automatic decisions. Cases between these thresholds will require manual review.",
-          children: (
-            <div className="grid grid-cols-2 gap-4 max-w-xl">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Auto-Approve Threshold (%)</label>
-                <Input 
-                  type="number" 
-                  min="0" max="100"
-                  value={formData.autoApproveThreshold}
-                  onChange={(e) => setFormData(p => ({ ...p, autoApproveThreshold: Number(e.target.value) }))}
-                />
-                <p className="text-xs text-muted-foreground">Scores &gt;= this will be approved instantly.</p>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Auto-Reject Threshold (%)</label>
-                <Input 
-                  type="number" 
-                  min="0" max="100"
-                  value={formData.autoRejectThreshold}
-                  onChange={(e) => setFormData(p => ({ ...p, autoRejectThreshold: Number(e.target.value) }))}
-                />
-                <p className="text-xs text-muted-foreground">Scores &lt;= this will be rejected instantly.</p>
-              </div>
-            </div>
-          )
-        },
-        {
-          title: "Liveness Check",
-          children: (
-            <div className="flex items-center justify-between max-w-xl">
-              <div className="space-y-0.5">
-                <label className="text-sm font-medium">Require Liveness Pass</label>
-                <p className="text-xs text-muted-foreground">If disabled, face match score is the only biometric criteria.</p>
-              </div>
-              <Switch 
-                checked={formData.livenessRequired}
-                onCheckedChange={(c) => setFormData(p => ({ ...p, livenessRequired: c }))}
+    <div className="max-w-3xl min-w-0 space-y-6">
+      <PageHeader
+        title="Verification Settings"
+        action={
+          <Button
+            variant="outline"
+            onClick={() => router.push('/verification')}
+            disabled={query.isSaving}
+          >
+            <ArrowLeft className="h-4 w-4" /> Queue
+          </Button>
+        }
+      />
+      <div className="flex flex-wrap items-center justify-between gap-3 border-y py-4">
+        <span className="text-sm font-medium">Automatic verification</span>
+        <Badge variant="secondary">Provider unavailable</Badge>
+      </div>
+      <form onSubmit={submit} className="space-y-6">
+        <fieldset disabled={query.isSaving} className="space-y-6 min-w-0">
+          <div className="space-y-2 max-w-sm">
+            <Label htmlFor="kyc-provider">Preferred provider</Label>
+            <select
+              id="kyc-provider"
+              className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+              value={form.enabledProvider}
+              onChange={(event) =>
+                setDraft({
+                  ...form,
+                  enabledProvider: event.target.value as AutomationThresholds['enabledProvider'],
+                })
+              }
+            >
+              <option value="HYPERVERGE">HyperVerge</option>
+              <option value="IDFY">IDfy</option>
+              <option value="SIGNZY">Signzy</option>
+              <option value="KARZA">Karza</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-y py-6">
+            <div className="space-y-2">
+              <Label htmlFor="kyc-approve">Auto-approve threshold (%)</Label>
+              <Input
+                id="kyc-approve"
+                type="number"
+                min={1}
+                max={100}
+                step={1}
+                required
+                value={Number.isFinite(form.autoApproveThreshold) ? form.autoApproveThreshold : ''}
+                onChange={(event) =>
+                  setDraft({ ...form, autoApproveThreshold: event.target.valueAsNumber })
+                }
               />
             </div>
-          )
-        }
-      ]}
-    />
+            <div className="space-y-2">
+              <Label htmlFor="kyc-reject">Auto-reject threshold (%)</Label>
+              <Input
+                id="kyc-reject"
+                type="number"
+                min={0}
+                max={99}
+                step={1}
+                required
+                value={Number.isFinite(form.autoRejectThreshold) ? form.autoRejectThreshold : ''}
+                onChange={(event) =>
+                  setDraft({ ...form, autoRejectThreshold: event.target.valueAsNumber })
+                }
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <Label htmlFor="kyc-liveness">Require liveness pass</Label>
+            <Switch
+              id="kyc-liveness"
+              checked={form.livenessRequired}
+              onCheckedChange={(checked) => setDraft({ ...form, livenessRequired: checked })}
+            />
+          </div>
+        </fieldset>
+        {!valid && (
+          <p role="alert" className="text-sm text-destructive">
+            Thresholds must be whole percentages from 0 to 100, with reject lower than approve.
+          </p>
+        )}
+        {query.saveError && (
+          <p role="alert" className="text-sm text-destructive">
+            {typeof saveMessage === 'string'
+              ? saveMessage
+              : 'Unable to save verification settings.'}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-3 border-t pt-4">
+          <Button type="submit" disabled={!valid || !draft || query.isSaving}>
+            <Save className="h-4 w-4" />
+            {query.isSaving ? 'Saving...' : 'Save settings'}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!draft || query.isSaving}
+            onClick={() => setDraft(null)}
+          >
+            Discard changes
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

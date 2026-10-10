@@ -1,28 +1,52 @@
 import { UserRestriction } from './types';
+import axios from '@/lib/api/client';
 
-let mockRestrictions: UserRestriction[] = [
-  { userId: 'UserA', userName: 'Alice', userType: 'CUSTOMER', restrictionType: 'WARNING', reason: 'Spamming chat', appliedAt: new Date().toISOString(), historyCount: 1 },
-  { userId: 'CompB', userName: 'Bob', userType: 'COMPANION', restrictionType: 'PERM_BAN', reason: 'Severe policy violation', appliedAt: new Date(Date.now() - 86400000).toISOString(), historyCount: 3 },
-];
+const durationMap: Record<string, string> = {
+  TEMPORARY_24H: 'TEMP_BAN',
+  TEMPORARY_7D: 'TEMP_BAN',
+  TEMPORARY_30D: 'TEMP_BAN',
+  PERMANENT: 'PERM_BAN',
+};
+
+const mapBan = (item: any): UserRestriction => ({
+  userId: item.userId,
+  userName: item.userId,
+  userType: item.userType,
+  restrictionType: (durationMap[item.duration] as UserRestriction['restrictionType']) ?? 'TEMP_BAN',
+  reason: item.reason,
+  appliedAt: item.startsAt || item.createdAt,
+  expiresAt: item.endsAt ?? undefined,
+  historyCount: 1,
+});
 
 export const bansApi = {
-  getRestrictions: async (): Promise<UserRestriction[]> => Promise.resolve([...mockRestrictions]),
-  applyRestriction: async (payload: { userId: string, restrictionType: string, reason: string, durationDays?: number }): Promise<void> => {
-    // In real app, this would also forcefully logout all active sessions for this user.
-    mockRestrictions.unshift({
-      userId: payload.userId,
-      userName: 'Unknown User', // mock
-      userType: 'CUSTOMER',
-      restrictionType: payload.restrictionType as any,
-      reason: payload.reason,
-      appliedAt: new Date().toISOString(),
-      expiresAt: payload.durationDays ? new Date(Date.now() + payload.durationDays * 86400000).toISOString() : undefined,
-      historyCount: 1
-    });
-    return Promise.resolve();
+  getRestrictions: async (): Promise<UserRestriction[]> => {
+    const res = await axios.get('/moderation/bans', { params: { page: 1, pageSize: 100 } });
+    const items = res.data.data?.data ?? res.data.data ?? [];
+    return items.map(mapBan);
   },
-  liftRestriction: async (userId: string): Promise<void> => {
-    mockRestrictions = mockRestrictions.filter(r => r.userId !== userId);
-    return Promise.resolve();
-  }
+  applyRestriction: async (payload: {
+    userId: string;
+    restrictionType: string;
+    reason: string;
+    durationDays?: number;
+  }): Promise<void> => {
+    const durationEnum =
+      payload.restrictionType === 'PERM_BAN'
+        ? 'PERMANENT'
+        : payload.durationDays && payload.durationDays <= 1
+          ? 'TEMPORARY_24H'
+          : payload.durationDays && payload.durationDays <= 7
+            ? 'TEMPORARY_7D'
+            : 'TEMPORARY_30D';
+    await axios.post('/moderation/bans', {
+      userId: payload.userId,
+      userType: 'CUSTOMER',
+      reason: payload.reason,
+      duration: durationEnum,
+    });
+  },
+  liftRestriction: async (banId: string): Promise<void> => {
+    await axios.patch(`/moderation/bans/${banId}/lift`, { reason: 'Lifted by admin' });
+  },
 };

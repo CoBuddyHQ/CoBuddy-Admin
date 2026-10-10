@@ -49,8 +49,8 @@ export interface SystemConfig {
   wallet: {
     maxWalletBalance: number;
   };
-  walletBalanceLimits: { 
-    nonKycMax: number; 
+  walletBalanceLimits: {
+    nonKycMax: number;
     kycVerifiedMax: number | null;
   };
 }

@@ -12,13 +12,13 @@ export const useChatSettings = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chat-settings'] });
       toast.success('Chat settings updated');
-    }
+    },
   });
 
   return {
     settings: query.data,
     isLoading: query.isLoading,
     updateSettings: updateMutation.mutate,
-    isUpdating: updateMutation.isPending
+    isUpdating: updateMutation.isPending,
   };
 };

@@ -4,8 +4,6 @@ import { toast } from 'sonner';
 import { ApplicationDecisionPayload } from '../types';
 
 export const useCompanionApplications = () => {
-  const queryClient = useQueryClient();
-
   const query = useQuery({
     queryKey: ['companion-applications'],
     queryFn: companionAppApi.getApplications,
@@ -31,7 +29,7 @@ export const useCompanionApplicationDetail = (id: string) => {
       queryClient.invalidateQueries({ queryKey: ['companion-applications'] });
       toast.success('Application assigned');
     },
-    onError: () => toast.error('Failed to assign application')
+    onError: () => toast.error('Failed to assign application'),
   });
 
   const decisionMutation = useMutation({
@@ -40,7 +38,7 @@ export const useCompanionApplicationDetail = (id: string) => {
       queryClient.invalidateQueries({ queryKey: ['companion-applications'] });
       toast.success('Decision submitted');
     },
-    onError: () => toast.error('Failed to submit decision')
+    onError: () => toast.error('Failed to submit decision'),
   });
 
   return {

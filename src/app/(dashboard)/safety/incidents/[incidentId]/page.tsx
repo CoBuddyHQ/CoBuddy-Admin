@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, FileText, Image as ImageIcon, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, User, FileText, ShieldAlert } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -22,10 +22,19 @@ export default function IncidentDetailPage() {
   const { user } = useAuthStore();
   const { incidentTypes } = useMasterData();
 
-  const { detail, isLoading, updateStatus, isUpdating, togglePreserveEvidence, isTogglingEvidence } = useIncidentDetail(incidentId);
+  const {
+    detail,
+    isLoading,
+    updateStatus,
+    isUpdating,
+    togglePreserveEvidence,
+    isTogglingEvidence,
+  } = useIncidentDetail(incidentId);
 
   const [isNoteOpen, setIsNoteOpen] = useState(false);
-  const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'ESCALATED_LEGAL' | 'CLOSED'>('INVESTIGATING');
+  const [newStatus, setNewStatus] = useState<'INVESTIGATING' | 'ESCALATED_LEGAL' | 'CLOSED'>(
+    'INVESTIGATING',
+  );
   const [note, setNote] = useState('');
   const [selectedEvidence, setSelectedEvidence] = useState<string | null>(null);
 
@@ -49,15 +58,23 @@ export default function IncidentDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => router.push('/safety/incidents')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <PageHeader 
-          title={`Incident: ${detail.id}`} 
-          description={`Type: ${incidentTypes.find(t => t.code === detail.type) ? getLocalizedText(incidentTypes.find(t => t.code === detail.type)!.label, 'en') : detail.type}`} 
+        <PageHeader
+          title={`Incident: ${detail.id}`}
+          description={`Type: ${incidentTypes.find((t) => t.code === detail.type) ? getLocalizedText(incidentTypes.find((t) => t.code === detail.type)!.label, 'en') : detail.type}`}
           action={
             detail.status !== 'CLOSED' ? (
               <div className="flex gap-2">
-                {detail.status !== 'INVESTIGATING' && <Button variant="outline" onClick={() => openNoteDialog('INVESTIGATING')}>Mark Investigating</Button>}
-                <Button variant="destructive" onClick={() => openNoteDialog('ESCALATED_LEGAL')}>Escalate to Legal</Button>
-                <Button variant="default" onClick={() => openNoteDialog('CLOSED')}>Close Incident</Button>
+                {detail.status !== 'INVESTIGATING' && (
+                  <Button variant="outline" onClick={() => openNoteDialog('INVESTIGATING')}>
+                    Mark Investigating
+                  </Button>
+                )}
+                <Button variant="destructive" onClick={() => openNoteDialog('ESCALATED_LEGAL')}>
+                  Escalate to Legal
+                </Button>
+                <Button variant="default" onClick={() => openNoteDialog('CLOSED')}>
+                  Close Incident
+                </Button>
               </div>
             ) : (
               <Badge variant="secondary">Closed</Badge>
@@ -67,7 +84,6 @@ export default function IncidentDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
@@ -94,12 +110,16 @@ export default function IncidentDetailPage() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Assigned Investigator:</span>
-                  <div className="font-medium mt-1">{detail.assignedInvestigator || 'Unassigned'}</div>
+                  <div className="font-medium mt-1">
+                    {detail.assignedInvestigator || 'Unassigned'}
+                  </div>
                 </div>
               </div>
               <div className="pt-4 border-t">
                 <h4 className="font-medium mb-2">Description</h4>
-                <p className="text-sm bg-muted p-4 rounded-md whitespace-pre-wrap">{detail.description}</p>
+                <p className="text-sm bg-muted p-4 rounded-md whitespace-pre-wrap">
+                  {detail.description}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -135,7 +155,7 @@ export default function IncidentDetailPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-muted-foreground">Preserve</span>
-                <Switch 
+                <Switch
                   checked={detail.preserveEvidence || false}
                   onCheckedChange={() => togglePreserveEvidence()}
                   disabled={isTogglingEvidence}
@@ -148,10 +168,15 @@ export default function IncidentDetailPage() {
               ) : (
                 <div className="space-y-2">
                   {detail.evidence.map((url, i) => (
-                    <div key={i} className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent transition-colors">
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent transition-colors"
+                    >
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium truncate flex-1">{url}</span>
-                      <Button variant="ghost" size="sm" onClick={() => setSelectedEvidence(url)}>View</Button>
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedEvidence(url)}>
+                        View
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -163,25 +188,34 @@ export default function IncidentDetailPage() {
 
       <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Update Incident Status</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Update Incident Status</DialogTitle>
+          </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4 pt-4">
             <div className="flex items-center gap-2 mb-2 text-sm">
               New Status: <Badge variant="outline">{newStatus}</Badge>
             </div>
             {newStatus === 'ESCALATED_LEGAL' && (
               <div className="p-3 bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-200 text-sm rounded-md mb-4 border border-red-200 dark:border-red-800">
-                <strong>Warning:</strong> This will lock the incident for legal review and notify the Legal Admin.
+                <strong>Warning:</strong> This will lock the incident for legal review and notify
+                the Legal Admin.
               </div>
             )}
-            <Textarea 
-              placeholder="Add your investigation notes or reason..." 
-              value={note} 
-              onChange={e => setNote(e.target.value)} 
-              required 
+            <Textarea
+              placeholder="Add your investigation notes or reason..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              required
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsNoteOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={isUpdating} variant={newStatus === 'ESCALATED_LEGAL' ? 'destructive' : 'default'}>
+              <Button type="button" variant="outline" onClick={() => setIsNoteOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isUpdating}
+                variant={newStatus === 'ESCALATED_LEGAL' ? 'destructive' : 'default'}
+              >
                 Save & Update
               </Button>
             </div>
@@ -189,7 +223,10 @@ export default function IncidentDetailPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={selectedEvidence !== null} onOpenChange={(open) => !open && setSelectedEvidence(null)}>
+      <Dialog
+        open={selectedEvidence !== null}
+        onOpenChange={(open) => !open && setSelectedEvidence(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>View Evidence</DialogTitle>
@@ -197,8 +234,17 @@ export default function IncidentDetailPage() {
           <div className="space-y-4 pt-4">
             {selectedEvidence && (
               <div className="flex flex-col gap-4">
-                <span className="text-sm font-medium break-all">{selectedEvidence.split('/').pop()}</span>
-                <a href={selectedEvidence} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline text-sm">Open in new tab</a>
+                <span className="text-sm font-medium break-all">
+                  {selectedEvidence.split('/').pop()}
+                </span>
+                <a
+                  href={selectedEvidence}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-500 hover:underline text-sm"
+                >
+                  Open in new tab
+                </a>
               </div>
             )}
           </div>

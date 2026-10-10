@@ -3,19 +3,28 @@ import { refundsApi } from '../api';
 import { toast } from 'sonner';
 
 import { BookingSettings } from '../types';
+import { useState } from 'react';
 
 export const useRefunds = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
 
-  const query = useQuery({ queryKey: ['refunds'], queryFn: refundsApi.getRefunds });
-  const settingsQuery = useQuery({ queryKey: ['booking-settings'], queryFn: refundsApi.getSettings });
+  const query = useQuery({
+    queryKey: ['refunds', page],
+    queryFn: () => refundsApi.getRefunds(page),
+  });
+  const settingsQuery = useQuery({
+    queryKey: ['booking-settings'],
+    queryFn: refundsApi.getSettings,
+  });
 
   const processMutation = useMutation({
-    mutationFn: ({ id, action }: { id: string, action: 'APPROVE' | 'REJECT' }) => refundsApi.processRefund(id, action),
+    mutationFn: ({ id, action }: { id: string; action: 'APPROVE' | 'REJECT' | 'PROCESS' }) =>
+      refundsApi.processRefund(id, action),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['refunds'] });
       toast.success('Refund processed successfully');
-    }
+    },
   });
 
   const updateSettingsMutation = useMutation({
@@ -23,11 +32,16 @@ export const useRefunds = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['booking-settings'] });
       toast.success('Settings updated');
-    }
+    },
   });
 
   return {
-    refunds: query.data || [],
+    refunds: query.data?.data || [],
+    meta: query.data?.meta,
+    page,
+    setPage,
+    isError: query.isError,
+    refetch: query.refetch,
     settings: settingsQuery.data,
     isLoading: query.isLoading || settingsQuery.isLoading,
     processRefund: processMutation.mutate,

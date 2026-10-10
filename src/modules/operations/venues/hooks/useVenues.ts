@@ -10,7 +10,6 @@ export const useVenues = () => {
     queryFn: venuesApi.getFeaturedVenues,
   });
 
-
   const toggleVenueMutation = useMutation({
     mutationFn: venuesApi.toggleVenueActive,
     onSuccess: () => {
@@ -27,9 +26,9 @@ export const useVenues = () => {
     },
   });
 
-
   const createVenueMutation = useMutation({
-    mutationFn: (data: Omit<FeaturedVenue, 'id' | 'isActive'>) => venuesApi.createFeaturedVenue(data),
+    mutationFn: (data: Omit<FeaturedVenue, 'id' | 'isActive'>) =>
+      venuesApi.createFeaturedVenue(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['featured-venues'] });
       toast.success('Venue added successfully');

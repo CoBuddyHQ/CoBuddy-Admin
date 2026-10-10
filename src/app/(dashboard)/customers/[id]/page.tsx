@@ -7,16 +7,44 @@ import { useCustomerDetail } from '@/modules/customers/hooks/useCustomers';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useReports } from '@/modules/moderation/reports/hooks/useReports';
+import { PaginationControls } from '@/components/ui/pagination-controls';
+import { useAuthStore } from '@/store/authStore';
 
 export default function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { customer, bookingHistory, transactionHistory, isLoading, updateStatus } = useCustomerDetail(id);
+  const {
+    customer,
+    bookingHistory,
+    transactionHistory,
+    isLoading,
+    updateStatus,
+    bookingMeta,
+    bookingPage,
+    setBookingPage,
+    transactionMeta,
+    transactionPage,
+    setTransactionPage,
+    historyPending,
+    historyError,
+    retryHistory,
+  } = useCustomerDetail(id);
+  const canManage = useAuthStore((state) =>
+    state.user?.roles.some((role) => ['SUPER_ADMIN', 'MODERATOR', 'SUPPORT_LEAD'].includes(role)),
+  );
   const { reports } = useReports();
-  const customerReports = reports?.filter(r => r.reporterId === id || r.reportedUserId === id) || [];
+  const customerReports =
+    reports?.filter((r) => r.reporterId === id || r.reportedUserId === id) || [];
 
   if (isLoading) return <div className="">Loading...</div>;
   if (!customer) return <div className="">Customer not found</div>;
@@ -27,12 +55,20 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         title={`Customer: ${customer.name}`}
         description="Detailed view of customer profile, wallet, and history."
         action={
-          <Link href="/customers" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">
+          <Link
+            href="/customers"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+          >
             Back to Directory
           </Link>
         }
       />
 
+      {historyError && (
+        <div role="alert">
+          Could not load customer history. <Button onClick={retryHistory}>Retry</Button>
+        </div>
+      )}
       <Tabs defaultValue="profile" className="flex-1 flex flex-col min-h-0">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -71,11 +107,31 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Verification</div>
-                  <Badge variant={customer.verificationStatus === 'VERIFIED' ? 'default' : customer.verificationStatus === 'REJECTED' ? 'destructive' : 'secondary'}>{customer.verificationStatus}</Badge>
+                  <Badge
+                    variant={
+                      customer.verificationStatus === 'VERIFIED'
+                        ? 'default'
+                        : customer.verificationStatus === 'REJECTED'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                  >
+                    {customer.verificationStatus}
+                  </Badge>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Status</div>
-                  <Badge variant={customer.status === 'ACTIVE' ? 'outline' : customer.status === 'BANNED' ? 'destructive' : 'secondary'}>{customer.status}</Badge>
+                  <Badge
+                    variant={
+                      customer.status === 'ACTIVE'
+                        ? 'outline'
+                        : customer.status === 'BANNED'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                  >
+                    {customer.status}
+                  </Badge>
                   {customer.flags > 0 && (
                     <div className="text-xs text-destructive flex items-center gap-1 mt-1">
                       <ShieldAlert className="h-3 w-3" /> {customer.flags} Flags
@@ -88,6 +144,12 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         </TabsContent>
 
         <TabsContent value="bookings" className="flex-1 overflow-auto pt-4">
+          <PaginationControls
+            meta={bookingMeta}
+            page={bookingPage}
+            onPageChange={setBookingPage}
+            pending={historyPending}
+          />
           <Card>
             <CardHeader>
               <CardTitle>Booking History</CardTitle>
@@ -106,14 +168,22 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bookingHistory?.map(booking => (
+                  {bookingHistory?.map((booking) => (
                     <TableRow key={booking.id}>
                       <TableCell>{booking.date}</TableCell>
                       <TableCell>{booking.companionName}</TableCell>
                       <TableCell>{booking.activity}</TableCell>
                       <TableCell>{booking.venue}</TableCell>
                       <TableCell>
-                        <Badge variant={booking.status === 'COMPLETED' ? 'default' : booking.status === 'CANCELLED' ? 'destructive' : 'secondary'}>
+                        <Badge
+                          variant={
+                            booking.status === 'COMPLETED'
+                              ? 'default'
+                              : booking.status === 'CANCELLED'
+                                ? 'destructive'
+                                : 'secondary'
+                          }
+                        >
                           {booking.status}
                         </Badge>
                       </TableCell>
@@ -127,6 +197,12 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         </TabsContent>
 
         <TabsContent value="wallet" className="flex-1 overflow-auto pt-4">
+          <PaginationControls
+            meta={transactionMeta}
+            page={transactionPage}
+            onPageChange={setTransactionPage}
+            pending={historyPending}
+          />
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>Wallet Details</CardTitle>
@@ -136,7 +212,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               <div className="text-3xl font-bold">₹{customer.walletBalance.toLocaleString()}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Transaction History</CardTitle>
@@ -152,14 +228,18 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactionHistory?.map(tx => (
+                  {transactionHistory?.map((tx) => (
                     <TableRow key={tx.id}>
                       <TableCell>{tx.date}</TableCell>
                       <TableCell>{tx.description}</TableCell>
                       <TableCell>
-                        <Badge variant={tx.type === 'CREDIT' ? 'default' : 'secondary'}>{tx.type}</Badge>
+                        <Badge variant={tx.type === 'CREDIT' ? 'default' : 'secondary'}>
+                          {tx.type}
+                        </Badge>
                       </TableCell>
-                      <TableCell className={tx.type === 'CREDIT' ? 'text-green-600 font-medium' : ''}>
+                      <TableCell
+                        className={tx.type === 'CREDIT' ? 'text-green-600 font-medium' : ''}
+                      >
                         {tx.type === 'CREDIT' ? '+' : '-'}₹{tx.amount}
                       </TableCell>
                     </TableRow>
@@ -178,7 +258,9 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             </CardHeader>
             <CardContent>
               {customerReports.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">No reports found for this customer.</div>
+                <div className="text-center py-8 text-muted-foreground">
+                  No reports found for this customer.
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -190,13 +272,25 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {customerReports.map(report => (
+                    {customerReports.map((report) => (
                       <TableRow key={report.id}>
                         <TableCell>{report.timestamp}</TableCell>
-                        <TableCell>{report.reporterId === customer.id ? 'Filed by Customer' : 'Filed Against Customer'}</TableCell>
+                        <TableCell>
+                          {report.reporterId === customer.id
+                            ? 'Filed by Customer'
+                            : 'Filed Against Customer'}
+                        </TableCell>
                         <TableCell>{report.category}</TableCell>
                         <TableCell>
-                          <Badge variant={report.status === 'OPEN' ? 'destructive' : report.status === 'RESOLVED' ? 'default' : 'secondary'}>
+                          <Badge
+                            variant={
+                              report.status === 'OPEN'
+                                ? 'destructive'
+                                : report.status === 'RESOLVED'
+                                  ? 'default'
+                                  : 'secondary'
+                            }
+                          >
                             {report.status}
                           </Badge>
                         </TableCell>
@@ -217,24 +311,24 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-4">
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => updateStatus('ACTIVE')}
-                  disabled={customer.status === 'ACTIVE'}
+                  disabled={!canManage || customer.status === 'ACTIVE'}
                 >
                   Set Active
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => updateStatus('SUSPENDED')}
-                  disabled={customer.status === 'SUSPENDED'}
+                  disabled={!canManage || customer.status === 'SUSPENDED'}
                 >
                   Suspend Account
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => updateStatus('BANNED')}
-                  disabled={customer.status === 'BANNED'}
+                  disabled={!canManage || customer.status === 'BANNED'}
                 >
                   Ban Account
                 </Button>

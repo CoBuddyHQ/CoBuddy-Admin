@@ -8,11 +8,12 @@ export const useGeofenceAlerts = () => {
   const query = useQuery({ queryKey: ['geofence-alerts'], queryFn: geofenceApi.getAlerts });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string, status: any }) => geofenceApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: any }) =>
+      geofenceApi.updateStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['geofence-alerts'] });
       toast.success('Alert status updated');
-    }
+    },
   });
 
   return {

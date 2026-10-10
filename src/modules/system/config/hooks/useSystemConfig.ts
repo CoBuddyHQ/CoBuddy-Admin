@@ -17,16 +17,17 @@ export const useSystemConfig = () => {
       queryClient.invalidateQueries({ queryKey: ['system-config'] });
       toast.success('Configuration saved successfully');
     },
-    onError: () => toast.error('Failed to save configuration')
+    onError: () => toast.error('Failed to save configuration'),
   });
 
   const updateMultiplierMutation = useMutation({
-    mutationFn: ({ id, multiplier }: { id: string, multiplier: number }) => configApi.updateActivityMultiplier(id, multiplier),
+    mutationFn: ({ id, multiplier }: { id: string; multiplier: number }) =>
+      configApi.updateActivityMultiplier(id, multiplier),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interests'] });
       toast.success('Multiplier updated successfully');
     },
-    onError: () => toast.error('Failed to update multiplier')
+    onError: () => toast.error('Failed to update multiplier'),
   });
 
   return {
@@ -34,6 +35,6 @@ export const useSystemConfig = () => {
     isLoading: query.isLoading,
     saveConfig: mutation.mutate,
     isSaving: mutation.isPending,
-    updateActivityMultiplier: updateMultiplierMutation.mutate
+    updateActivityMultiplier: updateMultiplierMutation.mutate,
   };
 };

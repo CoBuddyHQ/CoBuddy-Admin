@@ -1,32 +1,29 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { payoutsApi } from '../api';
+import type { PayoutStatus } from '../types';
 import { toast } from 'sonner';
 
-export const usePayouts = () => {
+export const usePayouts = (page: number, status?: PayoutStatus) => {
   const queryClient = useQueryClient();
-
-  const query = useQuery({ queryKey: ['payouts'], queryFn: payoutsApi.getPayouts });
-
-  const processMutation = useMutation({
-    mutationFn: payoutsApi.processPayout,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payouts'] });
-      toast.success('Payout processing initiated');
-    }
+  const query = useQuery({
+    queryKey: ['payouts', page, status],
+    queryFn: () => payoutsApi.getPayouts(page, status),
   });
-
-  const holdMutation = useMutation({
-    mutationFn: payoutsApi.holdPayout,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payouts'] });
-      toast.success('Payout put on hold');
-    }
+  const mutation = useMutation({
+    mutationFn: payoutsApi.updatePayout,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['payouts'] }),
+        queryClient.invalidateQueries({ queryKey: ['revenue-stats'] }),
+      ]);
+      toast.success('Payout record updated');
+    },
+    onError: (error) => {
+      const message = isAxiosError(error) ? error.response?.data?.error?.message : undefined;
+      toast.error(typeof message === 'string' ? message : 'Unable to update payout. Please retry.');
+      void queryClient.invalidateQueries({ queryKey: ['payouts'] });
+    },
   });
-
-  return {
-    payouts: query.data || [],
-    isLoading: query.isLoading,
-    processPayout: processMutation.mutate,
-    holdPayout: holdMutation.mutate
-  };
+  return { query, mutation };
 };

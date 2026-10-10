@@ -8,5 +8,5 @@ export interface TaxInvoice {
   totalEarnings: number;
   tdsDeducted: number;
   gstCollected: number;
-  status: 'PENDING' | 'GENERATED' | 'COMPLIANT';
+  status: 'DRAFT' | 'ISSUED' | 'PAID' | 'CANCELLED';
 }

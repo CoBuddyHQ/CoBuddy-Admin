@@ -1,0 +1,1576 @@
+{
+  "generatedAt": "2026-10-07T08:08:25.146Z",
+  "operationCount": 225,
+  "passed": 319,
+  "failed": 0,
+  "skipped": 0,
+  "checks": [
+    {
+      "name": "PostgreSQL and Redis readiness",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Correlation ID returned",
+      "passed": true
+    },
+    {
+      "name": "API responses are not cached",
+      "passed": true
+    },
+    {
+      "name": "Malformed JSON is rejected without disclosing request input",
+      "passed": true
+    },
+    {
+      "name": "Oversized input returns a non-cacheable 413",
+      "passed": true
+    },
+    {
+      "name": "Configured frontend origin passes CORS preflight",
+      "passed": true
+    },
+    {
+      "name": "Anonymous POST /api/auth/logout",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/auth/sessions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/auth/me",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/auth/2fa/setup",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/auth/2fa/confirm",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/auth/2fa/remove",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/employees",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/employees",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/employees/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/employees/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/employees/{id}/roles",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/employees/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/employees/{id}/resend-invite",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/employees/{id}/force-logout",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/audit-logs",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/cities",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/cities",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/cities/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/master-data/cities/{id}/service-hours",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/cities/{id}/areas",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/cities/{id}/areas/{areaId}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/interests",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/interests",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/interests/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/interests/{id}/multiplier",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/languages",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/languages",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/languages/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/app-languages",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/app-languages",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/app-languages/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/ticket-categories",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/ticket-categories",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/ticket-categories/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/incident-types",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/incident-types",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/incident-types/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/communication-styles",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/communication-styles",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/communication-styles/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/activity-paces",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/activity-paces",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/activity-paces/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/session-durations",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/session-durations",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/session-durations/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/notification-categories",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/notification-categories",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/notification-categories/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/review-tags",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/review-tags",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/review-tags/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/dispute-reasons",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/dispute-reasons",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/dispute-reasons/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/cancellation-reasons",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/cancellation-reasons",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/cancellation-reasons/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/kyc-doc-types",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/kyc-doc-types",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/kyc-doc-types/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/place-types",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/master-data/place-types",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/place-types/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/master-data/place-types/{id}/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/defaults",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/master-data/defaults",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/master-data/bundle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/system/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/system/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/system/app-configs",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/system/app-configs",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/system/app-configs/key/{configKey}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/system/app-configs/key/{configKey}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/system/app-configs/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/system/app-configs/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/system/app-configs/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/customers",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/customers/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/customers/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/customers/{id}/verification-status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/customers/{id}/booking-history",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/customers/{id}/transactions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/customers/{id}/reports",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/customers/{id}/adjust-wallet",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/customers/{id}/tickets",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/companions/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/companions/{id}/verification-status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}/trust-score-history",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}/session-history",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}/earnings-breakdown",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}/payouts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}/reviews",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companions/{id}/bank-accounts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/companions/{id}/approve-bank-account/{bankId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/companions/{id}/trust-score",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companion-applications",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companion-applications/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/companion-applications/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/companion-applications/{id}/schedule-interview",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/companion-applications/{id}/approve",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/companion-applications/{id}/reject",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/companion-applications/{id}/add-note",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/wallets",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/wallets/ledger/{walletId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/wallets/{ownerType}/{ownerId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/escrow",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/escrow/{bookingId}/release",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/escrow/release-stale",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/payouts/summary",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/payouts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/payouts/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/payouts/{id}/hold",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/payouts/{id}/lift-hold",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/payouts/{id}/process",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/payouts/{id}/mark-paid",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/payouts/{id}/mark-failed",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/refunds/summary",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/refunds",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/refunds/settings/booking",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/financial/refunds/settings/booking",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/refunds/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/refunds/{id}/approve",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/refunds/{id}/process",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/refunds/{id}/reject",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/fraud-detection/dashboard",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/fraud-detection",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/fraud-detection",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/fraud-detection/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/financial/fraud-detection/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/fraud-detection/{id}/actions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/tax-invoices/summary",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/tax-invoices",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/tax-invoices/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/tax-invoices/{id}/issue",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/tax-invoices/{id}/mark-paid",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/tax-invoices/{id}/cancel",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/revenue-reports/overview",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/revenue-reports/daily",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/revenue-reports/by-city",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/revenue-reports/top-companions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/reconciliation/summary",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/reconciliation",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/financial/reconciliation/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/financial/reconciliation/{id}/resolve",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/reports",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/reports/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reports/{id}/assign",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reports/{id}/assign-me",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/moderation/reports/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reports/{id}/ban-user",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reports/{id}/issue-warning",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/bans",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/bans",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/moderation/bans/{id}/lift",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/bans/{id}/appeals",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/flagged-chats",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/flagged-chats/{chatId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/flagged-chats/{chatId}/decide",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/chat-settings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/moderation/chat-settings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/risk-scores",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/risk-scores/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/moderation/risk-scores/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/moderation/risk-scores/{userId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/risk-scores/{userId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/reviews",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reviews/{id}/approve",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reviews/{id}/remove",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/reviews/{id}/flag",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/appeals",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/moderation/appeals/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/moderation/appeals/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/moderation/appeals/{id}/add-note",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/trust-score/dashboard",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/trust-score/rules",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/trust-score/rules",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/trust-score/rules/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/trust-score/rules/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/trust-score/recompute/{companionId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/trust-score/{companionId}/history",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/verification/cases",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/verification/cases/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/verification/cases/{id}/decision",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/verification/cases/re-run-auto-check/{caseId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/verification/thresholds",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/verification/thresholds",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/matchmaking/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/operations/matchmaking/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/active-sessions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/completed-bookings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/cancelled-bookings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/live-map/active-bookings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/safety/live-sessions/{bookingId}/safety-check",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/safety/live-sessions/{bookingId}/resolve-sos",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/live-sessions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/session-audit",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/bookings/disputes",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/bookings/disputes/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/bookings/disputes/{id}/penalty-override",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/sos",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/safety/sos/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/incidents",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/incidents/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/safety/incidents/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/safety/incidents/{id}/preserve-evidence/toggle",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/geofence/alerts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/safety/geofence/alerts/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/age-escalations",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/safety/age-escalations/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/safety/emergency-workflows",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/safety/emergency-workflows/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/analytics/growth",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/analytics/sessions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/analytics/market",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Login rejects invalid input",
+      "passed": true
+    },
+    {
+      "name": "Login authenticated against PostgreSQL bcrypt hash",
+      "passed": true
+    },
+    {
+      "name": "SOS map reads only open alert statuses",
+      "passed": true
+    },
+    {
+      "name": "SOS history accepts an explicit false filter",
+      "passed": true
+    },
+    {
+      "name": "SOS rejects an ambiguous open-alert filter",
+      "passed": true
+    },
+    {
+      "name": "Frontend cities query includes areas",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/auth/me",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/employees",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/audit-logs",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/cities",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/interests",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/languages",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/app-languages",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/ticket-categories",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/incident-types",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/communication-styles",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/activity-paces",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/session-durations",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/notification-categories",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/review-tags",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/dispute-reasons",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/cancellation-reasons",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/kyc-doc-types",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/place-types",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/defaults",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/master-data/bundle",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/system/config",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/system/app-configs",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/customers",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/companions",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/companion-applications",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/wallets",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/escrow",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/payouts/summary",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/payouts",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/refunds/summary",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/refunds",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/refunds/settings/booking",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/fraud-detection/dashboard",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/fraud-detection",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/tax-invoices/summary",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/tax-invoices",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/revenue-reports/overview",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/revenue-reports/daily",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/revenue-reports/by-city",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/revenue-reports/top-companions",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/reconciliation/summary",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/financial/reconciliation",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/reports",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/bans",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/flagged-chats",
+      "passed": true,
+      "detail": "HTTP 503 expected: chat provider unavailable"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/chat-settings",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/risk-scores",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/risk-scores/config",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/reviews",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/moderation/appeals",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/trust-score/dashboard",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/trust-score/rules",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/verification/cases",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/verification/thresholds",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/matchmaking/config",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/active-sessions",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/completed-bookings",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/cancelled-bookings",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/live-map/active-bookings",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/safety/live-sessions",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/session-audit",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/bookings/disputes",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/safety/sos",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/safety/incidents",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/safety/geofence/alerts",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/safety/age-escalations",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/safety/emergency-workflows",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/analytics/growth",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/analytics/sessions",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/analytics/market",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Moderator customer module permission",
+      "passed": true
+    },
+    {
+      "name": "Moderator cannot manage employees",
+      "passed": true
+    },
+    {
+      "name": "KYC rejection requires a documented reason",
+      "passed": true
+    },
+    {
+      "name": "Manual KYC endpoint rejects automatic-decision status values",
+      "passed": true
+    },
+    {
+      "name": "KYC settings reject string booleans instead of coercing false to true",
+      "passed": true
+    },
+    {
+      "name": "KYC settings reject null thresholds",
+      "passed": true
+    },
+    {
+      "name": "Overlapping KYC thresholds are rejected without changing stored settings",
+      "passed": true
+    },
+    {
+      "name": "KYC queue preserves requested pagination metadata",
+      "passed": true
+    },
+    {
+      "name": "Unavailable KYC provider returns 503 without inventing evidence",
+      "passed": true
+    },
+    {
+      "name": "Concurrent reviewers can commit only one KYC decision",
+      "passed": true,
+      "detail": "201, 409"
+    },
+    {
+      "name": "A committed KYC decision records exactly one reviewer audit event",
+      "passed": true
+    },
+    {
+      "name": "Already-decided KYC cases reject repeated decisions",
+      "passed": true
+    },
+    {
+      "name": "Failed applicant update rolls back the KYC decision and audit event",
+      "passed": true,
+      "detail": "HTTP 404; state PENDING_MANUAL_REVIEW; audit events 0"
+    },
+    {
+      "name": "Suspension immediately revokes access",
+      "passed": true
+    },
+    {
+      "name": "Refresh rotates session",
+      "passed": true
+    },
+    {
+      "name": "Refresh replay rejected",
+      "passed": true
+    },
+    {
+      "name": "Logout succeeds",
+      "passed": true
+    },
+    {
+      "name": "Logged-out access token rejected with another session alive",
+      "passed": true
+    },
+    {
+      "name": "Independent session remains valid",
+      "passed": true
+    },
+    {
+      "name": "Audit log never stores submitted password/refresh token",
+      "passed": true
+    }
+  ]
+}

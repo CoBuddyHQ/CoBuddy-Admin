@@ -1,33 +1,43 @@
 import { FlaggedChatSummary, FlaggedChatDetail } from './types';
+import axios from '@/lib/api/client';
 
-const mockChats: FlaggedChatSummary[] = [
-  { id: 'FC-101', participants: ['UserA', 'CompB'], flagReason: 'Off-platform payment', confidenceScore: 0.95, timestamp: new Date().toISOString(), status: 'PENDING' },
-  { id: 'FC-102', participants: ['UserC', 'CompD'], flagReason: 'Inappropriate language', confidenceScore: 0.88, timestamp: new Date().toISOString(), status: 'PENDING' },
-];
-
-const mockDetail: FlaggedChatDetail = {
-  ...mockChats[0],
-  messages: [
-    { id: 'M1', sender: 'UserA', content: 'Hi, can we meet?', timestamp: new Date(Date.now() - 50000).toISOString(), isFlagged: false },
-    { id: 'M2', sender: 'CompB', content: 'Yes, but please book through the app.', timestamp: new Date(Date.now() - 40000).toISOString(), isFlagged: false },
-    { id: 'M3', sender: 'UserA', content: 'Can I just GPay you directly to avoid fees?', timestamp: new Date(Date.now() - 10000).toISOString(), isFlagged: true },
-  ],
-  senderHistory: {
-    previousFlags: 2,
-    warnings: 1
-  }
-};
+const mapChat = (item: any): FlaggedChatSummary => ({
+  id: item.id,
+  participants: [item.senderId, item.receiverId],
+  flagReason: item.reason,
+  confidenceScore: item.severity === 'CRITICAL' ? 0.95 : item.severity === 'HIGH' ? 0.85 : 0.65,
+  timestamp: item.flaggedAt || item.createdAt,
+  status: item.status === 'REVIEWED' ? 'DISMISSED' : item.status,
+});
 
 export const flaggedChatApi = {
-  getChats: async (): Promise<FlaggedChatSummary[]> => Promise.resolve([...mockChats]),
-  getDetail: async (id: string): Promise<FlaggedChatDetail> => {
-    return Promise.resolve({ ...mockDetail, id });
+  getChats: async (): Promise<FlaggedChatSummary[]> => {
+    const res = await axios.get('/moderation/flagged-chats', {
+      params: { page: 1, pageSize: 100 },
+    });
+    const items = res.data.data?.data ?? res.data.data ?? [];
+    return items.map(mapChat);
   },
-  takeAction: async (id: string, action: 'DISMISS' | 'WARN' | 'ESCALATE', notes: string): Promise<void> => {
-    const chat = mockChats.find(c => c.id === id);
-    if (chat) {
-      chat.status = action === 'DISMISS' ? 'DISMISSED' : action === 'WARN' ? 'WARNED' : 'ESCALATED';
-    }
-    return Promise.resolve();
-  }
+  getDetail: async (id: string): Promise<FlaggedChatDetail> => {
+    const res = await axios.get(`/moderation/flagged-chats/${id}`);
+    const item = res.data.data;
+    return {
+      ...mapChat(item),
+      messages: (item.transcript ?? []).map((m: any) => ({
+        id: m.id,
+        sender: m.senderId,
+        content: m.text,
+        timestamp: m.at,
+        isFlagged: m.flagged ?? false,
+      })),
+      senderHistory: { previousFlags: 0, warnings: 0 },
+    };
+  },
+  takeAction: async (
+    id: string,
+    action: 'DISMISS' | 'WARN' | 'ESCALATE',
+    notes: string,
+  ): Promise<void> => {
+    await axios.post(`/moderation/flagged-chats/${id}/decide`, { action, note: notes });
+  },
 };

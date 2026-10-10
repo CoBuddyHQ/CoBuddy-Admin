@@ -12,7 +12,8 @@ export const useCityLaunch = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: CityLaunch['status'] }) => cityLaunchApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: CityLaunch['status'] }) =>
+      cityLaunchApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['city-launches'] });
       if (status === 'LIVE') {
@@ -24,14 +25,20 @@ export const useCityLaunch = () => {
   });
 
   const toggleTaskMutation = useMutation({
-    mutationFn: ({ cityId, taskId }: { cityId: string; taskId: string }) => cityLaunchApi.toggleChecklistTask(cityId, taskId),
+    mutationFn: ({ cityId, taskId }: { cityId: string; taskId: string }) =>
+      cityLaunchApi.toggleChecklistTask(cityId, taskId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['city-launches'] });
     },
   });
 
   const createLaunchMutation = useMutation({
-    mutationFn: (data: { cityName: string; region: string; targetLaunchDate: string; managerName: string }) => cityLaunchApi.createLaunch(data),
+    mutationFn: (data: {
+      cityName: string;
+      region: string;
+      targetLaunchDate: string;
+      managerName: string;
+    }) => cityLaunchApi.createLaunch(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['city-launches'] });
       toast.success('New city launch created successfully');

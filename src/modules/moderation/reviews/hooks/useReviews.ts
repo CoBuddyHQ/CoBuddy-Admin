@@ -8,11 +8,19 @@ export const useReviews = () => {
   const query = useQuery({ queryKey: ['reviews'], queryFn: reviewsApi.getReviews });
 
   const moderateMutation = useMutation({
-    mutationFn: ({ id, action, warning }: { id: string, action: 'APPROVE' | 'REMOVE', warning?: string }) => reviewsApi.moderateReview(id, action, warning),
+    mutationFn: ({
+      id,
+      action,
+      warning,
+    }: {
+      id: string;
+      action: 'APPROVE' | 'REMOVE';
+      warning?: string;
+    }) => reviewsApi.moderateReview(id, action, warning),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
       toast.success('Review moderated successfully');
-    }
+    },
   });
 
   return {

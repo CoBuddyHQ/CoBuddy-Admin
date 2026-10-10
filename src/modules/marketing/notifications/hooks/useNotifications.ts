@@ -7,15 +7,21 @@ import { NotificationConfig } from '../types';
 export const useNotifications = () => {
   const queryClient = useQueryClient();
 
-  const query = useQuery({ queryKey: ['notifications'], queryFn: notificationsApi.getNotifications });
-  const configQuery = useQuery({ queryKey: ['notification-config'], queryFn: notificationsApi.getConfig });
+  const query = useQuery({
+    queryKey: ['notifications'],
+    queryFn: notificationsApi.getNotifications,
+  });
+  const configQuery = useQuery({
+    queryKey: ['notification-config'],
+    queryFn: notificationsApi.getConfig,
+  });
 
   const createMutation = useMutation({
     mutationFn: notificationsApi.createNotification,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       toast.success('Notification saved');
-    }
+    },
   });
 
   const sendMutation = useMutation({
@@ -23,7 +29,7 @@ export const useNotifications = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       toast.success('Notification sent!');
-    }
+    },
   });
 
   const updateConfigMutation = useMutation({
@@ -31,7 +37,7 @@ export const useNotifications = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-config'] });
       toast.success('Configuration updated');
-    }
+    },
   });
 
   return {

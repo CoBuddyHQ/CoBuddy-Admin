@@ -12,7 +12,8 @@ export const useCompanions = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: CompanionRecord['status'] }) => companionsApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: CompanionRecord['status'] }) =>
+      companionsApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['companions'] });
       toast.success(`Companion status updated to ${status}`);
@@ -31,22 +32,22 @@ export const useCompanionDetail = (id: string) => {
 
   const companionQuery = useQuery({
     queryKey: ['companions', id],
-    queryFn: () => companionsApi.getCompanionById(id)
+    queryFn: () => companionsApi.getCompanionById(id),
   });
 
   const trustScoreHistoryQuery = useQuery({
     queryKey: ['companions', id, 'trust-score'],
-    queryFn: () => companionsApi.getTrustScoreHistory(id)
+    queryFn: () => companionsApi.getTrustScoreHistory(id),
   });
 
   const sessionHistoryQuery = useQuery({
     queryKey: ['companions', id, 'sessions'],
-    queryFn: () => companionsApi.getSessionHistory(id)
+    queryFn: () => companionsApi.getSessionHistory(id),
   });
 
   const earningsQuery = useQuery({
     queryKey: ['companions', id, 'earnings'],
-    queryFn: () => companionsApi.getEarningsBreakdown(id)
+    queryFn: () => companionsApi.getEarningsBreakdown(id),
   });
 
   const updateStatusMutation = useMutation({
@@ -54,7 +55,7 @@ export const useCompanionDetail = (id: string) => {
     onSuccess: (_, status) => {
       queryClient.invalidateQueries({ queryKey: ['companions'] });
       toast.success(`Companion status updated to ${status}`);
-    }
+    },
   });
 
   return {
@@ -62,7 +63,11 @@ export const useCompanionDetail = (id: string) => {
     trustScoreHistory: trustScoreHistoryQuery.data,
     sessionHistory: sessionHistoryQuery.data,
     earnings: earningsQuery.data,
-    isLoading: companionQuery.isLoading || trustScoreHistoryQuery.isLoading || sessionHistoryQuery.isLoading || earningsQuery.isLoading,
+    isLoading:
+      companionQuery.isLoading ||
+      trustScoreHistoryQuery.isLoading ||
+      sessionHistoryQuery.isLoading ||
+      earningsQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
   };
 };

@@ -10,7 +10,7 @@ export interface CompanionApplication {
   submittedAt: string;
   assignedTo?: string; // Staff name
   trustScore?: number;
-  
+
   // Profile Data
   dateOfBirth: string;
   gender: string;
@@ -23,7 +23,7 @@ export interface CompanionApplication {
     communicationStyle?: string;
     activityPace?: string;
   };
-  
+
   // Assessment
   interviewNotes?: string;
   backgroundCheckStatus: 'PENDING' | 'PASSED' | 'FAILED';

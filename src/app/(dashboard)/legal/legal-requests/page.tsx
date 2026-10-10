@@ -4,15 +4,34 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { useLegalRequests } from '@/modules/legal/legal-requests/hooks/useLegalRequests';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Send, Lock, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function LegalRequestsPage() {
   const { requests, isLoading, updateStatus, createRequest } = useLegalRequests();
@@ -23,14 +42,14 @@ export default function LegalRequestsPage() {
     associatedUserId: '',
     associatedUserName: '',
     deadline: '',
-    internalNotes: ''
+    internalNotes: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createRequest({
       ...formData,
-      status: 'OPEN'
+      status: 'OPEN',
     });
     setOpen(false);
     setFormData({
@@ -39,7 +58,7 @@ export default function LegalRequestsPage() {
       associatedUserId: '',
       associatedUserName: '',
       deadline: '',
-      internalNotes: ''
+      internalNotes: '',
     });
   };
 
@@ -70,12 +89,21 @@ export default function LegalRequestsPage() {
                 <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label>Agency Name</Label>
-                    <Input required value={formData.agencyName} onChange={e => setFormData({ ...formData, agencyName: e.target.value })} />
+                    <Input
+                      required
+                      value={formData.agencyName}
+                      onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Request Type</Label>
-                    <Select value={formData.requestType} onValueChange={(v: any) => setFormData({ ...formData, requestType: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                    <Select
+                      value={formData.requestType}
+                      onValueChange={(v: any) => setFormData({ ...formData, requestType: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="INFO_REQUEST">Information Request</SelectItem>
                         <SelectItem value="SUBPOENA">Subpoena</SelectItem>
@@ -87,20 +115,40 @@ export default function LegalRequestsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Target User ID</Label>
-                      <Input required value={formData.associatedUserId} onChange={e => setFormData({ ...formData, associatedUserId: e.target.value })} />
+                      <Input
+                        required
+                        value={formData.associatedUserId}
+                        onChange={(e) =>
+                          setFormData({ ...formData, associatedUserId: e.target.value })
+                        }
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label>Target User Name</Label>
-                      <Input required value={formData.associatedUserName} onChange={e => setFormData({ ...formData, associatedUserName: e.target.value })} />
+                      <Input
+                        required
+                        value={formData.associatedUserName}
+                        onChange={(e) =>
+                          setFormData({ ...formData, associatedUserName: e.target.value })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label>Deadline</Label>
-                    <Input type="datetime-local" required value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
+                    <Input
+                      type="datetime-local"
+                      required
+                      value={formData.deadline}
+                      onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Internal Notes</Label>
-                    <Input value={formData.internalNotes} onChange={e => setFormData({ ...formData, internalNotes: e.target.value })} />
+                    <Input
+                      value={formData.internalNotes}
+                      onChange={(e) => setFormData({ ...formData, internalNotes: e.target.value })}
+                    />
                   </div>
                   <div className="flex justify-end pt-2">
                     <Button type="submit">Submit Request</Button>
@@ -136,27 +184,31 @@ export default function LegalRequestsPage() {
                     <div className="text-xs text-muted-foreground">{req.associatedUserId}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">
-                      {new Date(req.deadline).toLocaleDateString()}
-                    </div>
+                    <div className="text-sm">{new Date(req.deadline).toLocaleDateString()}</div>
                     <div className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(req.deadline), { addSuffix: true })}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={
-                      req.status === 'CLOSED' ? 'secondary' : 
-                      req.status === 'RESPONSE_SENT' ? 'default' : 
-                      req.status === 'EVIDENCE_PRESERVED' ? 'outline' : 'destructive'
-                    }>
+                    <Badge
+                      variant={
+                        req.status === 'CLOSED'
+                          ? 'secondary'
+                          : req.status === 'RESPONSE_SENT'
+                            ? 'default'
+                            : req.status === 'EVIDENCE_PRESERVED'
+                              ? 'outline'
+                              : 'destructive'
+                      }
+                    >
                       {req.status.replace('_', ' ')}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       {req.status === 'OPEN' && (
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => updateStatus({ id: req.id, status: 'EVIDENCE_PRESERVED' })}
                           title="Lock Data"
@@ -164,10 +216,10 @@ export default function LegalRequestsPage() {
                           <Lock className="h-4 w-4 mr-1" /> Preserve
                         </Button>
                       )}
-                      
+
                       {req.status === 'EVIDENCE_PRESERVED' && (
-                        <Button 
-                          variant="default" 
+                        <Button
+                          variant="default"
                           size="sm"
                           onClick={() => updateStatus({ id: req.id, status: 'RESPONSE_SENT' })}
                           title="Log Response Sent"
@@ -177,8 +229,8 @@ export default function LegalRequestsPage() {
                       )}
 
                       {req.status === 'RESPONSE_SENT' && (
-                        <Button 
-                          variant="secondary" 
+                        <Button
+                          variant="secondary"
                           size="sm"
                           onClick={() => updateStatus({ id: req.id, status: 'CLOSED' })}
                           title="Close Case"
@@ -186,8 +238,13 @@ export default function LegalRequestsPage() {
                           <CheckCircle className="h-4 w-4 mr-1" /> Close
                         </Button>
                       )}
-                      
-                      <Button variant="outline" size="sm" title="View Docs" onClick={() => setSelectedDocs(req.documentUrls || [])}>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        title="View Docs"
+                        onClick={() => setSelectedDocs(req.documentUrls || [])}
+                      >
                         <FileText className="h-4 w-4" />
                       </Button>
                     </div>
@@ -210,9 +267,19 @@ export default function LegalRequestsPage() {
             ) : (
               <ul className="space-y-2">
                 {selectedDocs.map((url, i) => (
-                  <li key={i} className="flex items-center justify-between p-2 border rounded text-sm">
+                  <li
+                    key={i}
+                    className="flex items-center justify-between p-2 border rounded text-sm"
+                  >
                     <span className="truncate max-w-[250px]">{url.split('/').pop()}</span>
-                    <a href={url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -223,4 +290,3 @@ export default function LegalRequestsPage() {
     </div>
   );
 }
-

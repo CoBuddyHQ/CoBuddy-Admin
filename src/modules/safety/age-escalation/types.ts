@@ -3,8 +3,8 @@ export interface AgeEscalationCase {
   userId: string;
   userName: string;
   dobMismatchDetails: string;
-  idEstimate: number;
-  selfieEstimate: number;
+  idEstimate: number | null;
+  selfieEstimate: number | null;
   associatedRecordLink: string;
   status: 'PENDING_REVIEW' | 'FROZEN' | 'RESOLVED_CLEARED' | 'RESOLVED_BANNED';
   timestamp: string;

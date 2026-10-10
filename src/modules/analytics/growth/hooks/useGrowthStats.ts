@@ -7,5 +7,7 @@ export const useGrowthStats = () => {
   return {
     stats: query.data,
     isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
   };
 };

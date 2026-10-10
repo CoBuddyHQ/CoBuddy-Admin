@@ -1,48 +1,66 @@
 import { TrustScoreSummary, TrustScoreDetail, SafetyBonusRule } from './types';
+import axios from '@/lib/api/client';
 
-const mockSummaries: TrustScoreSummary[] = [
-  { companionId: 'COMP-001', companionName: 'Ayesha Khan', currentScore: 92, lastUpdated: new Date().toISOString(), status: 'EXCELLENT' },
-  { companionId: 'COMP-002', companionName: 'Rahul Singh', currentScore: 65, lastUpdated: new Date().toISOString(), status: 'NEEDS_IMPROVEMENT' },
-];
-
-const mockDetail: TrustScoreDetail = {
-  ...mockSummaries[0],
-  punctualityScore: 95,
-  completionRateScore: 98,
-  reviewsScore: 90,
-  incidentsScore: 100,
-  history: [
-    { date: new Date().toISOString(), score: 92, reason: 'Weekly recalculation' },
-    { date: new Date(Date.now() - 7*86400000).toISOString(), score: 90, reason: 'Completed 5 sessions without issues' }
-  ],
-  manualOverrides: []
-};
-
-const mockRules: SafetyBonusRule[] = [
-  { id: 'R1', description: 'Incident-free month', triggerEvent: 'INCIDENT_FREE_MONTH', bonusPoints: 5, active: true },
-  { id: 'R2', description: 'Fast SOS response history', triggerEvent: 'SOS_FAST_RESPONSE', bonusPoints: 10, active: true },
-];
+const statusFor = (score: number): TrustScoreSummary['status'] =>
+  score >= 80 ? 'EXCELLENT' : score >= 60 ? 'GOOD' : score >= 40 ? 'NEEDS_IMPROVEMENT' : 'CRITICAL';
+const mapSummary = (item: any): TrustScoreSummary => ({
+  companionId: item.id,
+  companionName: item.name,
+  currentScore: item.trustScore,
+  lastUpdated: item.updatedAt || new Date().toISOString(),
+  status: statusFor(item.trustScore),
+});
+const mapRule = (rule: any): SafetyBonusRule => ({
+  id: rule.id,
+  description: rule.description || rule.trigger,
+  triggerEvent: rule.trigger,
+  bonusPoints: rule.delta,
+  active: rule.enabled,
+});
 
 export const trustScoreApi = {
-  getSummaries: async (): Promise<TrustScoreSummary[]> => Promise.resolve([...mockSummaries]),
+  getSummaries: async (): Promise<TrustScoreSummary[]> => {
+    const response = await axios.get('/trust-score/dashboard');
+    const top10 = response.data.data?.top10 ?? [];
+    return top10.map(mapSummary);
+  },
   getDetail: async (id: string): Promise<TrustScoreDetail> => {
-    return Promise.resolve({ ...mockDetail, companionId: id });
+    const response = await axios.get(`/trust-score/${id}/history`);
+    const history = response.data.data ?? [];
+    const currentScore = history[0]?.newScore ?? 0;
+    return {
+      ...mapSummary({ id, name: id, trustScore: currentScore }),
+      punctualityScore: currentScore,
+      completionRateScore: currentScore,
+      reviewsScore: currentScore,
+      incidentsScore: currentScore,
+      history: history.map((entry: any) => ({
+        date: entry.date,
+        score: entry.newScore,
+        reason: entry.reason,
+      })),
+      manualOverrides: [],
+    };
   },
-  applyOverride: async (id: string, newScore: number, justification: string, adminName: string): Promise<TrustScoreDetail> => {
-    mockDetail.manualOverrides.unshift({
-      timestamp: new Date().toISOString(),
-      overrideBy: adminName,
-      previousScore: mockDetail.currentScore,
-      newScore,
-      justification
-    });
-    mockDetail.currentScore = newScore;
-    return Promise.resolve({ ...mockDetail });
+  applyOverride: async (
+    id: string,
+    _newScore?: number,
+    _justification?: string,
+    _adminName?: string,
+  ): Promise<TrustScoreDetail> => {
+    await axios.post(`/trust-score/recompute/${id}`);
+    return trustScoreApi.getDetail(id);
   },
-  getBonusRules: async (): Promise<SafetyBonusRule[]> => Promise.resolve([...mockRules]),
+  getBonusRules: async (): Promise<SafetyBonusRule[]> => {
+    const response = await axios.get('/trust-score/rules');
+    const rules = response.data.data ?? [];
+    return rules.map(mapRule);
+  },
   toggleBonusRule: async (id: string): Promise<void> => {
-    const rule = mockRules.find(r => r.id === id);
-    if (rule) rule.active = !rule.active;
-    return Promise.resolve();
-  }
+    const rulesResponse = await axios.get('/trust-score/rules');
+    const rules = rulesResponse.data.data ?? [];
+    const rule = rules.find((item: any) => item.id === id);
+    if (!rule) throw new Error('Rule not found');
+    await axios.patch(`/trust-score/rules/${id}`, { enabled: !rule.enabled });
+  },
 };

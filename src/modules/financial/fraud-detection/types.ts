@@ -1,4 +1,4 @@
-export type FraudReason = 'DUPLICATE_ACCOUNT' | 'GPS_SPOOFING' | 'FAKE_SELFIE' | 'SUSPICIOUS_TRANSACTION';
+export type FraudReason = string;
 
 export interface FraudAlert {
   id: string;
@@ -7,7 +7,7 @@ export interface FraudAlert {
   userType: 'CUSTOMER' | 'COMPANION';
   reason: FraudReason;
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  status: 'PENDING' | 'FROZEN' | 'CLEARED' | 'ESCALATED';
+  status: 'OPEN' | 'INVESTIGATING' | 'DISMISSED' | 'ACTION_TAKEN';
   timestamp: string;
   details: string;
 }

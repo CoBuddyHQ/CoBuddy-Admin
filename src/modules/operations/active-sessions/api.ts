@@ -1,10 +1,19 @@
+import axios from '@/lib/api/client';
 import { ActiveSession } from './types';
 
-const mockSessions: ActiveSession[] = [
-  { id: 'ACT-1', sessionId: 'SESS-201', companionName: 'Alice', userName: 'John', startTime: new Date(Date.now() - 3600000).toISOString(), expectedEndTime: new Date(Date.now() + 3600000).toISOString(), status: 'IN_PROGRESS', location: 'Bandra West' },
-  { id: 'ACT-2', sessionId: 'SESS-203', companionName: 'Charlie', userName: 'Dave', startTime: new Date(Date.now() - 7200000).toISOString(), expectedEndTime: new Date(Date.now() + 1800000).toISOString(), status: 'EXTENDED', location: 'Andheri East' },
-];
-
 export const activeSessionsApi = {
-  getSessions: async (): Promise<ActiveSession[]> => Promise.resolve([...mockSessions]),
+  getSessions: async (): Promise<ActiveSession[]> => {
+    const response = await axios.get('/operations/active-sessions');
+    const rows = response.data.data?.data ?? response.data.data ?? [];
+    return rows.map((booking: any) => ({
+      id: booking.id,
+      sessionId: booking.bookingRef,
+      companionName: booking.companion?.name ?? 'Unassigned',
+      userName: booking.customer?.name ?? 'Unknown',
+      startTime: booking.startTime,
+      expectedEndTime: booking.endTime,
+      status: booking.status,
+      location: booking.venue?.address ?? '',
+    }));
+  },
 };

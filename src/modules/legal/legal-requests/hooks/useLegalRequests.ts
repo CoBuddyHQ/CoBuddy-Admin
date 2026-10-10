@@ -12,7 +12,8 @@ export const useLegalRequests = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: LegalRequest['status'] }) => legalRequestsApi.updateStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: LegalRequest['status'] }) =>
+      legalRequestsApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['legal-requests'] });
       toast.success(`Legal request status updated to ${status}`);
@@ -20,7 +21,8 @@ export const useLegalRequests = () => {
   });
 
   const createRequestMutation = useMutation({
-    mutationFn: (data: Omit<LegalRequest, 'id' | 'receivedDate'>) => legalRequestsApi.createRequest(data),
+    mutationFn: (data: Omit<LegalRequest, 'id' | 'receivedDate'>) =>
+      legalRequestsApi.createRequest(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['legal-requests'] });
       toast.success('Legal request logged successfully');

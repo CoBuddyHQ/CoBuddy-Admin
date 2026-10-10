@@ -1,7 +1,8 @@
 export interface SessionMetrics {
   totalSessionsToday: number;
-  avgDurationMinutes: number;
-  cancellationRate: number; // percentage
+  avgDurationMinutes: number | null;
+  cancellationRate: number | null;
+  statuses: { status: string; count: number }[];
   chartData: {
     hour: string;
     sessions: number;

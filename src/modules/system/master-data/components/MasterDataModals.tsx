@@ -2,8 +2,14 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AppLanguage, City, Interest } from '../types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AppLanguage } from '../types';
 
 interface ModalProps {
   open: boolean;
@@ -13,7 +19,13 @@ interface ModalProps {
   initialData?: any;
 }
 
-export function AddCityModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+export function AddCityModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages = [],
+  initialData,
+}: ModalProps) {
   const [names, setNames] = useState<Record<string, string>>({});
   const [state, setState] = useState('');
   const [country, setCountry] = useState('India');
@@ -38,35 +50,55 @@ export function AddCityModal({ open, onOpenChange, onSubmit, appLanguages = [], 
     }
   };
 
-  const activeLangs = appLanguages.filter(l => l.active);
+  const activeLangs = appLanguages.filter((l) => l.active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{initialData ? 'Edit City' : 'Add New City'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{initialData ? 'Edit City' : 'Add New City'}</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Names</h4>
-            {activeLangs.map(lang => (
-              <Input 
+            {activeLangs.map((lang) => (
+              <Input
                 key={lang.code}
-                placeholder={`Name (${lang.name})`} 
-                value={names[lang.code] || ''} 
-                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
-                required={lang.code === 'en'} 
+                placeholder={`Name (${lang.name})`}
+                value={names[lang.code] || ''}
+                onChange={(e) => setNames({ ...names, [lang.code]: e.target.value })}
+                required={lang.code === 'en'}
               />
             ))}
           </div>
-          <Input placeholder="State" value={state} onChange={e => setState(e.target.value)} required />
-          <Input placeholder="Country" value={country} onChange={e => setCountry(e.target.value)} required />
-          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add City'}</Button></div>
+          <Input
+            placeholder="State"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            required
+          />
+          <div className="flex justify-end">
+            <Button type="submit">{initialData ? 'Save Changes' : 'Add City'}</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
 
-export function AddInterestModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+export function AddInterestModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages = [],
+  initialData,
+}: ModalProps) {
   const [names, setNames] = useState<Record<string, string>>({});
   const [type, setType] = useState('ACTIVITY');
 
@@ -83,45 +115,53 @@ export function AddInterestModal({ open, onOpenChange, onSubmit, appLanguages = 
       if (initialData) {
         onSubmit({ ...initialData, name: names, type });
       } else {
-        onSubmit({ 
-          name: names, 
-          type, 
+        onSubmit({
+          name: names,
+          type,
           basePriceMultiplier: 1.0,
-          active: true 
+          active: true,
         });
       }
       onOpenChange(false);
     }
   };
 
-  const activeLangs = appLanguages.filter(l => l.active);
+  const activeLangs = appLanguages.filter((l) => l.active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{initialData ? 'Edit Interest/Cuisine' : 'Add New Interest/Cuisine'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>
+            {initialData ? 'Edit Interest/Cuisine' : 'Add New Interest/Cuisine'}
+          </DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Names</h4>
-            {activeLangs.map(lang => (
-              <Input 
+            {activeLangs.map((lang) => (
+              <Input
                 key={lang.code}
-                placeholder={`Name (${lang.name})`} 
-                value={names[lang.code] || ''} 
-                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
-                required={lang.code === 'en'} 
+                placeholder={`Name (${lang.name})`}
+                value={names[lang.code] || ''}
+                onChange={(e) => setNames({ ...names, [lang.code]: e.target.value })}
+                required={lang.code === 'en'}
               />
             ))}
           </div>
           <Select value={type} onValueChange={(val) => setType(val as string)}>
-            <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="ACTIVITY">Activity</SelectItem>
               <SelectItem value="CUISINE">Cuisine</SelectItem>
               <SelectItem value="LIFESTYLE">Lifestyle</SelectItem>
             </SelectContent>
           </Select>
-          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Interest'}</Button></div>
+          <div className="flex justify-end">
+            <Button type="submit">{initialData ? 'Save Changes' : 'Add Interest'}</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
@@ -137,18 +177,33 @@ export function AddLanguageModal({ open, onOpenChange, onSubmit }: ModalProps) {
     if (name && code) {
       onSubmit({ name, code, active: true });
       onOpenChange(false);
-      setName(''); setCode('');
+      setName('');
+      setCode('');
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>Add New Spoken Language</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Add New Spoken Language</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          <Input placeholder="Language Name (e.g. Marathi)" value={name} onChange={e => setName(e.target.value)} required />
-          <Input placeholder="Code (e.g. mr)" value={code} onChange={e => setCode(e.target.value)} required />
-          <div className="flex justify-end"><Button type="submit">Add Language</Button></div>
+          <Input
+            placeholder="Language Name (e.g. Marathi)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="Code (e.g. mr)"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
+          <div className="flex justify-end">
+            <Button type="submit">Add Language</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
@@ -164,18 +219,33 @@ export function AddAppLanguageModal({ open, onOpenChange, onSubmit }: ModalProps
     if (name && code) {
       onSubmit({ name, code, active: true });
       onOpenChange(false);
-      setName(''); setCode('');
+      setName('');
+      setCode('');
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>Add New App Language</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Add New App Language</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          <Input placeholder="Language Name (e.g. English)" value={name} onChange={e => setName(e.target.value)} required />
-          <Input placeholder="Code (e.g. en)" value={code} onChange={e => setCode(e.target.value)} required />
-          <div className="flex justify-end"><Button type="submit">Add Language</Button></div>
+          <Input
+            placeholder="Language Name (e.g. English)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="Code (e.g. en)"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
+          <div className="flex justify-end">
+            <Button type="submit">Add Language</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
@@ -187,7 +257,15 @@ interface GenericCodeLabelModalProps extends ModalProps {
   codePlaceholder?: string;
 }
 
-export function GenericCodeLabelModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData, title, codePlaceholder = "Code" }: GenericCodeLabelModalProps) {
+export function GenericCodeLabelModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages = [],
+  initialData,
+  title,
+  codePlaceholder = 'Code',
+}: GenericCodeLabelModalProps) {
   const [names, setNames] = useState<Record<string, string>>({});
   const [code, setCode] = useState('');
 
@@ -210,34 +288,49 @@ export function GenericCodeLabelModal({ open, onOpenChange, onSubmit, appLanguag
     }
   };
 
-  const activeLangs = appLanguages.filter(l => l.active);
+  const activeLangs = appLanguages.filter((l) => l.active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{initialData ? `Edit ${title}` : `Add New ${title}`}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{initialData ? `Edit ${title}` : `Add New ${title}`}</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Names</h4>
-            {activeLangs.map(lang => (
-              <Input 
+            {activeLangs.map((lang) => (
+              <Input
                 key={lang.code}
-                placeholder={`Name (${lang.name})`} 
-                value={names[lang.code] || ''} 
-                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
-                required={lang.code === 'en'} 
+                placeholder={`Name (${lang.name})`}
+                value={names[lang.code] || ''}
+                onChange={(e) => setNames({ ...names, [lang.code]: e.target.value })}
+                required={lang.code === 'en'}
               />
             ))}
           </div>
-          <Input placeholder={codePlaceholder} value={code} onChange={e => setCode(e.target.value)} required />
-          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : `Add ${title}`}</Button></div>
+          <Input
+            placeholder={codePlaceholder}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
+          <div className="flex justify-end">
+            <Button type="submit">{initialData ? 'Save Changes' : `Add ${title}`}</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
 
-export function AddSessionDurationModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+export function AddSessionDurationModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages = [],
+  initialData,
+}: ModalProps) {
   const [names, setNames] = useState<Record<string, string>>({});
   const [minutes, setMinutes] = useState<string>('');
 
@@ -260,34 +353,52 @@ export function AddSessionDurationModal({ open, onOpenChange, onSubmit, appLangu
     }
   };
 
-  const activeLangs = appLanguages.filter(l => l.active);
+  const activeLangs = appLanguages.filter((l) => l.active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{initialData ? 'Edit Session Duration' : 'Add New Session Duration'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>
+            {initialData ? 'Edit Session Duration' : 'Add New Session Duration'}
+          </DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Names</h4>
-            {activeLangs.map(lang => (
-              <Input 
+            {activeLangs.map((lang) => (
+              <Input
                 key={lang.code}
-                placeholder={`Name (${lang.name})`} 
-                value={names[lang.code] || ''} 
-                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
-                required={lang.code === 'en'} 
+                placeholder={`Name (${lang.name})`}
+                value={names[lang.code] || ''}
+                onChange={(e) => setNames({ ...names, [lang.code]: e.target.value })}
+                required={lang.code === 'en'}
               />
             ))}
           </div>
-          <Input placeholder="Duration in minutes (e.g. 60)" type="number" value={minutes} onChange={e => setMinutes(e.target.value)} required />
-          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Session Duration'}</Button></div>
+          <Input
+            placeholder="Duration in minutes (e.g. 60)"
+            type="number"
+            value={minutes}
+            onChange={(e) => setMinutes(e.target.value)}
+            required
+          />
+          <div className="flex justify-end">
+            <Button type="submit">{initialData ? 'Save Changes' : 'Add Session Duration'}</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
 
-export function AddReviewTagModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+export function AddReviewTagModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages = [],
+  initialData,
+}: ModalProps) {
   const [names, setNames] = useState<Record<string, string>>({});
   const [code, setCode] = useState('');
   const [polarity, setPolarity] = useState('PRAISE');
@@ -314,49 +425,68 @@ export function AddReviewTagModal({ open, onOpenChange, onSubmit, appLanguages =
     }
   };
 
-  const activeLangs = appLanguages.filter(l => l.active);
+  const activeLangs = appLanguages.filter((l) => l.active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{initialData ? 'Edit Review Tag' : 'Add New Review Tag'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{initialData ? 'Edit Review Tag' : 'Add New Review Tag'}</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Names</h4>
-            {activeLangs.map(lang => (
-              <Input 
+            {activeLangs.map((lang) => (
+              <Input
                 key={lang.code}
-                placeholder={`Name (${lang.name})`} 
-                value={names[lang.code] || ''} 
-                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
-                required={lang.code === 'en'} 
+                placeholder={`Name (${lang.name})`}
+                value={names[lang.code] || ''}
+                onChange={(e) => setNames({ ...names, [lang.code]: e.target.value })}
+                required={lang.code === 'en'}
               />
             ))}
           </div>
-          <Input placeholder="Code (e.g. friendly)" value={code} onChange={e => setCode(e.target.value)} required />
+          <Input
+            placeholder="Code (e.g. friendly)"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
           <Select value={polarity} onValueChange={(val) => setPolarity(val as string)}>
-            <SelectTrigger><SelectValue placeholder="Polarity" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Polarity" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="PRAISE">Praise</SelectItem>
               <SelectItem value="CONCERN">Concern</SelectItem>
             </SelectContent>
           </Select>
           <Select value={appliesTo} onValueChange={(val) => setAppliesTo(val as string)}>
-            <SelectTrigger><SelectValue placeholder="Applies To" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Applies To" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="CUSTOMER_RATING_COMPANION">Customer Rating Companion</SelectItem>
               <SelectItem value="COMPANION_RATING_CUSTOMER">Companion Rating Customer</SelectItem>
               <SelectItem value="BOTH">Both</SelectItem>
             </SelectContent>
           </Select>
-          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Review Tag'}</Button></div>
+          <div className="flex justify-end">
+            <Button type="submit">{initialData ? 'Save Changes' : 'Add Review Tag'}</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
 
-export function AddCancellationReasonModal({ open, onOpenChange, onSubmit, appLanguages = [], initialData }: ModalProps) {
+export function AddCancellationReasonModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages = [],
+  initialData,
+}: ModalProps) {
   const [names, setNames] = useState<Record<string, string>>({});
   const [code, setCode] = useState('');
   const [appliesTo, setAppliesTo] = useState('ANY');
@@ -381,28 +511,39 @@ export function AddCancellationReasonModal({ open, onOpenChange, onSubmit, appLa
     }
   };
 
-  const activeLangs = appLanguages.filter(l => l.active);
+  const activeLangs = appLanguages.filter((l) => l.active);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{initialData ? 'Edit Cancellation Reason' : 'Add New Cancellation Reason'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>
+            {initialData ? 'Edit Cancellation Reason' : 'Add New Cancellation Reason'}
+          </DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Names</h4>
-            {activeLangs.map(lang => (
-              <Input 
+            {activeLangs.map((lang) => (
+              <Input
                 key={lang.code}
-                placeholder={`Name (${lang.name})`} 
-                value={names[lang.code] || ''} 
-                onChange={e => setNames({ ...names, [lang.code]: e.target.value })} 
-                required={lang.code === 'en'} 
+                placeholder={`Name (${lang.name})`}
+                value={names[lang.code] || ''}
+                onChange={(e) => setNames({ ...names, [lang.code]: e.target.value })}
+                required={lang.code === 'en'}
               />
             ))}
           </div>
-          <Input placeholder="Code (e.g. emergency)" value={code} onChange={e => setCode(e.target.value)} required />
+          <Input
+            placeholder="Code (e.g. emergency)"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
           <Select value={appliesTo} onValueChange={(val) => setAppliesTo(val as string)}>
-            <SelectTrigger><SelectValue placeholder="Applies To" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Applies To" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="CUSTOMER_CANCEL">Customer Cancel</SelectItem>
               <SelectItem value="COMPANION_REJECT">Companion Reject</SelectItem>
@@ -411,14 +552,24 @@ export function AddCancellationReasonModal({ open, onOpenChange, onSubmit, appLa
               <SelectItem value="ANY">Any</SelectItem>
             </SelectContent>
           </Select>
-          <div className="flex justify-end"><Button type="submit">{initialData ? 'Save Changes' : 'Add Cancellation Reason'}</Button></div>
+          <div className="flex justify-end">
+            <Button type="submit">
+              {initialData ? 'Save Changes' : 'Add Cancellation Reason'}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
 
-export function AddPlaceTypeModal({ open, onOpenChange, onSubmit, appLanguages, initialData }: any) {
+export function AddPlaceTypeModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  appLanguages,
+  initialData,
+}: any) {
   const [typeName, setTypeName] = useState('');
   const [displayName, setDisplayName] = useState<Record<string, string>>({});
 
@@ -437,15 +588,17 @@ export function AddPlaceTypeModal({ open, onOpenChange, onSubmit, appLanguages, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!typeName) return;
-    
+
     // Ensure all active languages have a value, fallback to 'en' if missing
     const finalLabel = { ...displayName };
     const enVal = finalLabel['en'] || typeName;
-    appLanguages.filter((l: any) => l.active).forEach((l: any) => {
-      if (!finalLabel[l.code]) {
-        finalLabel[l.code] = enVal;
-      }
-    });
+    appLanguages
+      .filter((l: any) => l.active)
+      .forEach((l: any) => {
+        if (!finalLabel[l.code]) {
+          finalLabel[l.code] = enVal;
+        }
+      });
 
     if (initialData) {
       onSubmit({ id: initialData.id, typeName, displayName: finalLabel });
@@ -464,23 +617,36 @@ export function AddPlaceTypeModal({ open, onOpenChange, onSubmit, appLanguages, 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Type Name</label>
-            <Input required value={typeName} onChange={e => setTypeName(e.target.value)} disabled={!!initialData} />
+            <Input
+              required
+              value={typeName}
+              onChange={(e) => setTypeName(e.target.value)}
+              disabled={!!initialData}
+            />
           </div>
           <div className="space-y-3 pt-2">
             <label className="text-sm font-medium border-b pb-1">Display Name Translations</label>
-            {appLanguages.filter((l: any) => l.active).map((lang: any) => (
-              <div key={lang.code} className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">{lang.name} ({lang.code}){lang.code === 'en' && ' *'}</label>
-                <Input 
-                  required={lang.code === 'en'}
-                  value={displayName[lang.code] || ''} 
-                  onChange={e => setDisplayName({...displayName, [lang.code]: e.target.value})} 
-                  placeholder={lang.code !== 'en' ? `Translation in ${lang.name}` : ''}
-                />
-              </div>
-            ))}
+            {appLanguages
+              .filter((l: any) => l.active)
+              .map((lang: any) => (
+                <div key={lang.code} className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    {lang.name} ({lang.code}){lang.code === 'en' && ' *'}
+                  </label>
+                  <Input
+                    required={lang.code === 'en'}
+                    value={displayName[lang.code] || ''}
+                    onChange={(e) =>
+                      setDisplayName({ ...displayName, [lang.code]: e.target.value })
+                    }
+                    placeholder={lang.code !== 'en' ? `Translation in ${lang.name}` : ''}
+                  />
+                </div>
+              ))}
           </div>
-          <Button type="submit" className="w-full">{initialData ? 'Save Changes' : 'Add Place Type'}</Button>
+          <Button type="submit" className="w-full">
+            {initialData ? 'Save Changes' : 'Add Place Type'}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

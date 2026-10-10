@@ -1,16 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
 import { verificationApi } from '../api';
-import { VerificationCase } from '../types';
+import type { VerificationFilter } from '../types';
 
-export const useVerificationQueue = (statusFilter?: string) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['verification-cases', statusFilter],
-    queryFn: () => verificationApi.getCases(statusFilter),
+export const useVerificationQueue = ({
+  status,
+  page = 1,
+  pageSize = 20,
+  enabled = true,
+}: {
+  status?: VerificationFilter;
+  page?: number;
+  pageSize?: number;
+  enabled?: boolean;
+} = {}) => {
+  const query = useQuery({
+    queryKey: ['verification-cases', status, page, pageSize],
+    queryFn: () => verificationApi.getCases(status, page, pageSize),
+    enabled,
   });
 
   return {
-    cases: (data as VerificationCase[]) || [],
-    isLoading,
-    error,
+    ...query,
+    cases: query.data?.data ?? [],
+    meta: query.data?.meta,
   };
 };

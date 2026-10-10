@@ -2,125 +2,71 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useMarketPerformance } from '@/modules/analytics/market/hooks/useMarketPerformance';
-import { useRevenueStats } from '@/modules/financial/revenue-reports/hooks/useRevenueStats';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, DonutChart } from '@tremor/react';
+import { Button } from '@/components/ui/button';
+import { BarChart } from '@tremor/react';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableHeaderCell,
+  TableHeader,
   TableRow,
-} from '@tremor/react';
+} from '@/components/ui/table';
+import { formatCurrency } from '@/lib/utils';
 
 export default function FinancialAnalyticsPage() {
-  const { performance, isLoading: marketLoading } = useMarketPerformance();
-  const { stats: revenueStats, isLoading: revLoading } = useRevenueStats();
-
-  if (marketLoading || revLoading || !revenueStats) return <div className="">Loading Analytics Data...</div>;
-
-  const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
-  const chartData = performance.map(p => ({
-    name: p.cityName,
-    Bookings: p.totalBookings,
-    Revenue: p.revenueGenerated
-  }));
-
+  const { performance, isLoading, isError, refetch } = useMarketPerformance();
+  if (isError)
+    return (
+      <div role="alert">
+        Could not load city metrics. <Button onClick={() => void refetch()}>Retry</Button>
+      </div>
+    );
+  if (isLoading) return <div role="status">Loading city metrics...</div>;
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Financial Analytics" 
-        description="Analyze revenue, customer acquisition cost (CAC), LTV, and market performance."
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Average CAC</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{formatCurrency(450)}</div><p className="text-xs text-muted-foreground mt-1">-5% from last month</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Average LTV</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{formatCurrency(12500)}</div><p className="text-xs text-muted-foreground mt-1">+12% from last month</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold text-green-600">{formatCurrency(revenueStats.totalRevenue)}</div><p className="text-xs text-muted-foreground mt-1">YTD Gross Revenue</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Escrow Balance</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{formatCurrency(revenueStats.escrowBalance)}</div><p className="text-xs text-muted-foreground mt-1">Currently Held</p></CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue by City</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BarChart
-              className="h-72 mt-4"
-              data={chartData}
-              index="name"
-              categories={['Revenue']}
-              colors={['indigo']}
-              valueFormatter={formatCurrency}
-              yAxisWidth={110}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Booking Distribution</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center justify-center">
-            <DonutChart
-              className="h-72 mt-4"
-              data={chartData}
-              category="Bookings"
-              index="name"
-              colors={['indigo', 'cyan', 'amber', 'rose', 'emerald']}
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="flex-1 min-h-[300px]">
-        <CardHeader>
-          <CardTitle>Detailed City Metrics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>City</TableHeaderCell>
-                <TableHeaderCell>Total Bookings</TableHeaderCell>
-                <TableHeaderCell>Active Companions</TableHeaderCell>
-                <TableHeaderCell>Revenue Generated</TableHeaderCell>
-                <TableHeaderCell>MoM Growth</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {performance.map(p => (
-                <TableRow key={p.cityName}>
-                  <TableCell className="font-medium">{p.cityName}</TableCell>
-                  <TableCell>{p.totalBookings.toLocaleString()}</TableCell>
-                  <TableCell>{p.activeCompanions}</TableCell>
-                  <TableCell>{formatCurrency(p.revenueGenerated)}</TableCell>
-                  <TableCell>
-                    <span className={p.growthRate >= 0 ? 'text-green-600' : 'text-destructive'}>
-                      {p.growthRate > 0 ? '+' : ''}{p.growthRate}%
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <PageHeader title="Financial Analytics" />
+      <section className="min-w-0">
+        <h2 className="text-base font-semibold">Platform Fees on Completed, Paid Bookings</h2>
+        {performance.length ? (
+          <BarChart
+            className="mt-4 h-72"
+            data={performance}
+            index="cityName"
+            categories={['revenueGenerated']}
+            colors={['emerald']}
+            valueFormatter={(value) => formatCurrency(value)}
+            yAxisWidth={100}
+            showLegend={false}
+          />
+        ) : (
+          <p className="py-4 text-sm text-muted-foreground">No cities configured.</p>
+        )}
+      </section>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>City</TableHead>
+            <TableHead>All Bookings</TableHead>
+            <TableHead>Active Companions</TableHead>
+            <TableHead>Completed Booking Fees</TableHead>
+            <TableHead>Booking Growth: MTD vs Last Month (UTC)</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {performance.map((item) => (
+            <TableRow key={item.cityId}>
+              <TableCell>{item.cityName}</TableCell>
+              <TableCell>{item.totalBookings.toLocaleString()}</TableCell>
+              <TableCell>{item.activeCompanions}</TableCell>
+              <TableCell>{formatCurrency(item.revenueGenerated)}</TableCell>
+              <TableCell>
+                {item.growthRate === null ? 'No prior bookings' : `${item.growthRate}%`}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
-

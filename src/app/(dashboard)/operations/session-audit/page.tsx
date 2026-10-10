@@ -3,7 +3,14 @@
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useSessionAudit } from '@/modules/operations/session-audit/hooks/useSessionAudit';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -36,9 +43,17 @@ export default function SessionAuditPage() {
                   className="pl-8 w-64"
                 />
               </div>
-              <Button variant="outline" onClick={() => {
-                import('@/lib/exportCsv').then(m => m.exportToCsv(logs, `session-audit-log-${new Date().toISOString().split('T')[0]}.csv`));
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  import('@/lib/exportCsv').then((m) =>
+                    m.exportToCsv(
+                      logs,
+                      `session-audit-log-${new Date().toISOString().split('T')[0]}.csv`,
+                    ),
+                  );
+                }}
+              >
                 <Download className="h-4 w-4 mr-2" /> Export
               </Button>
             </div>
@@ -58,11 +73,15 @@ export default function SessionAuditPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">Loading...</TableCell>
+                  <TableCell colSpan={5} className="text-center py-4">
+                    Loading...
+                  </TableCell>
                 </TableRow>
               ) : logs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">No logs found.</TableCell>
+                  <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                    No logs found.
+                  </TableCell>
                 </TableRow>
               ) : (
                 logs.map((log) => (
@@ -76,7 +95,9 @@ export default function SessionAuditPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-[10px]">{log.actorType}</Badge>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {log.actorType}
+                        </Badge>
                         <span className="font-mono text-xs">{log.actorId}</span>
                       </div>
                     </TableCell>

@@ -5,14 +5,7 @@ import { useReports } from '@/modules/moderation/reports/hooks/useReports';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 import { UserPlus } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -42,7 +35,7 @@ export default function ReportsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {reports.map(rep => (
+            {reports.map((rep) => (
               <TableRow key={rep.id}>
                 <TableCell>{rep.id}</TableCell>
                 <TableCell>{rep.category}</TableCell>
@@ -53,26 +46,32 @@ export default function ReportsPage() {
                   {rep.assignedTo ? (
                     <span className="text-sm font-medium">{rep.assignedTo}</span>
                   ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => assignToMe({ id: rep.id, staffName: user.name || 'Admin' })}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => assignToMe({ id: rep.id })}>
                       <UserPlus className="h-4 w-4 mr-1" /> Assign to Me
                     </Button>
                   )}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={
-                    rep.status === 'OPEN' ? 'destructive' : 
-                    rep.status === 'INVESTIGATING' ? 'default' : 
-                    rep.status === 'ESCALATED' ? 'outline' : 'secondary'
-                  }>
+                  <Badge
+                    variant={
+                      rep.status === 'OPEN'
+                        ? 'destructive'
+                        : rep.status === 'INVESTIGATING'
+                          ? 'default'
+                          : rep.status === 'ESCALATED'
+                            ? 'outline'
+                            : 'secondary'
+                    }
+                  >
                     {rep.status}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => router.push(`/moderation/reports/${rep.id}`)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/moderation/reports/${rep.id}`)}
+                  >
                     Investigate
                   </Button>
                 </TableCell>

@@ -12,23 +12,17 @@ export default function CompanionApplicationDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.applicationId as string;
-  const user = useAuthStore(s => s.user);
-  
-  const { 
-    application, 
-    isLoading, 
-    assignToMe, 
-    isAssigning,
-    submitDecision,
-    isSubmittingDecision
-  } = useCompanionApplicationDetail(id);
+  const user = useAuthStore((s) => s.user);
+
+  const { application, isLoading, assignToMe, isAssigning, submitDecision, isSubmittingDecision } =
+    useCompanionApplicationDetail(id);
 
   if (isLoading) return <div className="">Loading...</div>;
   if (!application) return <div className="">Application not found.</div>;
 
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col">
-      <PageHeader 
+      <PageHeader
         title={`Review Application: ${application.id}`}
         action={
           <Button variant="outline" onClick={() => router.push('/companion-applications')}>
@@ -37,9 +31,9 @@ export default function CompanionApplicationDetailPage() {
           </Button>
         }
       />
-      
+
       <div className="flex-1 min-h-0">
-        <ApplicationReviewView 
+        <ApplicationReviewView
           application={application}
           onAssignToMe={() => assignToMe(user?.name || 'Current User')}
           isAssigning={isAssigning}

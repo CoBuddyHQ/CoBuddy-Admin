@@ -1,10 +1,19 @@
+import axios from '@/lib/api/client';
 import { CompletedBooking } from './types';
 
-const mockCompleted: CompletedBooking[] = [
-  { id: 'CB-101', sessionId: 'SESS-198', companionName: 'Alice', userName: 'John', durationMinutes: 120, totalCost: 4500, rating: 5, dateCompleted: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'CB-102', sessionId: 'SESS-199', companionName: 'Bob', userName: 'Jane', durationMinutes: 180, totalCost: 6500, rating: 4, dateCompleted: new Date(Date.now() - 172800000).toISOString() },
-];
-
 export const completedBookingsApi = {
-  getBookings: async (): Promise<CompletedBooking[]> => Promise.resolve([...mockCompleted]),
+  getBookings: async (): Promise<CompletedBooking[]> => {
+    const response = await axios.get('/operations/completed-bookings');
+    const rows = response.data.data?.data ?? response.data.data ?? [];
+    return rows.map((booking: any) => ({
+      id: booking.id,
+      sessionId: booking.bookingRef,
+      companionName: booking.companion?.name ?? 'Unassigned',
+      userName: booking.customer?.name ?? 'Unknown',
+      durationMinutes: booking.durationMins,
+      totalCost: Number(booking.bookingAmount ?? 0),
+      rating: 0,
+      dateCompleted: booking.updatedAt,
+    }));
+  },
 };

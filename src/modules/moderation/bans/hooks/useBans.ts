@@ -12,7 +12,7 @@ export const useBans = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bans'] });
       toast.success('Restriction applied and user logged out globally.');
-    }
+    },
   });
 
   const liftMutation = useMutation({
@@ -20,7 +20,7 @@ export const useBans = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bans'] });
       toast.success('Restriction lifted successfully.');
-    }
+    },
   });
 
   return {
@@ -29,6 +29,6 @@ export const useBans = () => {
     applyRestriction: applyMutation.mutate,
     isApplying: applyMutation.isPending,
     liftRestriction: liftMutation.mutate,
-    isLifting: liftMutation.isPending
+    isLifting: liftMutation.isPending,
   };
 };

@@ -2,14 +2,7 @@
 
 import { ListDetailTemplate } from '@/components/templates/ListDetailTemplate';
 import { useCompletedBookings } from '@/modules/operations/completed-bookings/hooks/useCompletedBookings';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 import { Star } from 'lucide-react';
 
 export default function CompletedBookingsPage() {
@@ -35,12 +28,14 @@ export default function CompletedBookingsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookings.map(b => (
+            {bookings.map((b) => (
               <TableRow key={b.id}>
                 <TableCell>{b.sessionId}</TableCell>
                 <TableCell className="font-medium">{b.companionName}</TableCell>
                 <TableCell>{b.userName}</TableCell>
-                <TableCell>{Math.floor(b.durationMinutes / 60)}h {b.durationMinutes % 60}m</TableCell>
+                <TableCell>
+                  {Math.floor(b.durationMinutes / 60)}h {b.durationMinutes % 60}m
+                </TableCell>
                 <TableCell>{formatCurrency(b.totalCost)}</TableCell>
                 <TableCell>
                   <div className="flex items-center">

@@ -6,14 +6,7 @@ import { Badge } from '@/components/ui/badge';
 
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function FlaggedChatsPage() {
   const { chats, isLoading } = useFlaggedChats();
@@ -36,7 +29,7 @@ export default function FlaggedChatsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {chats.map(chat => (
+            {chats.map((chat) => (
               <TableRow key={chat.id}>
                 <TableCell>{chat.id}</TableCell>
                 <TableCell>{chat.participants.join(' & ')}</TableCell>
@@ -48,7 +41,11 @@ export default function FlaggedChatsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => router.push(`/moderation/flagged-chats/${chat.id}`)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/moderation/flagged-chats/${chat.id}`)}
+                  >
                     Review
                   </Button>
                 </TableCell>

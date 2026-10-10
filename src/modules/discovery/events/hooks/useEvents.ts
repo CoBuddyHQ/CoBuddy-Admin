@@ -12,7 +12,7 @@ export const useEvents = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast.success('Event created');
-    }
+    },
   });
 
   const toggleMutation = useMutation({
@@ -20,7 +20,7 @@ export const useEvents = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast.success('Event status toggled');
-    }
+    },
   });
 
   return {
@@ -28,6 +28,6 @@ export const useEvents = () => {
     isLoading: query.isLoading,
     createEvent: createMutation.mutate,
     isCreating: createMutation.isPending,
-    toggleEvent: toggleMutation.mutate
+    toggleEvent: toggleMutation.mutate,
   };
 };

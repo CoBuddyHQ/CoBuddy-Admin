@@ -1,19 +1,17 @@
+import axios from '@/lib/api/client';
 import { AppConfig } from './types';
 
-let mockConfig: AppConfig = {
-  maintenanceMode: false,
-  maintenanceMessage: 'We are currently undergoing scheduled maintenance. Please try again later.',
-  forceUpdateIos: true,
-  minVersionIos: '1.2.0',
-  forceUpdateAndroid: false,
-  minVersionAndroid: '1.1.5',
-  maxDailyBookingsPerUser: 3,
-};
+const CONFIG_KEY = 'admin-app-config';
+const unwrap = (response: any) => response.data.data?.data ?? response.data.data;
 
 export const appConfigsApi = {
-  getConfig: async (): Promise<AppConfig> => Promise.resolve({ ...mockConfig }),
+  getConfig: async (): Promise<AppConfig> => {
+    const response = await axios.get('/system/app-configs/key/' + CONFIG_KEY);
+    const value = unwrap(response)?.value;
+    if (!value) throw new Error('App configuration has not been initialized');
+    return value as AppConfig;
+  },
   updateConfig: async (config: AppConfig): Promise<void> => {
-    mockConfig = { ...config };
-    return Promise.resolve();
-  }
+    await axios.put('/system/app-configs/key/' + CONFIG_KEY, { value: config });
+  },
 };

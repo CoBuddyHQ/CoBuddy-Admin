@@ -3,14 +3,7 @@
 import { ListDetailTemplate } from '@/components/templates/ListDetailTemplate';
 import { useActiveSessions } from '@/modules/operations/active-sessions/hooks/useActiveSessions';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function ActiveSessionsPage() {
   const { sessions, isLoading } = useActiveSessions();
@@ -33,7 +26,7 @@ export default function ActiveSessionsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sessions.map(s => (
+            {sessions.map((s) => (
               <TableRow key={s.id}>
                 <TableCell>{s.sessionId}</TableCell>
                 <TableCell className="font-medium">{s.companionName}</TableCell>
@@ -42,7 +35,15 @@ export default function ActiveSessionsPage() {
                 <TableCell>{new Date(s.startTime).toLocaleTimeString()}</TableCell>
                 <TableCell>{new Date(s.expectedEndTime).toLocaleTimeString()}</TableCell>
                 <TableCell>
-                  <Badge variant={s.status === 'EXTENDED' ? 'secondary' : s.status === 'ARRIVING' ? 'outline' : 'default'}>
+                  <Badge
+                    variant={
+                      s.status === 'EXTENDED'
+                        ? 'secondary'
+                        : s.status === 'ARRIVING'
+                          ? 'outline'
+                          : 'default'
+                    }
+                  >
                     {s.status}
                   </Badge>
                 </TableCell>

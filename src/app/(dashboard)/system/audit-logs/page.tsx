@@ -3,14 +3,7 @@
 import { ListDetailTemplate } from '@/components/templates/ListDetailTemplate';
 import { useAuditLogs } from '@/modules/system/audit-logs/hooks/useAuditLogs';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 export default function AuditLogsPage() {
   const { logs, isLoading } = useAuditLogs();
@@ -32,18 +25,33 @@ export default function AuditLogsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {logs.map(l => (
+            {logs.map((l) => (
               <TableRow key={l.id}>
                 <TableCell>{new Date(l.timestamp).toLocaleString()}</TableCell>
-                <TableCell className="font-medium">{l.adminName} ({l.adminId})</TableCell>
+                <TableCell className="font-medium">
+                  {l.adminName} ({l.adminId})
+                </TableCell>
                 <TableCell>
-                  <Badge variant={l.action === 'LOGIN' ? 'default' : l.action === 'LOGOUT' ? 'secondary' : 'outline'} className={l.action === 'LOGIN' ? 'bg-green-600 hover:bg-green-700' : ''}>
+                  <Badge
+                    variant={
+                      l.action === 'LOGIN'
+                        ? 'default'
+                        : l.action === 'LOGOUT'
+                          ? 'secondary'
+                          : 'outline'
+                    }
+                    className={l.action === 'LOGIN' ? 'bg-green-600 hover:bg-green-700' : ''}
+                  >
                     {l.action}
                   </Badge>
                 </TableCell>
                 <TableCell>{l.moduleAffected}</TableCell>
-                <TableCell className="max-w-sm truncate" title={l.details}>{l.details}</TableCell>
-                <TableCell className="text-muted-foreground font-mono text-xs">{l.ipAddress}</TableCell>
+                <TableCell className="max-w-sm truncate" title={l.details}>
+                  {l.details}
+                </TableCell>
+                <TableCell className="text-muted-foreground font-mono text-xs">
+                  {l.ipAddress}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

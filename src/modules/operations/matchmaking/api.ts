@@ -1,16 +1,12 @@
+import axios from '@/lib/api/client';
 import { MatchmakingConfig } from './types';
 
-let mockConfig: MatchmakingConfig = {
-  maxSearchRadiusKm: 25,
-  priorityAlgorithm: 'RATING_BASED',
-  allowCrossCityBooking: false,
-  minRatingThreshold: 3.5,
-};
-
 export const matchmakingApi = {
-  getConfig: async (): Promise<MatchmakingConfig> => Promise.resolve({ ...mockConfig }),
+  getConfig: async (): Promise<MatchmakingConfig> => {
+    const response = await axios.get<{ data: MatchmakingConfig }>('/operations/matchmaking/config');
+    return response.data.data;
+  },
   updateConfig: async (config: MatchmakingConfig): Promise<void> => {
-    mockConfig = { ...config };
-    return Promise.resolve();
-  }
+    await axios.put('/operations/matchmaking/config', config);
+  },
 };

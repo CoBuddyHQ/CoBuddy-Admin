@@ -1,14 +1,23 @@
+import axios from '@/lib/api/client';
 import { GeofenceAlert } from './types';
 
-const mockAlerts: GeofenceAlert[] = [
-  { id: 'GEO-001', sessionId: 'SESS-202', companionId: 'CompX', companionName: 'Sarah', expectedLocation: 'Starbucks, CP', actualLocation: '2 km away', breachSeverity: 'MEDIUM', timestamp: new Date().toISOString(), status: 'INVESTIGATING' }
-];
-
 export const geofenceApi = {
-  getAlerts: async (): Promise<GeofenceAlert[]> => Promise.resolve([...mockAlerts]),
+  getAlerts: async (): Promise<GeofenceAlert[]> => {
+    const response = await axios.get('/safety/geofence/alerts');
+    const rows = response.data.data?.data ?? response.data.data ?? [];
+    return rows.map((item: any) => ({
+      id: item.id,
+      sessionId: item.sessionId,
+      companionId: item.companionId,
+      companionName: item.companionName,
+      expectedLocation: item.expectedLocation,
+      actualLocation: item.actualLocation,
+      breachSeverity: item.breachSeverity,
+      timestamp: item.createdAt,
+      status: item.status,
+    }));
+  },
   updateStatus: async (id: string, status: GeofenceAlert['status']): Promise<void> => {
-    const alert = mockAlerts.find(a => a.id === id);
-    if (alert) alert.status = status;
-    return Promise.resolve();
-  }
+    await axios.patch('/safety/geofence/alerts/' + id + '/status', { status });
+  },
 };

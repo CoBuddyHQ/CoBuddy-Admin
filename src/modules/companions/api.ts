@@ -1,72 +1,70 @@
-import { CompanionRecord } from './types';
+import {
+  CompanionRecord,
+  TrustScoreHistoryEntry,
+  SessionHistoryEntry,
+  EarningsBreakdown,
+} from './types';
+import axios from '@/lib/api/client';
 
-let mockCompanions: CompanionRecord[] = [
-  {
-    id: 'COMP-2001',
-    name: 'Neha Gupta',
-    email: 'neha.g@example.com',
-    phone: '+91 9876543211',
-    joinDate: '2023-01-10',
-    verificationStatus: 'VERIFIED',
-    trustScore: 98,
-    totalEarnings: 125000,
-    totalSessions: 45,
-    status: 'ACTIVE'
-  },
-  {
-    id: 'COMP-2002',
-    name: 'Vikram Singh',
-    email: 'vikram.s@example.com',
-    phone: '+91 8765432112',
-    joinDate: '2023-02-15',
-    verificationStatus: 'VERIFIED',
-    trustScore: 85,
-    totalEarnings: 45000,
-    totalSessions: 12,
-    status: 'ACTIVE'
-  },
-  {
-    id: 'COMP-2003',
-    name: 'Priya Desai',
-    email: 'priya.d@example.com',
-    phone: '+91 7654321123',
-    joinDate: '2023-06-20',
-    verificationStatus: 'REJECTED',
-    trustScore: 30,
-    totalEarnings: 0,
-    totalSessions: 0,
-    status: 'BANNED'
-  }
-];
+const mapCompanion = (item: any): CompanionRecord => ({
+  id: item.id,
+  name: item.name,
+  email: item.email || '',
+  phone: item.phone,
+  joinDate: item.joinDate || item.createdAt,
+  verificationStatus: item.verificationStatus,
+  trustScore: item.trustScore ?? 0,
+  totalEarnings: Number(item.totalEarnings ?? 0),
+  totalSessions: item.totalSessions ?? 0,
+  status: item.status,
+});
 
 export const companionsApi = {
   getCompanions: async (): Promise<CompanionRecord[]> => {
-    return [...mockCompanions];
+    const res = await axios.get('/companions', { params: { page: 1, pageSize: 100 } });
+    const items = res.data.data?.data ?? res.data.data ?? [];
+    return items.map(mapCompanion);
   },
   getCompanionById: async (id: string): Promise<CompanionRecord | undefined> => {
-    return mockCompanions.find(c => c.id === id);
+    const res = await axios.get(`/companions/${id}`);
+    return mapCompanion(res.data.data);
   },
   updateStatus: async (id: string, status: CompanionRecord['status']): Promise<void> => {
-    mockCompanions = mockCompanions.map(c => c.id === id ? { ...c, status } : c);
+    await axios.patch(`/companions/${id}/status`, { status });
   },
-  getTrustScoreHistory: async (id: string): Promise<import('./types').TrustScoreHistoryEntry[]> => {
-    return [
-      { id: '1', date: '2026-08-01', oldScore: 90, newScore: 85, reason: 'Late cancellation' },
-      { id: '2', date: '2026-07-15', oldScore: 88, newScore: 90, reason: '5-star review from verified booking' }
-    ];
+  getTrustScoreHistory: async (id: string): Promise<TrustScoreHistoryEntry[]> => {
+    const res = await axios.get(`/companions/${id}/trust-score-history`);
+    const items = res.data.data ?? [];
+    return items.map((e: any) => ({
+      id: e.id,
+      date: e.date,
+      oldScore: e.oldScore,
+      newScore: e.newScore,
+      reason: e.reason,
+    }));
   },
-  getSessionHistory: async (id: string): Promise<import('./types').SessionHistoryEntry[]> => {
-    return [
-      { id: 'S1', date: '2026-08-05', customerName: 'Aarav M.', activity: 'Coffee', durationMins: 120, earnings: 1500 },
-      { id: 'S2', date: '2026-08-02', customerName: 'Karan P.', activity: 'Movie', durationMins: 180, earnings: 3000 }
-    ];
+  getSessionHistory: async (id: string): Promise<SessionHistoryEntry[]> => {
+    const res = await axios.get(`/companions/${id}/session-history`, {
+      params: { page: 1, pageSize: 50 },
+    });
+    const items = res.data.data?.data ?? res.data.data ?? [];
+    return items.map((s: any) => ({
+      id: s.id,
+      date: s.startTime || s.createdAt,
+      customerName: s.customer?.name ?? 'N/A',
+      activity: s.activityLabel,
+      durationMins: s.durationMins,
+      earnings: Number(s.companionNetAmount ?? 0),
+    }));
   },
-  getEarningsBreakdown: async (id: string): Promise<import('./types').EarningsBreakdown> => {
+  getEarningsBreakdown: async (id: string): Promise<EarningsBreakdown> => {
+    const res = await axios.get(`/companions/${id}/earnings-breakdown`);
+    const d = res.data.data;
     return {
-      baseEarnings: 100000,
-      bonusEarnings: 25000,
-      platformFeeDeducted: 12500,
-      totalNet: 112500
+      baseEarnings: Number(d.baseEarnings ?? 0),
+      bonusEarnings: Number(d.bonusEarnings ?? 0),
+      platformFeeDeducted: Number(d.platformFeeDeducted ?? 0),
+      totalNet: Number(d.totalNet ?? 0),
     };
-  }
+  },
 };

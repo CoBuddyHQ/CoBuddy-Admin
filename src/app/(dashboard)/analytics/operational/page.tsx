@@ -2,141 +2,70 @@
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useSessionMetrics } from '@/modules/analytics/sessions/hooks/useSessionMetrics';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, BarChart, DonutChart } from '@tremor/react';
-import { useCompanions } from '@/modules/companions/hooks/useCompanions';
-import { useTickets } from '@/modules/support/tickets/hooks/useTickets';
-import { useSLA } from '@/modules/support/sla-dashboard/hooks/useSLA';
+import { LineChart, BarChart } from '@tremor/react';
 
 export default function SessionMetricsPage() {
-  const { metrics, isLoading: sessionsLoading } = useSessionMetrics();
-  const { companions, isLoading: compsLoading } = useCompanions();
-  const { tickets, isLoading: ticketsLoading } = useTickets();
-  const { alerts, isLoading: slaLoading } = useSLA();
-
-  if (sessionsLoading || compsLoading || ticketsLoading || slaLoading || !metrics) return <div className="">Loading Analytics Data...</div>;
-
-  // 1. Booking Funnel
-  // Requested = totalSessionsToday * 1.3, Accepted = totalSessionsToday, Completed = totalSessionsToday * (1 - cancellationRate)
-  const requested = Math.round(metrics.totalSessionsToday * 1.3);
-  const accepted = metrics.totalSessionsToday;
-  const completed = Math.round(metrics.totalSessionsToday * (1 - metrics.cancellationRate / 100));
-  const funnelData = [
-    { stage: 'Requested', count: requested },
-    { stage: 'Accepted', count: accepted },
-    { stage: 'Completed', count: completed }
+  const { metrics, isLoading, isError, refetch } = useSessionMetrics();
+  if (isError)
+    return (
+      <div role="alert">
+        Could not load session metrics. <Button onClick={() => void refetch()}>Retry</Button>
+      </div>
+    );
+  if (isLoading || !metrics) return <div role="status">Loading session metrics...</div>;
+  const summaries = [
+    { label: 'Bookings Today (UTC)', value: metrics.totalSessionsToday.toLocaleString() },
+    {
+      label: 'Average Booked Duration',
+      value:
+        metrics.avgDurationMinutes === null ? 'No bookings' : `${metrics.avgDurationMinutes} mins`,
+    },
+    {
+      label: 'Cancellation Rate',
+      value: metrics.cancellationRate === null ? 'No bookings' : `${metrics.cancellationRate}%`,
+    },
   ];
-
-  // 2. Ticket Volume & SLA Breach
-  const openTickets = tickets.filter(t => t.status !== 'RESOLVED' && t.status !== 'CLOSED').length;
-  const breachedCount = alerts.filter((a: any) => a.status === 'BREACHED').length;
-  const slaBreachPct = tickets.length > 0 ? ((breachedCount / tickets.length) * 100).toFixed(1) : '0';
-
-  // 3. Discovery Distribution
-  const totalBookings = companions.reduce((sum, c) => sum + c.totalSessions, 0);
-  const sortedComps = [...companions].sort((a, b) => b.totalSessions - a.totalSessions);
-  const top10Count = Math.max(1, Math.ceil(sortedComps.length * 0.1));
-  const top10Bookings = sortedComps.slice(0, top10Count).reduce((sum, c) => sum + c.totalSessions, 0);
-  const remainingBookings = totalBookings - top10Bookings;
-  const discoveryData = [
-    { name: 'Top 10% Companions', bookings: top10Bookings },
-    { name: 'Remaining 90%', bookings: remainingBookings }
-  ];
-
-
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Session Metrics" 
-        description="Track booking volumes, duration, and cancellation trends."
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Total Sessions (Today)</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{metrics.totalSessionsToday.toLocaleString()}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Avg. Session Duration</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold">{metrics.avgDurationMinutes} mins</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Cancellation Rate</CardTitle></CardHeader>
-          <CardContent><div className="text-2xl font-bold text-destructive">{metrics.cancellationRate}%</div></CardContent>
-        </Card>
+      <PageHeader title="Session Metrics" />
+      <div className="grid gap-4 md:grid-cols-3">
+        {summaries.map((item) => (
+          <Card key={item.label}>
+            <CardHeader>
+              <CardTitle className="text-sm">{item.label}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-semibold">{item.value}</CardContent>
+          </Card>
+        ))}
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Session Volume & Cancellations (Hourly)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LineChart
-            className="h-80 mt-4"
-            data={metrics.chartData}
-            index="hour"
-            categories={['sessions', 'cancellations']}
-            colors={['indigo', 'rose']}
-            yAxisWidth={80}
+      <section className="min-w-0 border-t pt-4">
+        <h2 className="text-base font-semibold">Bookings by Scheduled Hour (UTC)</h2>
+        <LineChart
+          className="mt-4 h-72"
+          data={metrics.chartData}
+          index="hour"
+          categories={['sessions', 'cancellations']}
+          colors={['cyan', 'rose']}
+          yAxisWidth={60}
+        />
+      </section>
+      <section className="min-w-0 border-t pt-4">
+        <h2 className="text-base font-semibold">Current Booking Statuses (Today)</h2>
+        {metrics.statuses.length ? (
+          <BarChart
+            className="mt-4 h-72"
+            data={metrics.statuses}
+            index="status"
+            categories={['count']}
+            colors={['emerald']}
+            showLegend={false}
           />
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Booking Funnel</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BarChart
-              className="h-64"
-              data={funnelData}
-              index="stage"
-              categories={['count']}
-              colors={['blue']}
-              layout="vertical"
-              showLegend={false}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Support & SLA Operations</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-              <span className="font-medium">Total Open Tickets</span>
-              <span className="text-xl font-bold">{openTickets}</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-              <span className="font-medium">SLA Breaches (Active)</span>
-              <span className="text-xl font-bold text-destructive">{breachedCount}</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-              <span className="font-medium">SLA Breach Rate</span>
-              <span className="text-xl font-bold text-destructive">{slaBreachPct}%</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Discovery Distribution (Fairness)</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center h-64">
-          <DonutChart
-            className="h-full w-full"
-            data={discoveryData}
-            category="bookings"
-            index="name"
-            colors={['amber', 'slate']}
-            valueFormatter={(val) => `${val} bookings`}
-          />
-        </CardContent>
-      </Card>
+        ) : (
+          <p className="py-4 text-sm text-muted-foreground">No bookings scheduled today.</p>
+        )}
+      </section>
     </div>
   );
 }
-

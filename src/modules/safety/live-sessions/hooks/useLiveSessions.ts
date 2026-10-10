@@ -11,14 +11,14 @@ export const useLiveSessions = () => {
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['liveSessions'],
     queryFn: liveSessionsApi.getLiveSessions,
-    refetchInterval: 10000 // Poll every 10s for live updates
+    refetchInterval: 10000, // Poll every 10s for live updates
   });
 
   const conflictingSessionIds = useMemo(() => {
     const ids = new Set<string>();
     if (!config?.booking?.overlappingSessionConflictDetection) return ids;
 
-    const ongoing = sessions.filter(s => s.status === 'ONGOING');
+    const ongoing = sessions.filter((s) => s.status === 'ONGOING');
     for (let i = 0; i < ongoing.length; i++) {
       for (let j = i + 1; j < ongoing.length; j++) {
         const s1 = ongoing[i];
@@ -44,7 +44,7 @@ export const useLiveSessions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liveSessions'] });
       toast.success('SOS alert resolved');
-    }
+    },
   });
 
   const { mutate: flagSession } = useMutation({
@@ -52,7 +52,7 @@ export const useLiveSessions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liveSessions'] });
       toast.success('Session flagged to Safety Ops');
-    }
+    },
   });
 
   return {
@@ -60,6 +60,6 @@ export const useLiveSessions = () => {
     isLoading,
     resolveSOS,
     flagSession,
-    conflictingSessionIds
+    conflictingSessionIds,
   };
 };

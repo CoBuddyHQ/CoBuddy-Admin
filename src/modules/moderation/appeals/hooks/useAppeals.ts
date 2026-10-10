@@ -8,17 +8,23 @@ export const useAppeals = () => {
   const query = useQuery({ queryKey: ['appeals'], queryFn: appealsApi.getAppeals });
 
   const resolveMutation = useMutation({
-    mutationFn: ({ id, action }: { id: string, action: 'UPHELD' | 'REVERSED' | 'REDUCED_TO_WARNING' }) => appealsApi.resolveAppeal(id, action),
+    mutationFn: ({
+      id,
+      action,
+    }: {
+      id: string;
+      action: 'UPHELD' | 'REVERSED' | 'REDUCED_TO_WARNING';
+    }) => appealsApi.resolveAppeal(id, action),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appeals'] });
       toast.success('Appeal resolved successfully');
-    }
+    },
   });
 
   return {
     appeals: query.data || [],
     isLoading: query.isLoading,
     resolveAppeal: resolveMutation.mutate,
-    isResolving: resolveMutation.isPending
+    isResolving: resolveMutation.isPending,
   };
 };

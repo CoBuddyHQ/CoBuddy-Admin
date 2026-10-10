@@ -12,13 +12,13 @@ export const useMatchmakingConfig = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matchmaking-config'] });
       toast.success('Matchmaking configuration updated successfully');
-    }
+    },
   });
 
   return {
     config: query.data,
     isLoading: query.isLoading,
     updateConfig: updateMutation.mutate,
-    isUpdating: updateMutation.isPending
+    isUpdating: updateMutation.isPending,
   };
 };

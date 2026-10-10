@@ -20,10 +20,10 @@ export const useAuthStore = create<AuthState>()(
       hasRole: (role) => {
         const user = get().user;
         return user ? user.roles.includes(role) : false;
-      }
+      },
     }),
     {
       name: 'auth-storage', // unique name
-    }
-  )
+    },
+  ),
 );

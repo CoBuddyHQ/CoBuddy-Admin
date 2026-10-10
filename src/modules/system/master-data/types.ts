@@ -109,7 +109,8 @@ export interface CancellationReason {
   id: string;
   code: string;
   label: Record<string, string>;
-  appliesTo: 'CUSTOMER_CANCEL' | 'COMPANION_REJECT' | 'COMPANION_CANCEL' | 'COMPANION_EARLY_END' | 'ANY';
+  appliesTo:
+    'CUSTOMER_CANCEL' | 'COMPANION_REJECT' | 'COMPANION_CANCEL' | 'COMPANION_EARLY_END' | 'ANY';
   active: boolean;
 }
 

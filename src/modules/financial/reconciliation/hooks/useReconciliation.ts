@@ -12,18 +12,16 @@ export const useReconciliation = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: ReconciliationRecord['status'] }) => reconciliationApi.updateStatus(id, status),
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: Exclude<ReconciliationRecord['matchStatus'], 'PENDING'>;
+    }) => reconciliationApi.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['reconciliation-records'] });
       toast.success(`Record marked as ${status}`);
-    },
-  });
-
-  const retryWebhookMutation = useMutation({
-    mutationFn: reconciliationApi.retryWebhook,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reconciliation-records'] });
-      toast.success('Webhook processed successfully');
     },
   });
 
@@ -31,6 +29,5 @@ export const useReconciliation = () => {
     records: recordsQuery.data ?? [],
     isLoading: recordsQuery.isLoading,
     updateStatus: updateStatusMutation.mutate,
-    retryWebhook: retryWebhookMutation.mutate,
   };
 };

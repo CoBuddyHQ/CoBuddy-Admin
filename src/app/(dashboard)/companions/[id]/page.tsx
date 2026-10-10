@@ -7,12 +7,20 @@ import { useCompanionDetail } from '@/modules/companions/hooks/useCompanions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import Link from 'next/link';
 
 export default function CompanionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { companion, trustScoreHistory, sessionHistory, earnings, isLoading, updateStatus } = useCompanionDetail(id);
+  const { companion, trustScoreHistory, sessionHistory, earnings, isLoading, updateStatus } =
+    useCompanionDetail(id);
 
   if (isLoading) return <div className="">Loading...</div>;
   if (!companion) return <div className="">Companion not found</div>;
@@ -23,7 +31,10 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
         title={`Companion: ${companion.name}`}
         description="Detailed view of companion profile and performance."
         action={
-          <Link href="/companions" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">
+          <Link
+            href="/companions"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+          >
             Back to Directory
           </Link>
         }
@@ -63,11 +74,31 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Status</div>
-                  <Badge variant={companion.status === 'ACTIVE' ? 'outline' : companion.status === 'SUSPENDED' ? 'destructive' : 'secondary'}>{companion.status}</Badge>
+                  <Badge
+                    variant={
+                      companion.status === 'ACTIVE'
+                        ? 'outline'
+                        : companion.status === 'SUSPENDED'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                  >
+                    {companion.status}
+                  </Badge>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Verification</div>
-                  <Badge variant={companion.verificationStatus === 'VERIFIED' ? 'default' : companion.verificationStatus === 'REJECTED' ? 'destructive' : 'secondary'}>{companion.verificationStatus}</Badge>
+                  <Badge
+                    variant={
+                      companion.verificationStatus === 'VERIFIED'
+                        ? 'default'
+                        : companion.verificationStatus === 'REJECTED'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                  >
+                    {companion.verificationStatus}
+                  </Badge>
                 </div>
               </div>
             </CardContent>
@@ -91,7 +122,7 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {trustScoreHistory?.map(entry => (
+                  {trustScoreHistory?.map((entry) => (
                     <TableRow key={entry.id}>
                       <TableCell>{entry.date}</TableCell>
                       <TableCell>{entry.oldScore}</TableCell>
@@ -123,7 +154,7 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sessionHistory?.map(session => (
+                  {sessionHistory?.map((session) => (
                     <TableRow key={session.id}>
                       <TableCell>{session.date}</TableCell>
                       <TableCell>{session.customerName}</TableCell>
@@ -148,15 +179,21 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
               <div className="grid grid-cols-2 gap-4">
                 <div className="border rounded-md p-4 bg-muted/50">
                   <div className="text-sm text-muted-foreground">Base Earnings</div>
-                  <div className="text-2xl font-bold">₹{earnings?.baseEarnings.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    ₹{earnings?.baseEarnings.toLocaleString()}
+                  </div>
                 </div>
                 <div className="border rounded-md p-4 bg-muted/50">
                   <div className="text-sm text-muted-foreground">Bonus Earnings</div>
-                  <div className="text-2xl font-bold text-green-600">₹{earnings?.bonusEarnings.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    ₹{earnings?.bonusEarnings.toLocaleString()}
+                  </div>
                 </div>
                 <div className="border rounded-md p-4 bg-muted/50">
                   <div className="text-sm text-muted-foreground">Platform Fee Deducted</div>
-                  <div className="text-2xl font-bold text-destructive">₹{earnings?.platformFeeDeducted.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-destructive">
+                    ₹{earnings?.platformFeeDeducted.toLocaleString()}
+                  </div>
                 </div>
                 <div className="border rounded-md p-4 bg-primary text-primary-foreground">
                   <div className="text-sm opacity-90">Total Net Earnings</div>
@@ -175,21 +212,21 @@ export default function CompanionDetailPage({ params }: { params: Promise<{ id: 
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-4">
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => updateStatus('ACTIVE')}
                   disabled={companion.status === 'ACTIVE'}
                 >
                   Set Active
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => updateStatus('SUSPENDED')}
                   disabled={companion.status === 'SUSPENDED'}
                 >
                   Suspend Account
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => updateStatus('BANNED')}
                   disabled={companion.status === 'BANNED'}

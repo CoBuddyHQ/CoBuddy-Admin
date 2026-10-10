@@ -1,21 +1,14 @@
-import { PayoutItem } from './types';
-
-const mockPayouts: PayoutItem[] = [
-  { id: 'PO-1001', companionId: 'C-001', companionName: 'Priya Sharma', amount: 14500, periodStart: '2023-10-01', periodEnd: '2023-10-15', status: 'PENDING', dueDate: '2023-10-18', payoutMethod: { type: 'UPI', accountDetails: 'priya***@okhdfcbank', verified: true } },
-  { id: 'PO-1002', companionId: 'C-042', companionName: 'Rahul Verma', amount: 8200, periodStart: '2023-10-01', periodEnd: '2023-10-15', status: 'ON_HOLD', dueDate: '2023-10-18', payoutMethod: { type: 'BANK', accountDetails: 'A/C ****1234, HDFC Bank', verified: false } },
-  { id: 'PO-1003', companionId: 'C-017', companionName: 'Anita Desai', amount: 21000, periodStart: '2023-09-15', periodEnd: '2023-09-30', status: 'PAID', dueDate: '2023-10-03', payoutMethod: { type: 'BANK', accountDetails: 'A/C ****9876, SBI', verified: true } }
-];
+import axios from '@/lib/api/client';
+import type { PayoutAction, PayoutPage, PayoutStatus } from './types';
 
 export const payoutsApi = {
-  getPayouts: async (): Promise<PayoutItem[]> => Promise.resolve([...mockPayouts]),
-  processPayout: async (id: string): Promise<void> => {
-    const p = mockPayouts.find(x => x.id === id);
-    if (p) p.status = 'PROCESSING';
-    return Promise.resolve();
+  getPayouts: async (page = 1, status?: PayoutStatus): Promise<PayoutPage> => {
+    const response = await axios.get<PayoutPage>('/financial/payouts', {
+      params: { page, pageSize: 20, status },
+    });
+    return response.data;
   },
-  holdPayout: async (id: string): Promise<void> => {
-    const p = mockPayouts.find(x => x.id === id);
-    if (p) p.status = 'ON_HOLD';
-    return Promise.resolve();
-  }
+  updatePayout: async ({ id, action, ...body }: PayoutAction): Promise<void> => {
+    await axios.post('/financial/payouts/' + encodeURIComponent(id) + '/' + action, body);
+  },
 };

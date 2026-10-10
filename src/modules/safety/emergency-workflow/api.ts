@@ -1,17 +1,27 @@
+import axios from '@/lib/api/client';
 import { EmergencyWorkflow } from './types';
 
-const mockWorkflows: EmergencyWorkflow[] = [
-  { id: 'EWF-001', sosAlertId: 'SOS-991', status: 'STEP_1_CONTACT_USER', log: [{ timestamp: new Date().toISOString(), action: 'Workflow initiated.', handledBy: 'System' }], createdAt: new Date().toISOString() }
-];
-
 export const emergencyWorkflowApi = {
-  getWorkflows: async (): Promise<EmergencyWorkflow[]> => Promise.resolve([...mockWorkflows]),
-  advanceStep: async (id: string, newStatus: EmergencyWorkflow['status'], actionDetail: string, handler: string): Promise<void> => {
-    const wf = mockWorkflows.find(w => w.id === id);
-    if (wf) {
-      wf.status = newStatus;
-      wf.log.push({ timestamp: new Date().toISOString(), action: actionDetail, handledBy: handler });
-    }
-    return Promise.resolve();
-  }
+  getWorkflows: async (): Promise<EmergencyWorkflow[]> => {
+    const response = await axios.get('/safety/emergency-workflows');
+    const rows = response.data.data?.data ?? response.data.data ?? [];
+    return rows.map((item: any) => ({
+      id: item.id,
+      sosAlertId: item.sosAlertId,
+      status: item.status,
+      createdAt: item.createdAt,
+      log: item.log ?? [],
+    }));
+  },
+  advanceStep: async (
+    id: string,
+    newStatus: EmergencyWorkflow['status'],
+    actionDetail: string,
+    _handler: string,
+  ): Promise<void> => {
+    await axios.patch('/safety/emergency-workflows/' + id + '/status', {
+      status: newStatus,
+      actionDetail,
+    });
+  },
 };

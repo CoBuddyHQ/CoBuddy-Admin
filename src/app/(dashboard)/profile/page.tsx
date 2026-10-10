@@ -3,13 +3,12 @@
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Shield, ShieldAlert, Key } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { SecuritySettings } from '@/modules/auth/components/SecuritySettings';
+import { hasPermission } from '@/lib/auth/permissions';
 import { LoginHistoryCard } from '@/modules/system/audit-logs/components/LoginHistoryCard';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const twoFactorEnabled = user?.twoFactorEnabled || false;
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -37,8 +36,11 @@ export default function ProfilePage() {
               <label className="text-sm font-medium text-muted-foreground">Assigned Roles</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {user?.roles && user.roles.length > 0 ? (
-                  user.roles.map(role => (
-                    <span key={role} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+                  user.roles.map((role) => (
+                    <span
+                      key={role}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary"
+                    >
                       {role.replace(/_/g, ' ')}
                     </span>
                   ))
@@ -55,45 +57,12 @@ export default function ProfilePage() {
             <CardTitle>Security</CardTitle>
             <CardDescription>Manage your security preferences.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-full ${twoFactorEnabled ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                  {twoFactorEnabled ? <Shield className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
-                </div>
-                <div>
-                  <div className="font-medium">Two-Factor Authentication</div>
-                  <div className="text-sm text-muted-foreground">
-                    {twoFactorEnabled ? '2FA is active on your account.' : '2FA is not enabled.'}
-                  </div>
-                </div>
-              </div>
-              <Button variant="outline" disabled>Manage</Button>
-            </div>
-
-            <div className="border-t pt-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-full bg-slate-100 text-slate-600">
-                    <Key className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="font-medium">Change Password</div>
-                    <div className="text-sm text-muted-foreground">
-                      Update your account password.
-                    </div>
-                  </div>
-                </div>
-                <Button disabled>Update</Button>
-              </div>
-              <p className="mt-3 text-xs text-amber-600 font-medium">
-                * Available once account system is connected.
-              </p>
-            </div>
+          <CardContent>
+            <SecuritySettings />
           </CardContent>
         </Card>
 
-        {user && (
+        {user && hasPermission(user.roles, 'audit-logs') && (
           <div className="md:col-span-2">
             <LoginHistoryCard employeeId={user.id} />
           </div>
@@ -102,4 +71,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

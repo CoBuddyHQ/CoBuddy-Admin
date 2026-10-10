@@ -1,14 +1,7 @@
 import { CompanionApplication } from '../types';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils/formatDate';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@tremor/react';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@tremor/react';
 
 interface Props {
   applications: CompanionApplication[];
@@ -30,8 +23,8 @@ export function CompanionApplicationsTable({ applications, onSelectApp }: Props)
       </TableHead>
       <TableBody>
         {applications.map((app) => (
-          <TableRow 
-            key={app.id} 
+          <TableRow
+            key={app.id}
             className="cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() => onSelectApp(app.id)}
           >
@@ -42,12 +35,17 @@ export function CompanionApplicationsTable({ applications, onSelectApp }: Props)
             </TableCell>
             <TableCell>{app.city}</TableCell>
             <TableCell>
-              <Badge variant={
-                app.status === 'APPROVED' ? 'default' :
-                app.status === 'REJECTED' ? 'destructive' :
-                app.status === 'IN_REVIEW' ? 'secondary' :
-                'outline'
-              }>
+              <Badge
+                variant={
+                  app.status === 'APPROVED'
+                    ? 'default'
+                    : app.status === 'REJECTED'
+                      ? 'destructive'
+                      : app.status === 'IN_REVIEW'
+                        ? 'secondary'
+                        : 'outline'
+                }
+              >
                 {app.status.replace('_', ' ')}
               </Badge>
             </TableCell>

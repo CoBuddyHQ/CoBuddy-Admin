@@ -1,47 +1,34 @@
-import { FraudAlert, FraudReason } from './types';
+import axios from '@/lib/api/client';
+import { FraudAlert } from './types';
 
-let mockAlerts: FraudAlert[] = [
-  {
-    id: 'FRAUD-101',
-    userId: 'USR-112',
-    userName: 'John Doe',
-    userType: 'CUSTOMER',
-    reason: 'SUSPICIOUS_TRANSACTION',
-    severity: 'HIGH',
-    status: 'PENDING',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    details: 'Multiple failed high-value bookings using different cards within 10 minutes.'
-  },
-  {
-    id: 'FRAUD-102',
-    userId: 'COMP-998',
-    userName: 'Sarah Lee',
-    userType: 'COMPANION',
-    reason: 'GPS_SPOOFING',
-    severity: 'CRITICAL',
-    status: 'PENDING',
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
-    details: 'Device GPS teleported from Mumbai to Delhi in 5 minutes. Mock location app detected.'
-  },
-  {
-    id: 'FRAUD-103',
-    userId: 'COMP-445',
-    userName: 'Priya S.',
-    userType: 'COMPANION',
-    reason: 'DUPLICATE_ACCOUNT',
-    severity: 'MEDIUM',
-    status: 'PENDING',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    details: 'Device ID matches previously banned account BANNED-221.'
-  }
-];
+const mapAlert = (item: any): FraudAlert => ({
+  id: item.id,
+  userId: item.userId,
+  userName: item.userId,
+  userType: item.userType,
+  reason: item.category,
+  severity:
+    item.riskScore >= 80
+      ? 'CRITICAL'
+      : item.riskScore >= 60
+        ? 'HIGH'
+        : item.riskScore >= 30
+          ? 'MEDIUM'
+          : 'LOW',
+  status: item.status,
+  timestamp: item.createdAt,
+  details: item.description,
+});
 
 export const fraudApi = {
   getAlerts: async (): Promise<FraudAlert[]> => {
-    return [...mockAlerts];
+    const response = await axios.get('/financial/fraud-detection', {
+      params: { page: 1, pageSize: 100 },
+    });
+    const items = response.data.data?.data ?? response.data.data ?? [];
+    return items.map(mapAlert);
   },
-  
   updateAlertStatus: async (id: string, status: FraudAlert['status']): Promise<void> => {
-    mockAlerts = mockAlerts.map(a => a.id === id ? { ...a, status } : a);
-  }
+    await axios.patch('/financial/fraud-detection/' + id, { status });
+  },
 };

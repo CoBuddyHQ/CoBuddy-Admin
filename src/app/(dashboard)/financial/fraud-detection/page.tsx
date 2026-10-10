@@ -4,7 +4,14 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { useFraudDetection } from '@/modules/financial/fraud-detection/hooks/useFraudDetection';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
 export default function FraudDetectionPage() {
@@ -14,10 +21,14 @@ export default function FraudDetectionPage() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'CRITICAL': return 'destructive';
-      case 'HIGH': return 'destructive';
-      case 'MEDIUM': return 'default';
-      default: return 'secondary';
+      case 'CRITICAL':
+        return 'destructive';
+      case 'HIGH':
+        return 'destructive';
+      case 'MEDIUM':
+        return 'default';
+      default:
+        return 'secondary';
     }
   };
 
@@ -53,7 +64,10 @@ export default function FraudDetectionPage() {
                   <TableCell>
                     <div className="font-medium">{alert.userName}</div>
                     <div className="text-xs text-muted-foreground">{alert.userId}</div>
-                    <Badge variant={alert.userType === 'COMPANION' ? 'default' : 'secondary'} className="mt-1">
+                    <Badge
+                      variant={alert.userType === 'COMPANION' ? 'default' : 'secondary'}
+                      className="mt-1"
+                    >
                       {alert.userType}
                     </Badge>
                   </TableCell>
@@ -67,33 +81,42 @@ export default function FraudDetectionPage() {
                     {alert.details}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={alert.status === 'PENDING' ? 'outline' : alert.status === 'FROZEN' ? 'destructive' : 'default'}>
+                    <Badge
+                      variant={
+                        alert.status === 'OPEN'
+                          ? 'outline'
+                          : alert.status === 'ACTION_TAKEN'
+                            ? 'destructive'
+                            : 'default'
+                      }
+                    >
                       {alert.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {alert.status === 'PENDING' && (
+                    {(alert.status === 'OPEN' || alert.status === 'INVESTIGATING') && (
                       <div className="flex gap-2">
-                        <Button 
-                          variant="destructive" 
+                        <Button
+                          variant="default"
                           size="sm"
-                          onClick={() => updateStatus({ id: alert.id, status: 'FROZEN' })}
+                          disabled={alert.status === 'INVESTIGATING'}
+                          onClick={() => updateStatus({ id: alert.id, status: 'INVESTIGATING' })}
                         >
-                          Freeze
+                          Investigate
                         </Button>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
-                          onClick={() => updateStatus({ id: alert.id, status: 'CLEARED' })}
+                          onClick={() => updateStatus({ id: alert.id, status: 'DISMISSED' })}
                         >
-                          Clear
+                          Dismiss
                         </Button>
-                        <Button 
-                          variant="secondary" 
+                        <Button
+                          variant="secondary"
                           size="sm"
-                          onClick={() => updateStatus({ id: alert.id, status: 'ESCALATED' })}
+                          onClick={() => updateStatus({ id: alert.id, status: 'ACTION_TAKEN' })}
                         >
-                          Escalate
+                          Mark Action Taken
                         </Button>
                       </div>
                     )}
@@ -107,4 +130,3 @@ export default function FraudDetectionPage() {
     </div>
   );
 }
-

@@ -1,5 +1,12 @@
 # CoBuddy Backend - Architecture & Tech Stack
 
+> Historical design specification. For the implemented folder layout, installed
+> runtime/framework versions and feature ownership, use
+> [the verified backend structure](../BACKEND_STRUCTURE.md). Provider, Socket.io,
+> BullMQ, encryption and observability entries below are design requirements,
+> not evidence that those integrations are deployed. The current runtime is
+> Node 24.x with NestJS 11, Express 5 and Prisma 5.
+
 ## 1. Overview
 
 This document defines the production-grade backend architecture for CoBuddy Admin Panel. The backend must support:
@@ -237,7 +244,7 @@ cobuddy-backend/
 ├── prisma/
 │   ├── schema.prisma                        # ← All tables + indexes + enums
 │   ├── migrations/                          # Prisma migrate dev -> create migration files
-│   ├── seed.ts                              # Seed: Super Admin, roles, 10 cities, master data
+│   ├── seed.ts                              # Reference language only; administrator bootstrap is separate
 │   └── seed-helpers.ts
 │
 ├── test/

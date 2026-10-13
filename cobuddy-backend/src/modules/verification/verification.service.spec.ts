@@ -23,9 +23,13 @@ describe('Verification provider safety', () => {
       $transaction: jest.fn(),
     };
     const service = new VerificationService(db);
-    await expect(service.rerunAutoCheck('case-1', { sub: 'admin-1' } as any)).rejects.toThrow(
-      ServiceUnavailableException,
-    );
+    await expect(
+      service.rerunAutoCheck('case-1', {
+        sub: 'admin-1',
+        roles: ['SUPER_ADMIN'],
+        cityScopeIds: [],
+      } as any),
+    ).rejects.toThrow(ServiceUnavailableException);
     expect(db.$transaction).not.toHaveBeenCalled();
   });
   it('reports nonexistent verification cases without writing data', async () => {
@@ -34,14 +38,25 @@ describe('Verification provider safety', () => {
       $transaction: jest.fn(),
     };
     await expect(
-      new VerificationService(db).rerunAutoCheck('missing', { sub: 'admin-1' } as any),
+      new VerificationService(db).rerunAutoCheck('missing', {
+        sub: 'admin-1',
+        roles: ['SUPER_ADMIN'],
+        cityScopeIds: [],
+      } as any),
     ).rejects.toThrow(NotFoundException);
     expect(db.$transaction).not.toHaveBeenCalled();
   });
 });
 
 describe('Verification manual decision integrity', () => {
-  const user = { sub: 'reviewer-1', name: 'Reviewer' } as AuthStaffPayload;
+  const user: AuthStaffPayload = {
+    sub: 'reviewer-1',
+    employeeId: 'REVIEWER-1',
+    email: 'reviewer@example.invalid',
+    name: 'Reviewer',
+    roles: ['MODERATOR'],
+    cityScopeIds: [],
+  };
 
   function setup(
     status: VerificationStatus = VerificationStatus.PENDING_MANUAL_REVIEW,

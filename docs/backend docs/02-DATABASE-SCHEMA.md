@@ -1654,27 +1654,11 @@ For CITY_OPS_MANAGER, create PostgreSQL RLS policies so a `city_scope = 'CITY-1'
 
 ---
 
-## 14. Database Seed Checklist
+## 14. Database initialization
 
-On first run, `prisma/seed.ts` must create:
+The current prisma/seed.ts only upserts the English application language. It never inserts demo accounts or operational activity. Create the first administrator with the separate admin:bootstrap command and explicit credentials; existing administrators are preserved. Manage cities, areas, languages and other reference settings through their APIs or administration screens.
 
-1. ✅ **SystemDefault** singleton row
-2. ✅ **VerificationThreshold** singleton
-3. ✅ **DiscoveryRankingConfig** singleton
-4. ✅ **EmergencyWorkflowConfig** singleton
-5. ✅ 10 Cities (Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai, Kolkata, Ahmedabad, Jaipur, Surat) with at least 2 areas each (see [master-data/api.ts](file:///d:/CoBuddy-Admin/src/modules/system/master-data/api.ts))
-6. ✅ 15 Spoken Languages + 5 App Languages
-7. ✅ 13 Interests (CUISINE: 1, ACTIVITY: 12)
-8. ✅ 10 Ticket Categories
-9. ✅ 12 Incident Types
-10. ✅ 5 Communication Styles + 5 Activity Paces + 10 Session Durations
-11. ✅ 11 Notification Categories + 13 Review Tags
-12. ✅ 11 Dispute Reasons + 14 Cancellation Reasons
-13. ✅ 5 KYC Document Types + 10 Place Types
-14. ✅ **Super Admin user**: email=`admin@cobuddy.com`, password=generate + log to console, roles=[SUPER_ADMIN], employeeId=EMP-001
-15. ✅ **8 Staff Employees** for every other role (Support Lead/Agent, Moderator, Safety Operator, Finance Admin, Legal Admin, City Ops Manager, HR Admin) — exactly as in [employees/api.ts](file:///d:/CoBuddy-Admin/src/modules/system/employees/api.ts)
-16. ✅ 2 MatchmakingConfig per first 2 cities
-17. ✅ 10 NotificationTemplates for core events (SOS_TRIGGERED, TICKET_ASSIGNED, etc.)
+Historical demo records require a reviewed cleanup with a database backup. See ../../docs/VERIFY_BACKEND_INTEGRATION.md for local verification and cleanup details.
 
 ---
 

@@ -1,4 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -8,6 +14,8 @@ import { PrismaService } from '@/prisma/prisma.module';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  private readonly logger = new Logger(JwtAuthGuard.name);
+
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService,
@@ -23,7 +31,19 @@ export class JwtAuthGuard implements CanActivate {
     const req = ctx.switchToHttp().getRequest();
     const auth = req.headers['authorization'];
     const bearer = typeof auth === 'string' && auth.startsWith('Bearer ') ? auth.slice(7) : null;
-    if (!bearer) throw new UnauthorizedException('Missing bearer token');
+    if (!bearer) {
+      if (!['production', 'staging'].includes(this.config.get<string>('NODE_ENV') || '')) {
+        this.logger.warn(
+          JSON.stringify({
+            event: 'auth_missing_bearer',
+            requestId: req.id,
+            method: req.method,
+            route: req.route?.path ?? 'unmatched',
+          }),
+        );
+      }
+      throw new UnauthorizedException('Missing bearer token');
+    }
 
     let payload: { sub?: string; sid?: string };
     try {

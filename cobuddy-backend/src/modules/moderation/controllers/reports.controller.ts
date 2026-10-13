@@ -18,13 +18,13 @@ export class ReportsController {
   constructor(private service: ModerationService) {}
 
   @Get()
-  list(@Query() dto: ListReportsDto) {
-    return this.service.listReports(dto);
+  list(@Query() dto: ListReportsDto, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.listReports(dto, user);
   }
 
   @Get(':id')
-  get(@Param('id') id: string) {
-    return this.service.getReport(id);
+  get(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.getReport(id, user);
   }
 
   @Post(':id/assign')

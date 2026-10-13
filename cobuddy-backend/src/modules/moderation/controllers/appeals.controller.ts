@@ -12,13 +12,13 @@ export class AppealsController {
   constructor(private service: ModerationService) {}
 
   @Get()
-  list(@Query() dto: ListAppealsDto) {
-    return this.service.listAppeals(dto);
+  list(@Query() dto: ListAppealsDto, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.listAppeals(dto, user);
   }
 
   @Get(':id')
-  get(@Param('id') id: string) {
-    return this.service.getAppeal(id);
+  get(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.getAppeal(id, user);
   }
 
   @Patch(':id/status')

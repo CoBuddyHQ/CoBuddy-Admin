@@ -1,0 +1,106 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { cityLaunchApi } from '../api';
+import { toast } from 'sonner';
+import { CityLaunch, WaitlistConfig } from '../types';
+
+export const useCityLaunch = () => {
+  const queryClient = useQueryClient();
+
+  const launchesQuery = useQuery({
+    throwOnError: true,
+    meta: { workflow: true },
+    queryKey: ['city-launches'],
+    queryFn: cityLaunchApi.getLaunches,
+  });
+
+  const updateStatusMutation = useMutation({
+    meta: { workflow: true },
+    mutationFn: ({ id, status }: { id: string; status: CityLaunch['status'] }) =>
+      cityLaunchApi.updateStatus(id, status),
+    onSuccess: (_, { status }) => {
+      queryClient.invalidateQueries({ queryKey: ['city-launches'] });
+      if (status === 'LIVE') {
+        toast.success('City marked live — added to Master Data and now visible to users');
+      } else {
+        toast.success(`Launch status updated to ${status}`);
+      }
+    },
+  });
+
+  const toggleTaskMutation = useMutation({
+    meta: { workflow: true },
+    mutationFn: ({
+      cityId,
+      taskId,
+      completed,
+    }: {
+      cityId: string;
+      taskId: string;
+      completed: boolean;
+    }) => cityLaunchApi.toggleChecklistTask(cityId, taskId, completed),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['city-launches'] });
+    },
+  });
+
+  const createLaunchMutation = useMutation({
+    meta: { workflow: true },
+    mutationFn: (data: {
+      cityName: string;
+      region: string;
+      targetLaunchDate: string;
+      managerName: string;
+    }) => cityLaunchApi.createLaunch(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['city-launches'] });
+      toast.success('New city launch created successfully');
+    },
+  });
+
+  const configQuery = useQuery({
+    throwOnError: true,
+    meta: { workflow: true },
+    queryKey: ['waitlist-config'],
+    queryFn: cityLaunchApi.getConfig,
+  });
+
+  const entriesQuery = useQuery({
+    throwOnError: true,
+    meta: { workflow: true },
+    queryKey: ['waitlist-entries'],
+    queryFn: cityLaunchApi.getEntries,
+  });
+
+  const updateConfigMutation = useMutation({
+    meta: { workflow: true },
+    mutationFn: (config: WaitlistConfig) => cityLaunchApi.updateConfig(config),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waitlist-config'] });
+      toast.success('Waitlist configuration updated');
+    },
+  });
+
+  const approveEntryMutation = useMutation({
+    meta: { workflow: true },
+    mutationFn: (id: string) => cityLaunchApi.approveEntry(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waitlist-entries'] });
+      toast.success('User approved from waitlist');
+    },
+  });
+
+  return {
+    launches: launchesQuery.data ?? [],
+    isLoadingLaunches: launchesQuery.isLoading,
+    updateStatus: updateStatusMutation.mutate,
+    toggleTask: toggleTaskMutation.mutate,
+    createLaunch: createLaunchMutation.mutateAsync,
+
+    config: configQuery.data,
+    entries: entriesQuery.data ?? [],
+    isLoadingWaitlist: configQuery.isLoading || entriesQuery.isLoading,
+    updateConfig: updateConfigMutation.mutate,
+    isUpdatingConfig: updateConfigMutation.isPending,
+    approveEntry: approveEntryMutation.mutate,
+  };
+};

@@ -15,6 +15,9 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: cobuddy-frontend
     strategy:
       matrix:
         maps: [missing-key, configured-key]
@@ -28,10 +31,11 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: cobuddy-frontend/package-lock.json
       - run: npm ci
-      - run: npm run verify:frontend
+      - run: npm run verify
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - run: npm audit --omit=dev --audit-level=moderate
@@ -78,7 +82,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: cobuddy-backend/package-lock.json
       - run: npm ci
@@ -91,3 +95,8 @@ jobs:
       - run: npm run test:unit
       - run: npm run test:api
       - run: npm audit --omit=dev --audit-level=moderate
+      - run: npm ci --prefix ../cobuddy-frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: cobuddy-frontend
+      - run: npm run test:live
+        working-directory: .

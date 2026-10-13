@@ -58,6 +58,8 @@ export const envSchema = z
     S3_BUCKET_PRIVATE: z.string().optional(),
     S3_BUCKET_PUBLIC: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
+    NOTIFICATION_DELIVERY_URL: z.string().url().startsWith('https://').optional(),
+    NOTIFICATION_DELIVERY_TOKEN: z.string().min(32).optional(),
     EMAIL_FROM_NAME: z.string().default('CoBuddy Admin'),
     EMAIL_FROM_ADDR: z.string().email().default('no-reply@cobuddy.in'),
     CORS_ORIGIN: z.string().default('http://localhost:3000'),

@@ -5,6 +5,7 @@ import { AllowModule, Roles } from '@/common/decorators/auth.decorators';
 import { StaffRole } from '@prisma/client';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { CurrentUser, AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { requireGlobal } from '@/common/auth/city-scope';
 
 @Controller('trust-score')
 @AllowModule('trust-score')
@@ -12,8 +13,8 @@ export class TrustScoreController {
   constructor(private service: TrustScoreService) {}
 
   @Get('dashboard')
-  dashboard() {
-    return this.service.getDashboard();
+  dashboard(@CurrentUser() user: AuthStaffPayload) {
+    return this.service.getDashboard(user);
   }
 
   @Get('rules')
@@ -24,7 +25,8 @@ export class TrustScoreController {
   @Post('rules')
   @Roles(StaffRole.SUPER_ADMIN, StaffRole.MODERATOR)
   @AuditLog({ action: 'TRUST_SCORE_RULE_CREATE', module: 'trust-score' })
-  createRule(@Body() dto: CreateRuleDto) {
+  createRule(@Body() dto: CreateRuleDto, @CurrentUser() user: AuthStaffPayload) {
+    requireGlobal(user);
     return this.service.createRule(dto);
   }
 
@@ -36,14 +38,20 @@ export class TrustScoreController {
     resourceIdParam: 'id',
     captureDiff: true,
   })
-  updateRule(@Param('id') id: string, @Body() dto: UpdateRuleDto) {
+  updateRule(
+    @Param('id') id: string,
+    @Body() dto: UpdateRuleDto,
+    @CurrentUser() user: AuthStaffPayload,
+  ) {
+    requireGlobal(user);
     return this.service.updateRule(id, dto);
   }
 
   @Delete('rules/:id')
   @Roles(StaffRole.SUPER_ADMIN, StaffRole.MODERATOR)
   @AuditLog({ action: 'TRUST_SCORE_RULE_DELETE', module: 'trust-score', resourceIdParam: 'id' })
-  deleteRule(@Param('id') id: string) {
+  deleteRule(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    requireGlobal(user);
     return this.service.deleteRule(id);
   }
 
@@ -61,7 +69,7 @@ export class TrustScoreController {
   }
 
   @Get(':companionId/history')
-  history(@Param('companionId') companionId: string) {
-    return this.service.getHistory(companionId);
+  history(@Param('companionId') companionId: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.getHistory(companionId, user);
   }
 }

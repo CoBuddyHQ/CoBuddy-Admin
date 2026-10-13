@@ -12,8 +12,8 @@ export class ReviewsController {
   constructor(private service: ModerationService) {}
 
   @Get()
-  list(@Query() dto: ListReviewsDto) {
-    return this.service.listReviews(dto);
+  list(@Query() dto: ListReviewsDto, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.listReviews(dto, user);
   }
 
   @Post(':id/approve')

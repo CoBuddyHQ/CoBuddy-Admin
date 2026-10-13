@@ -327,6 +327,8 @@ model City {
   geofenceZones      GeofenceZone[]      @relation("CityGeofenceZones")
   specialEvents      SpecialEvent[]      @relation("CitySpecialEvents")
   matchmakingConfigs MatchmakingConfig[] @relation("CityMatchmakingConfigs")
+  launch             CityLaunch?
+  waitlist           WaitlistEntry[]
 
   @@index([active])
   @@index([state])
@@ -518,9 +520,10 @@ model StaffEmployee {
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
-  subordinates    StaffEmployee[] @relation("EmployeeManager")
-  assignedTickets SupportTicket[] @relation("TicketAssignee")
-  assignedReports UserReport[]    @relation("ReportAssignee")
+  subordinates          StaffEmployee[]        @relation("EmployeeManager")
+  assignedTickets       SupportTicket[]        @relation("TicketAssignee")
+  assignedReports       UserReport[]           @relation("ReportAssignee")
+  applicationInterviews CompanionApplication[] @relation("ApplicationInterviewer")
 
   sessions            StaffSession[]
   passwordResetTokens PasswordResetToken[]
@@ -661,6 +664,7 @@ model Companion {
   tickets           SupportTicket[]          @relation("CompanionTickets")
   wallet            Wallet?
   applications      CompanionApplication[]
+  promotion         CompanionPromotion?
 
   @@index([status])
   @@index([cityId])
@@ -715,6 +719,8 @@ model Venue {
   lat           Float
   lng           Float
   photoUrl      String?
+  nameI18n      Json?
+  categoryI18n  Json?
   active        Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -1041,24 +1047,29 @@ model VerificationThreshold {
 }
 
 model CompanionApplication {
-  id                String   @id @default(uuid())
-  companionId       String?  @unique
-  firstName         String
-  lastName          String
-  phone             String
-  email             String?
-  cityId            String
-  cvUrl             String?
-  portfolioUrls     String[]
-  applicationStatus String
-  reviewNotes       String?
-  reviewedByStaffId String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                   String    @id @default(uuid())
+  companionId          String?   @unique
+  firstName            String
+  lastName             String
+  phone                String
+  email                String?
+  cityId               String
+  cvUrl                String?
+  portfolioUrls        String[]
+  applicationStatus    String
+  reviewNotes          String?
+  reviewedByStaffId    String?
+  interviewScheduledAt DateTime?
+  interviewerStaffId   String?
+  interviewMeetingLink String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  companion Companion? @relation(fields: [companionId], references: [id])
+  companion   Companion?     @relation(fields: [companionId], references: [id])
+  interviewer StaffEmployee? @relation("ApplicationInterviewer", fields: [interviewerStaffId], references: [id], onDelete: SetNull)
 
   @@index([applicationStatus, createdAt(sort: Desc)])
+  @@index([interviewerStaffId])
   @@index([cityId])
 }
 
@@ -1287,6 +1298,7 @@ model SupportTicket {
   assignedToId     String?
   slaDeadline      DateTime?
   resolutionNote   String?
+  resolvedAt       DateTime?
   relatedBookingId String?
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
@@ -1409,17 +1421,18 @@ model MatchmakingConfig {
 }
 
 model SpecialEvent {
-  id          String   @id @default(uuid())
-  cityId      String
-  title       Json
-  description Json
-  bannerUrl   String
-  startDate   DateTime
-  endDate     DateTime
-  discountPct Float?
-  featured    Boolean  @default(false)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id             String   @id @default(uuid())
+  cityId         String
+  title          Json
+  description    Json
+  bannerUrl      String
+  linkedCategory String?
+  startDate      DateTime
+  endDate        DateTime
+  discountPct    Float?
+  featured       Boolean  @default(false)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
 
   city City @relation("CitySpecialEvents", fields: [cityId], references: [id])
 
@@ -1427,28 +1440,40 @@ model SpecialEvent {
 }
 
 model PolicyDocument {
-  id          String   @id @default(uuid())
-  docKey      String   @unique
-  title       String
-  content     String
-  version     String
-  effectiveOn DateTime
-  publishedBy String?
-  createdAt   DateTime @default(now())
+  id            String          @id @default(uuid())
+  docKey        String
+  title         String
+  content       String
+  version       String
+  effectiveOn   DateTime
+  publishedBy   String?
+  createdAt     DateTime        @default(now())
+  titleI18n     Json?
+  contentI18n   Json?
+  publishStatus String          @default("DRAFT")
+  updatedAt     DateTime        @updatedAt
+  consents      PolicyConsent[]
 
+  @@unique([docKey, version])
   @@index([docKey, effectiveOn(sort: Desc)])
 }
 
 model TrainingModule {
-  id           String     @id @default(uuid())
-  title        String
-  audience     String
-  requiredRole StaffRole?
-  contentUrl   String
-  quizJson     Json?
-  passPctReq   Int        @default(80)
-  active       Boolean    @default(true)
-  createdAt    DateTime   @default(now())
+  id            String               @id @default(uuid())
+  title         String
+  audience      String
+  requiredRole  StaffRole?
+  contentUrl    String
+  quizJson      Json?
+  passPctReq    Int                  @default(80)
+  active        Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  titleI18n     Json?
+  contentI18n   Json?
+  category      String               @default("SAFETY")
+  publishStatus String               @default("DRAFT")
+  updatedAt     DateTime             @updatedAt
+  completions   TrainingCompletion[]
 }
 
 model DataPrivacyRequest {
@@ -1462,6 +1487,8 @@ model DataPrivacyRequest {
   requestedFields String[]
   fulfillmentUrl  String?
   completedAt     DateTime?
+  legalHold       Boolean   @default(false)
+  exportJson      Json?
   createdAt       DateTime  @default(now())
 
   @@index([status])
@@ -1479,6 +1506,9 @@ model LegalRequest {
   preserveUntil     DateTime
   fulfillmentStatus String
   documentsUrl      String?
+  documentUrls      String[] @default([])
+  internalNotes     String   @default("")
+  targetUserType    String   @default("CUSTOMER")
   approvedByLegalId String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -1509,13 +1539,95 @@ model ReferralCode {
 }
 
 model Announcement {
-  id             String    @id @default(uuid())
-  title          Json
-  body           Json
-  targetAudience String
-  targetCityIds  String[]
-  publishedAt    DateTime
-  expiresAt      DateTime?
-  createdById    String
-  createdAt      DateTime  @default(now())
+  id                     String              @id @default(uuid())
+  title                  Json
+  body                   Json
+  targetAudience         String
+  targetCityIds          String[]
+  publishedAt            DateTime
+  expiresAt              DateTime?
+  createdById            String
+  createdAt              DateTime            @default(now())
+  status                 String              @default("DRAFT")
+  category               String              @default("GENERAL")
+  scheduledFor           DateTime?
+  sentAt                 DateTime?
+  failureReason          String?
+  dispatches             BroadcastDelivery[]
+  dispatchLeaseId        String?
+  dispatchLeaseExpiresAt DateTime?
+}
+
+model CityLaunch {
+  id               String   @id @default(uuid())
+  cityId           String   @unique
+  targetLaunchDate DateTime
+  status           String   @default("PLANNING")
+  managerName      String
+  checklist        Json
+  updatedAt        DateTime @updatedAt
+  city             City     @relation(fields: [cityId], references: [id])
+}
+
+model WaitlistEntry {
+  id           String    @id @default(uuid())
+  email        String
+  phone        String
+  cityId       String
+  status       String    @default("PENDING")
+  createdAt    DateTime  @default(now())
+  approvedAt   DateTime?
+  approvedById String?
+  city         City      @relation(fields: [cityId], references: [id])
+
+  @@unique([email, cityId])
+}
+
+model CompanionPromotion {
+  id            String    @id @default(uuid())
+  companionId   String    @unique
+  promotedUntil DateTime
+  companion     Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+}
+
+model PolicyConsent {
+  id         String         @id @default(uuid())
+  documentId String
+  userId     String
+  userType   String
+  ipAddress  String
+  createdAt  DateTime       @default(now())
+  document   PolicyDocument @relation(fields: [documentId], references: [id])
+
+  @@unique([documentId, userId, userType])
+}
+
+model TrainingCompletion {
+  id        String         @id @default(uuid())
+  moduleId  String
+  userId    String
+  userType  String
+  score     Int
+  passed    Boolean
+  createdAt DateTime       @default(now())
+  module    TrainingModule @relation(fields: [moduleId], references: [id])
+
+  @@unique([moduleId, userId, userType])
+}
+
+model BroadcastDelivery {
+  id             String       @id @default(uuid())
+  announcementId String
+  recipientId    String
+  recipientType  String
+  status         String       @default("PENDING")
+  attempts       Int          @default(0)
+  providerId     String?
+  failureReason  String?
+  sentAt         DateTime?
+  updatedAt      DateTime     @updatedAt
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, recipientId, recipientType])
+  @@index([status])
 }

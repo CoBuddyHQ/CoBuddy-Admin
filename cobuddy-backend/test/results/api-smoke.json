@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-07T08:08:25.146Z",
-  "operationCount": 225,
-  "passed": 319,
+  "generatedAt": "2026-10-10T11:33:32.301Z",
+  "operationCount": 299,
+  "passed": 420,
   "failed": 0,
   "skipped": 0,
   "checks": [
@@ -527,6 +527,11 @@
     },
     {
       "name": "Anonymous GET /api/companion-applications/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/companion-applications/{id}/assign-self",
       "passed": true,
       "detail": "HTTP 401"
     },
@@ -1116,6 +1121,371 @@
       "detail": "HTTP 401"
     },
     {
+      "name": "Anonymous GET /api/admin-options/workflow",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/admin-options/cities",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/discovery/events",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/discovery/events",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/discovery/events/{id}/active",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/discovery/ranking-config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/discovery/ranking-config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/discovery/ranking-config/settings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/discovery/ranking-config/settings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/discovery/ranking-config/promoted",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/discovery/ranking-config/promoted",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/discovery/ranking-config/promoted/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/venues",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/operations/venues",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/operations/venues/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/operations/venues/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/operations/venues/{id}/active",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/city-launch",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/operations/city-launch",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/operations/city-launch/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/operations/city-launch/{id}/checklist/{taskId}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/city-launch/waitlist/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/operations/city-launch/waitlist/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/city-launch/waitlist",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/operations/city-launch/waitlist",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/operations/city-launch/waitlist/{id}/approve",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/operations/growth-abuse",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/operations/growth-abuse/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/operations/growth-abuse/{id}/actions",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/platform-config/policy-docs/settings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/platform-config/policy-docs/settings",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/tickets",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/agents",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/support/tickets/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets/{id}/replies",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets/{id}/escalate",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets/{id}/assign-self",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/support/tickets/{id}/assignment",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/sla-dashboard/alerts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/sla-dashboard/performance",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/platform-config/policy-docs/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/platform-config/policy-docs/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/platform-config/training/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous DELETE /api/platform-config/training/{id}",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/platform-config/policy-docs",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/platform-config/policy-docs",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/platform-config/policy-docs/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/platform-config/policy-docs/consents",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/platform-config/training",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/platform-config/training",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/platform-config/training/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/platform-config/training/quiz",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/legal/data-privacy",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/legal/data-privacy",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/legal/data-privacy/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/legal/data-privacy/{id}/hold",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/legal/data-privacy/{id}/export",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/legal/legal-requests",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/legal/legal-requests",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/legal/legal-requests/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/marketing/notifications",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/marketing/notifications",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/marketing/notifications/config",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/marketing/notifications/{id}/send",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/marketing/notifications/{id}/receipts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/marketing/announcements",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/marketing/announcements",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/marketing/templates",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PUT /api/marketing/templates",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/marketing/referrals",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/marketing/referrals",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/marketing/referrals/{id}/active",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
       "name": "Login rejects invalid input",
       "passed": true
     },
@@ -1491,6 +1861,141 @@
       "detail": "HTTP 200"
     },
     {
+      "name": "Authenticated GET /api/admin-options/workflow",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/admin-options/cities",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/discovery/events",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/discovery/ranking-config",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/discovery/ranking-config/settings",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/discovery/ranking-config/promoted",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/venues",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/city-launch",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/city-launch/waitlist/config",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/city-launch/waitlist",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/operations/growth-abuse",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/platform-config/policy-docs/settings",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/tickets",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/agents",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/sla-dashboard/alerts",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/sla-dashboard/performance",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/platform-config/policy-docs",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/platform-config/policy-docs/consents",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/platform-config/training",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/platform-config/training/quiz",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/legal/data-privacy",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/legal/legal-requests",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/marketing/notifications",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/marketing/notifications/config",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/marketing/announcements",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/marketing/templates",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/marketing/referrals",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
       "name": "Moderator customer module permission",
       "passed": true
     },
@@ -1529,7 +2034,7 @@
     {
       "name": "Concurrent reviewers can commit only one KYC decision",
       "passed": true,
-      "detail": "201, 409"
+      "detail": "409, 201"
     },
     {
       "name": "A committed KYC decision records exactly one reviewer audit event",

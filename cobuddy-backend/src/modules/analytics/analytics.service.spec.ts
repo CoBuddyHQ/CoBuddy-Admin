@@ -10,6 +10,16 @@ describe('Database-backed analytics', () => {
     expect(analyticsCityScope({ ...user, roles: ['SUPER_ADMIN', 'CITY_OPS_MANAGER'] })).toEqual({});
   });
 
+  it.each(['SAFETY_OPERATOR', 'MODERATOR', 'SUPPORT_AGENT', 'SUPPORT_LEAD', 'FINANCE_ADMIN'])(
+    'applies assigned city restrictions to %s without a city-manager role',
+    (role) => {
+      expect(analyticsCityScope({ ...user, roles: [role] })).toEqual({
+        cityId: { in: ['city-a'] },
+      });
+      expect(analyticsCityScope({ ...user, roles: [role], cityScopeIds: [] })).toEqual({});
+    },
+  );
+
   it('uses full database counts instead of a paginated customer list and applies scope to SQL', async () => {
     const prisma = {
       customer: { count: jest.fn().mockResolvedValueOnce(91).mockResolvedValueOnce(4) },
@@ -42,6 +52,78 @@ describe('Database-backed analytics', () => {
     expect(result.data.chartData).toHaveLength(24);
     expect(result.data.chartData.every((row) => row.sessions === 0)).toBe(true);
   });
+
+  it('calculates safety metrics from complete grouped database results', async () => {
+    const prisma = {
+      userBan: {
+        groupBy: jest.fn().mockResolvedValue([
+          { userId: 'customer-1', userType: 'CUSTOMER', _count: { _all: 2 } },
+          { userId: 'customer-2', userType: 'CUSTOMER', _count: { _all: 1 } },
+        ]),
+      },
+      fraudFlag: {
+        groupBy: jest.fn().mockResolvedValue([
+          { category: 'GPS_SPOOFING', _count: { _all: 2 } },
+          { category: 'PAYMENT_FRAUD', _count: { _all: 1 } },
+        ]),
+      },
+      minorAgeEscalation: {
+        groupBy: jest.fn().mockResolvedValue([
+          { status: 'APPROVED', _count: { _all: 1 } },
+          { status: 'PENDING', _count: { _all: 2 } },
+        ]),
+      },
+    };
+
+    const result = await new AnalyticsService(prisma as any).safety({
+      roles: ['SUPER_ADMIN'],
+      cityScopeIds: [],
+    } as any);
+
+    expect(result.data).toMatchObject({
+      activeRestrictions: 3,
+      repeatOffenders: 1,
+      repeatOffenderRate: 50,
+      fraudHits: 3,
+      spoofHits: 2,
+      totalAgeEscalations: 3,
+      resolvedAgeEscalations: 1,
+      ageResolutionRate: 33.3,
+    });
+    expect(prisma.userBan.groupBy.mock.calls[0][0].where.AND).toContainEqual({ liftedAt: null });
+    expect(prisma.userBan.groupBy.mock.calls[0][0].where.AND).toContainEqual({
+      startsAt: expect.objectContaining({ lte: expect.any(Date) }),
+    });
+    expect(prisma.fraudFlag.groupBy.mock.calls[0][0].where).toEqual({});
+  });
+
+  it.each(['CITY_OPS_MANAGER', 'SAFETY_OPERATOR', 'MODERATOR'])(
+    'limits safety aggregates for scoped %s staff',
+    async (role) => {
+      const prisma = {
+        customer: { findMany: jest.fn().mockResolvedValue([{ id: 'customer-a' }]) },
+        companion: { findMany: jest.fn().mockResolvedValue([{ id: 'companion-a' }]) },
+        userBan: { groupBy: jest.fn().mockResolvedValue([]) },
+        fraudFlag: { groupBy: jest.fn().mockResolvedValue([]) },
+        minorAgeEscalation: { groupBy: jest.fn().mockResolvedValue([]) },
+      };
+
+      await new AnalyticsService(prisma as any).safety({ ...user, roles: [role] });
+
+      expect(prisma.userBan.groupBy.mock.calls[0][0].where.AND).toContainEqual({
+        OR: [
+          { userType: 'CUSTOMER', userId: { in: ['customer-a'] } },
+          { userType: 'COMPANION', userId: { in: ['companion-a'] } },
+        ],
+      });
+      expect(prisma.fraudFlag.groupBy.mock.calls[0][0].where.OR[0].userId.in).toEqual([
+        'customer-a',
+      ]);
+      expect(prisma.minorAgeEscalation.groupBy.mock.calls[0][0].where.OR[1].userId.in).toEqual([
+        'companion-a',
+      ]);
+    },
+  );
 
   it('propagates database failures instead of presenting an empty dashboard', async () => {
     const prisma = {

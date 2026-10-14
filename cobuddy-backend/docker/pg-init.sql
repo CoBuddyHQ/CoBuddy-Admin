@@ -4,9 +4,9 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- Optional: For strict append-only audit log - REVOKE update/delete after app user created.
--- Example (run as superuser AFTER creating the cobuddy login):
---   REVOKE UPDATE, DELETE ON audit_log FROM cobuddy;
---   REVOKE TRUNCATE ON audit_log FROM cobuddy;
-
--- Note: App user name matches docker-compose POSTGRES_USER=cobuddy
+-- Ensure cobuddy_admin exists if created under different default DB
+SELECT 'CREATE DATABASE cobuddy_admin' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'cobuddy_admin')\gexec
+\c cobuddy_admin
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pg_trgm;

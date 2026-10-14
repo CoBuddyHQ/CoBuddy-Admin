@@ -12,7 +12,8 @@ const net = require("net");
 let attempts = 0;
 function check() {
   attempts++;
-  const socket = net.createConnection({ host: process.env.POSTGRES_HOST || "postgres", port: 5432 }, () => {
+  const host = process.env.POSTGRES_HOST || "postgres";
+  const socket = net.createConnection({ host, port: 5432 }, () => {
     console.log("      PostgreSQL is reachable and accepting connections!");
     socket.end();
     process.exit(0);

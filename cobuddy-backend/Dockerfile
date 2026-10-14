@@ -6,8 +6,6 @@
 
 FROM node:24-alpine AS builder
 
-RUN apk add --no-cache openssl libc6-compat
-
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -25,8 +23,6 @@ RUN npm run build
 # ── STAGE 2: RUNNER ───────────────────────────────────────────
 FROM node:24-alpine AS runner
 
-RUN apk add --no-cache openssl libc6-compat dos2unix curl
-
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -35,7 +31,7 @@ COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma/
 COPY docker-entrypoint.sh ./
 
-RUN dos2unix docker-entrypoint.sh && chmod +x docker-entrypoint.sh
+RUN sed -i 's/\r$//' docker-entrypoint.sh && chmod +x docker-entrypoint.sh
 
 EXPOSE 4000
 

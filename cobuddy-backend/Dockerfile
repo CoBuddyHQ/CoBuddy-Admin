@@ -6,6 +6,8 @@
 
 FROM node:24-alpine AS builder
 
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -22,6 +24,8 @@ RUN npm run build
 
 # ── STAGE 2: RUNNER ───────────────────────────────────────────
 FROM node:24-alpine AS runner
+
+RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 

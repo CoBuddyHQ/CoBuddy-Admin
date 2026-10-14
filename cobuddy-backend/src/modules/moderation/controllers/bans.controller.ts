@@ -12,8 +12,8 @@ export class BansController {
   constructor(private service: ModerationService) {}
 
   @Get()
-  list(@Query() dto: ListBansDto) {
-    return this.service.listBans(dto);
+  list(@Query() dto: ListBansDto, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.listBans(dto, user);
   }
 
   @Post()
@@ -31,7 +31,7 @@ export class BansController {
   }
 
   @Get(':id/appeals')
-  getAppeals(@Param('id') id: string) {
-    return this.service.getBanAppeals(id);
+  getAppeals(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.getBanAppeals(id, user);
   }
 }

@@ -16,16 +16,47 @@ import { ListCasesDto } from './dto/list-cases.dto';
 import { DecisionDto } from './dto/decision.dto';
 import { UpdateThresholdsDto } from './dto/update-thresholds.dto';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { scopedCities } from '@/common/auth/city-scope';
 
 @Injectable()
 export class VerificationService {
   constructor(private prisma: PrismaService) {}
 
-  async listCases(dto: ListCasesDto) {
+  private async applicantScope(user: AuthStaffPayload): Promise<Prisma.VerificationCaseWhereInput> {
+    const cities = scopedCities(user);
+    if (cities === undefined) return {};
+    const [customers, companions] = await Promise.all([
+      this.prisma.customer.findMany({ where: { cityId: { in: cities } }, select: { id: true } }),
+      this.prisma.companion.findMany({ where: { cityId: { in: cities } }, select: { id: true } }),
+    ]);
+    return {
+      OR: [
+        { applicantType: 'CUSTOMER', applicantId: { in: customers.map(({ id }) => id) } },
+        { applicantType: 'COMPANION', applicantId: { in: companions.map(({ id }) => id) } },
+      ],
+    };
+  }
+
+  private async assertApplicantScope(
+    kyc: { applicantType: VerificationApplicantType; applicantId: string },
+    user: AuthStaffPayload,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const cities = scopedCities(user);
+    if (cities === undefined) return;
+    const query = { where: { id: kyc.applicantId, cityId: { in: cities } }, select: { id: true } };
+    const applicant =
+      kyc.applicantType === 'CUSTOMER'
+        ? await db.customer.findFirst(query)
+        : await db.companion.findFirst(query);
+    if (!applicant) throw new NotFoundException('Verification case not found');
+  }
+
+  async listCases(dto: ListCasesDto, user: AuthStaffPayload) {
     const { page, pageSize, status, applicantType } = dto;
     const skip = (page - 1) * pageSize;
 
-    const where: Prisma.VerificationCaseWhereInput = {};
+    const where: Prisma.VerificationCaseWhereInput = await this.applicantScope(user);
     if (status) where.status = status;
     if (applicantType) where.applicantType = applicantType;
 
@@ -53,12 +84,13 @@ export class VerificationService {
     };
   }
 
-  async getCase(id: string) {
+  async getCase(id: string, user: AuthStaffPayload) {
     const kyc = await this.prisma.verificationCase.findUnique({
       where: { id },
       include: { auditTrail: { orderBy: { timestamp: 'asc' } } },
     });
     if (!kyc) throw new NotFoundException('Verification case not found');
+    await this.assertApplicantScope(kyc, user);
     return { data: kyc };
   }
 
@@ -75,6 +107,7 @@ export class VerificationService {
     const result = await this.prisma.$transaction(async (tx) => {
       const kyc = await tx.verificationCase.findUnique({ where: { id } });
       if (!kyc) throw new NotFoundException('Verification case not found');
+      await this.assertApplicantScope(kyc, user, tx);
       if (kyc.status !== VerificationStatus.PENDING_MANUAL_REVIEW)
         throw new ConflictException('This case is no longer pending manual review');
 
@@ -126,9 +159,10 @@ export class VerificationService {
     return { data: result, message: `Case ${dto.decision.toLowerCase()}` };
   }
 
-  async rerunAutoCheck(caseId: string, _user: AuthStaffPayload) {
+  async rerunAutoCheck(caseId: string, user: AuthStaffPayload) {
     const kyc = await this.prisma.verificationCase.findUnique({ where: { id: caseId } });
     if (!kyc) throw new NotFoundException('Verification case not found');
+    await this.assertApplicantScope(kyc, user);
 
     // No verification provider is integrated. Stored or fabricated results are not a fresh check.
     throw new ServiceUnavailableException('Verification provider is not configured');

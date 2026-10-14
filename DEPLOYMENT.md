@@ -2,11 +2,16 @@
 
 ## Current Release Boundary
 
-This repository is not a completed all-module product. The core API and admin
-screens have working integrations, but support, discovery, marketing, legal,
-training/policies, safety analytics, city launch, venues and growth abuse remain
-unfinished. Their in-memory dummy implementations have been removed. Navigation
-and direct dashboard access are blocked in every environment by `src/lib/release.ts`.
+Frontend source, configuration, tests and dependencies live in `cobuddy-frontend/`.
+Backend source, Prisma, Docker and server dependencies live in `cobuddy-backend/`.
+Use `cobuddy-frontend/.env.local` for browser configuration and
+`cobuddy-backend/.env` for server secrets. Each folder has its own `.env.example`
+and lockfile. Root npm scripts delegate to these applications.
+
+The twelve admin workflows in [AUDIT_REPAIR_REPORT.md](AUDIT_REPAIR_REPORT.md)
+now have database-backed integrations. Provider delivery and consumer-app
+dependencies described there still require acceptance testing. Safety analytics
+and flagged chats remain blocked by `cobuddy-frontend/src/lib/release.ts`.
 Growth, operational and city financial analytics now query the real database.
 Flagged-chat review is also blocked
 until a storage provider is integrated. Hiding a screen is not an API permission
@@ -68,12 +73,11 @@ Saving a preferred provider or thresholds still does not activate an integration
 Use Node.js 24 and the committed lockfiles. Run from the repository root:
 
 ```sh
-npm ci
-npm --prefix cobuddy-backend ci
+npm run install:all
 npm --prefix cobuddy-backend run prisma:generate
 npm run verify
 npm run audit:production
-npx playwright install chromium
+npm --prefix cobuddy-frontend exec -- playwright install chromium
 npm run test:browser
 ```
 
@@ -104,6 +108,35 @@ in branch protection. The workflow is based on the official
 [setup-node](https://github.com/actions/setup-node) actions.
 
 ## Configuration
+
+### Vercel frontend
+
+Create a Vercel project for this monorepo with **Root Directory** set to
+`cobuddy-frontend` and the Next.js framework preset. The frontend package pins
+`engines.node` to `24.x`, matching the repository `.nvmrc` and GitHub Actions;
+Vercel selects Node 24.x from that package setting. Do not set the Vercel project
+to Node 22.x.
+
+`cobuddy-frontend/vercel.json` selects the Next.js preset, `npm ci` install and
+`npm run build:vercel` build. Set **Root Directory** to `cobuddy-frontend` in the
+Vercel dashboard; it is not a `vercel.json` setting. Leave Output Directory at the
+Next.js default. The Vercel build validates `NEXT_PUBLIC_API_URL` before compiling
+and fails for a missing, HTTP or localhost API URL. It validates only frontend
+configuration and does not need backend database/JWT secrets. Do not use the
+repository-wide `build:production` command for this frontend-only Vercel project.
+
+Set the public API URL in both **Production** and **Preview** environments (use a
+staging backend for Preview). Changing `NEXT_PUBLIC_*` requires a new deployment
+because Next.js embeds these values into the browser build. A successful build
+does not prove the API is reachable or CORS/authentication work; verify those
+against the deployed URL. See [Vercel configuration](https://vercel.com/docs/project-configuration/vercel-json)
+and [environment variables](https://vercel.com/docs/environment-variables).
+
+Set `NEXT_PUBLIC_API_URL` to the publicly reachable backend URL ending in `/api`
+(for example, `https://api.example.com/api`). `localhost` only works on the
+developer's machine. Set the backend's `CORS_ORIGIN` to the admin site's HTTPS
+origin. Deploy `cobuddy-backend/` separately to a Node.js 24 host with PostgreSQL
+and Redis; the Vercel frontend project does not run the NestJS backend.
 
 Configure the frontend `NEXT_PUBLIC_API_URL` at build time, for example
 `https://api.your-domain.example/api`. Never put secrets in `NEXT_PUBLIC_*` values.
@@ -211,7 +244,7 @@ contains the Prisma CLI; do not reinstall tooling inside a live process.
 
 ## Runtime
 
-The frontend builds with `output: standalone`. Package `.next/standalone` together
+The frontend builds with `output: standalone`. From `cobuddy-frontend/`, package `.next/standalone` together
 with `public` and `.next/static` at the equivalent locations inside the standalone
 directory. Start its `server.js` with the desired `PORT` and `HOSTNAME`.
 

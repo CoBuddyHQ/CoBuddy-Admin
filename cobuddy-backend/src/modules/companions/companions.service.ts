@@ -104,6 +104,7 @@ export class CompanionsService {
           oldScore: companion.trustScore,
           newScore: dto.newScore,
           reason: dto.reason,
+          reasonCategory: 'admin_override',
         },
       });
       const updatedCompanion = await tx.companion.update({

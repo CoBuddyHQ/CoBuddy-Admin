@@ -1,0 +1,12 @@
+node_modules/**
+dist/**
+coverage/**
+test-results/**
+test/results/**
+docker/data/**
+package-lock.json
+*.tsbuildinfo
+.env*
+**/*.md
+**/*.sql
+**/*.prisma

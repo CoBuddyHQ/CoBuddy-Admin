@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { AppConfig, Prisma } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.module';
 import { CreateRuleDto, UpdateRuleDto } from './dto/trust-score.dto';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { cityWhere } from '@/common/auth/city-scope';
 
 export interface TrustScoreRule {
   id: string;
@@ -10,64 +13,19 @@ export interface TrustScoreRule {
   category: string;
   description?: string;
   enabled: boolean;
-  createdAt: Date;
+  createdAt: string;
 }
 
-let ruleStore: TrustScoreRule[] = [
-  {
-    id: 'r1',
-    trigger: 'positive_review_5star',
-    delta: 5,
-    category: 'reviews',
-    description: '5-star review received',
-    enabled: true,
-    createdAt: new Date(),
-  },
-  {
-    id: 'r2',
-    trigger: 'negative_review_1star',
-    delta: -10,
-    category: 'reviews',
-    description: '1-star review received',
-    enabled: true,
-    createdAt: new Date(),
-  },
-  {
-    id: 'r3',
-    trigger: 'booking_no_show',
-    delta: -15,
-    category: 'bookings',
-    description: 'No show on confirmed booking',
-    enabled: true,
-    createdAt: new Date(),
-  },
-  {
-    id: 'r4',
-    trigger: 'booking_completed',
-    delta: 2,
-    category: 'bookings',
-    description: 'Booking completed successfully',
-    enabled: true,
-    createdAt: new Date(),
-  },
-  {
-    id: 'r5',
-    trigger: 'report_substantiated',
-    delta: -20,
-    category: 'safety',
-    description: 'Report against user substantiated',
-    enabled: true,
-    createdAt: new Date(),
-  },
-];
+const RULE_PREFIX = 'trust-score.rule.';
 
 @Injectable()
 export class TrustScoreService {
   constructor(private prisma: PrismaService) {}
 
-  async getDashboard() {
+  async getDashboard(user: AuthStaffPayload) {
     const companions = await this.prisma.companion.findMany({
-      select: { id: true, name: true, trustScore: true, totalSessions: true },
+      where: cityWhere(user),
+      select: { id: true, name: true, trustScore: true, totalSessions: true, updatedAt: true },
       orderBy: { trustScore: 'desc' },
     });
 
@@ -93,6 +51,7 @@ export class TrustScoreService {
     return {
       data: {
         histogram: buckets,
+        companions,
         totalCompanions: companions.length,
         averageScore: companions.length
           ? Math.round(companions.reduce((s, c) => s + c.trustScore, 0) / companions.length)
@@ -103,38 +62,62 @@ export class TrustScoreService {
     };
   }
 
+  private mapRule(record: AppConfig): TrustScoreRule {
+    return { ...(record.value as unknown as Omit<TrustScoreRule, 'id'>), id: record.id };
+  }
+
   async getRules() {
-    return { data: ruleStore };
+    const records = await this.prisma.appConfig.findMany({
+      where: { configKey: { startsWith: RULE_PREFIX } },
+      orderBy: { updatedAt: 'asc' },
+    });
+    return { data: records.map((record) => this.mapRule(record)) };
   }
 
   async createRule(dto: CreateRuleDto) {
-    const newRule: TrustScoreRule = {
-      id: `r${Date.now()}`,
-      ...dto,
-      enabled: true,
-      createdAt: new Date(),
-    };
-    ruleStore.push(newRule);
-    return { data: newRule, message: 'Rule created' };
+    const id = randomUUID();
+    const record = await this.prisma.appConfig.create({
+      data: {
+        id,
+        configKey: RULE_PREFIX + id,
+        value: { ...dto, enabled: true, createdAt: new Date().toISOString() },
+        description: 'Trust score rule',
+      },
+    });
+    return { data: this.mapRule(record), message: 'Rule created' };
   }
 
   async updateRule(id: string, dto: UpdateRuleDto) {
-    const idx = ruleStore.findIndex((r) => r.id === id);
-    if (idx === -1) throw new NotFoundException('Rule not found');
-    ruleStore[idx] = { ...ruleStore[idx], ...dto };
-    return { data: ruleStore[idx], message: 'Rule updated' };
+    const record = await this.prisma.appConfig.findFirst({
+      where: { id, configKey: { startsWith: RULE_PREFIX } },
+    });
+    if (!record) throw new NotFoundException('Rule not found');
+    const changes = Object.fromEntries(
+      Object.entries(dto).filter(([, value]) => value !== undefined),
+    );
+    const value = { ...(record.value as Prisma.JsonObject), ...changes } as Prisma.InputJsonObject;
+    const result = await this.prisma.appConfig.updateMany({
+      where: { id, updatedAt: record.updatedAt, configKey: { startsWith: RULE_PREFIX } },
+      data: { value },
+    });
+    if (result.count !== 1) throw new ConflictException('Rule changed. Refresh and try again.');
+    return {
+      data: this.mapRule({ ...record, value: value as Prisma.JsonObject }),
+      message: 'Rule updated',
+    };
   }
 
   async deleteRule(id: string) {
-    const before = ruleStore.length;
-    ruleStore = ruleStore.filter((r) => r.id !== id);
-    if (ruleStore.length === before) throw new NotFoundException('Rule not found');
+    const result = await this.prisma.appConfig.deleteMany({
+      where: { id, configKey: { startsWith: RULE_PREFIX } },
+    });
+    if (!result.count) throw new NotFoundException('Rule not found');
     return { message: 'Rule deleted' };
   }
 
-  async recompute(companionId: string, _user: AuthStaffPayload) {
-    const companion = await this.prisma.companion.findUnique({
-      where: { id: companionId },
+  async recompute(companionId: string, user: AuthStaffPayload) {
+    const companion = await this.prisma.companion.findFirst({
+      where: { id: companionId, ...cityWhere(user) },
       include: { trustScoreHistory: { orderBy: { date: 'desc' }, take: 1 } },
     });
     if (!companion) throw new NotFoundException('Companion not found');
@@ -183,8 +166,10 @@ export class TrustScoreService {
     return { data: { companionId, oldScore, newScore }, message: 'Trust score recomputed' };
   }
 
-  async getHistory(companionId: string) {
-    const companion = await this.prisma.companion.findUnique({ where: { id: companionId } });
+  async getHistory(companionId: string, user: AuthStaffPayload) {
+    const companion = await this.prisma.companion.findFirst({
+      where: { id: companionId, ...cityWhere(user) },
+    });
     if (!companion) throw new NotFoundException('Companion not found');
 
     const history = await this.prisma.trustScoreHistoryEntry.findMany({

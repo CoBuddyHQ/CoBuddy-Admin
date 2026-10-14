@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { GeofenceAlertStatus, IncidentStatus, Prisma, SOSStatus } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.module';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { scopedCities } from '@/common/auth/city-scope';
 
 const activeSosStatuses: SOSStatus[] = [
   SOSStatus.TRIGGERED,
@@ -15,9 +16,7 @@ export class SafetyApiService {
   constructor(private readonly prisma: PrismaService) {}
 
   private cityScope(user: AuthStaffPayload) {
-    if (user.roles.includes('SUPER_ADMIN')) return undefined;
-    if (user.cityScopeIds.length) return user.cityScopeIds;
-    return user.roles.includes('CITY_OPS_MANAGER') ? [] : undefined;
+    return scopedCities(user);
   }
 
   async getSosAlerts(user: AuthStaffPayload, activeOnly = false) {

@@ -21,6 +21,7 @@ import { ListReviewsDto, RemoveReviewDto } from './dto/reviews.dto';
 import { ListAppealsDto, UpdateAppealStatusDto, AddAppealNoteDto } from './dto/appeals.dto';
 import { UpdateChatSettingsDto } from './dto/chat-settings.dto';
 import { addDuration } from '@/lib/date-util';
+import { cityWhere, scopedCities } from '@/common/auth/city-scope';
 
 const CHAT_SETTINGS_PREFIX = 'chat_settings.';
 const RISK_CONFIG_PREFIX = 'risk_config.';
@@ -29,10 +30,52 @@ const RISK_CONFIG_PREFIX = 'risk_config.';
 export class ModerationService {
   constructor(private prisma: PrismaService) {}
 
-  async listReports(dto: ListReportsDto) {
+  private async ownerScope(user: AuthStaffPayload) {
+    const cities = scopedCities(user);
+    if (cities === undefined) return {};
+    const [customers, companions] = await Promise.all([
+      this.prisma.customer.findMany({ where: cityWhere(user), select: { id: true } }),
+      this.prisma.companion.findMany({ where: cityWhere(user), select: { id: true } }),
+    ]);
+    return {
+      OR: [
+        { userType: 'CUSTOMER', userId: { in: customers.map(({ id }) => id) } },
+        { userType: 'COMPANION', userId: { in: companions.map(({ id }) => id) } },
+      ],
+    };
+  }
+
+  private async reportScope(user: AuthStaffPayload) {
+    const scope = await this.ownerScope(user);
+    return scope.OR
+      ? {
+          OR: scope.OR.map(({ userType, userId }) => ({
+            reportedUserType: userType,
+            reportedUserId: userId,
+          })),
+        }
+      : {};
+  }
+
+  private reviewScope(user: AuthStaffPayload) {
+    return scopedCities(user) === undefined
+      ? {}
+      : { OR: [{ toCompanion: cityWhere(user) }, { toCustomer: cityWhere(user) }] };
+  }
+
+  private async appealScope(user: AuthStaffPayload) {
+    if (scopedCities(user) === undefined) return {};
+    const bans = await this.prisma.userBan.findMany({
+      where: await this.ownerScope(user),
+      select: { id: true },
+    });
+    return { banId: { in: bans.map(({ id }) => id) } };
+  }
+
+  async listReports(dto: ListReportsDto, user: AuthStaffPayload) {
     const { page, pageSize, status, category, assignedToId } = dto;
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = await this.reportScope(user);
     if (status) where.status = status;
     if (category) where.categoryCode = category;
     if (assignedToId) where.assignedToId = assignedToId;
@@ -60,9 +103,9 @@ export class ModerationService {
     };
   }
 
-  async getReport(id: string) {
-    const report = await this.prisma.userReport.findUnique({
-      where: { id },
+  async getReport(id: string, user: AuthStaffPayload) {
+    const report = await this.prisma.userReport.findFirst({
+      where: { id, ...(await this.reportScope(user)) },
       include: { assignedTo: { select: { id: true, name: true } } },
     });
     if (!report) throw new NotFoundException('Report not found');
@@ -75,7 +118,9 @@ export class ModerationService {
     user: AuthStaffPayload,
     assignSelf: boolean,
   ) {
-    const report = await this.prisma.userReport.findUnique({ where: { id } });
+    const report = await this.prisma.userReport.findFirst({
+      where: { id, ...(await this.reportScope(user)) },
+    });
     if (!report) throw new NotFoundException('Report not found');
 
     const staffId = assignSelf ? user.sub : dto?.staffId;
@@ -94,7 +139,9 @@ export class ModerationService {
   }
 
   async updateReportStatus(id: string, dto: UpdateReportStatusDto, user: AuthStaffPayload) {
-    const report = await this.prisma.userReport.findUnique({ where: { id } });
+    const report = await this.prisma.userReport.findFirst({
+      where: { id, ...(await this.reportScope(user)) },
+    });
     if (!report) throw new NotFoundException('Report not found');
 
     const existingNotes: any[] = Array.isArray(report.notes as any) ? (report.notes as any[]) : [];
@@ -115,7 +162,9 @@ export class ModerationService {
   }
 
   async banUserFromReport(id: string, dto: BanUserFromReportDto, user: AuthStaffPayload) {
-    const report = await this.prisma.userReport.findUnique({ where: { id } });
+    const report = await this.prisma.userReport.findFirst({
+      where: { id, ...(await this.reportScope(user)) },
+    });
     if (!report) throw new NotFoundException('Report not found');
 
     const durationEnum = dto.duration as unknown as BanDuration;
@@ -150,7 +199,9 @@ export class ModerationService {
   }
 
   async issueWarning(id: string, dto: IssueWarningDto, user: AuthStaffPayload) {
-    const report = await this.prisma.userReport.findUnique({ where: { id } });
+    const report = await this.prisma.userReport.findFirst({
+      where: { id, ...(await this.reportScope(user)) },
+    });
     if (!report) throw new NotFoundException('Report not found');
 
     const notif = await this.prisma.staffNotification.create({
@@ -166,10 +217,10 @@ export class ModerationService {
     return { data: notif, message: 'Warning issued' };
   }
 
-  async listBans(dto: ListBansDto) {
+  async listBans(dto: ListBansDto, user: AuthStaffPayload) {
     const { page, pageSize, userId, userType } = dto;
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = await this.ownerScope(user);
     if (userId) where.userId = userId;
     if (userType) where.userType = userType;
 
@@ -191,6 +242,14 @@ export class ModerationService {
   }
 
   async createBan(dto: CreateBanDto, user: AuthStaffPayload) {
+    if (scopedCities(user) !== undefined) {
+      const query = { where: { id: dto.userId, ...cityWhere(user) }, select: { id: true } };
+      const account =
+        dto.userType === 'CUSTOMER'
+          ? await this.prisma.customer.findFirst(query)
+          : await this.prisma.companion.findFirst(query);
+      if (!account) throw new NotFoundException('Account not found');
+    }
     const durationEnum = dto.duration as unknown as BanDuration;
     let endsAt: Date | null = null;
     if (dto.duration === 'TEMPORARY_24H') endsAt = addDuration('24h');
@@ -220,7 +279,9 @@ export class ModerationService {
   }
 
   async liftBan(id: string, dto: LiftBanDto, user: AuthStaffPayload) {
-    const ban = await this.prisma.userBan.findUnique({ where: { id } });
+    const ban = await this.prisma.userBan.findFirst({
+      where: { id, ...(await this.ownerScope(user)) },
+    });
     if (!ban) throw new NotFoundException('Ban not found');
 
     const updated = await this.prisma.userBan.update({
@@ -238,8 +299,10 @@ export class ModerationService {
     return { data: updated, message: 'Ban lifted' };
   }
 
-  async getBanAppeals(banId: string) {
-    const ban = await this.prisma.userBan.findUnique({ where: { id: banId } });
+  async getBanAppeals(banId: string, user: AuthStaffPayload) {
+    const ban = await this.prisma.userBan.findFirst({
+      where: { id: banId, ...(await this.ownerScope(user)) },
+    });
     if (!ban) throw new NotFoundException('Ban not found');
     const appeals = await this.prisma.userBanAppeal.findMany({
       where: { banId },
@@ -312,11 +375,11 @@ export class ModerationService {
     return this.getChatSettings().then((r) => ({ ...r, message: 'Chat settings updated' }));
   }
 
-  async listRiskScores(dto: ListRiskScoresDto) {
+  async listRiskScores(dto: ListRiskScoresDto, user: AuthStaffPayload) {
     const { page, pageSize, userType } = dto;
     const skip = (page - 1) * pageSize;
 
-    const whereFlag: any = {};
+    const whereFlag: any = await this.ownerScope(user);
     if (userType) whereFlag.userType = userType;
 
     const flags = await this.prisma.fraudFlag.findMany({
@@ -340,10 +403,14 @@ export class ModerationService {
     };
   }
 
-  async reclassifyRiskScore(userId: string, riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL') {
+  async reclassifyRiskScore(
+    userId: string,
+    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
+    user: AuthStaffPayload,
+  ) {
     const scoreByLevel = { LOW: 20, MEDIUM: 45, HIGH: 65, CRITICAL: 85 };
     const result = await this.prisma.fraudFlag.updateMany({
-      where: { userId },
+      where: { userId, ...(await this.ownerScope(user)) },
       data: { riskScore: scoreByLevel[riskLevel] },
     });
     if (result.count === 0) throw new NotFoundException('No risk flags found for user');
@@ -353,9 +420,9 @@ export class ModerationService {
     };
   }
 
-  async getRiskScoreBreakdown(userId: string) {
+  async getRiskScoreBreakdown(userId: string, user: AuthStaffPayload) {
     const flags = await this.prisma.fraudFlag.findMany({
-      where: { userId },
+      where: { userId, ...(await this.ownerScope(user)) },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -373,19 +440,21 @@ export class ModerationService {
     const avg = flags.length ? total / flags.length : 0;
 
     let userInfo: any = null;
-    const customer = await this.prisma.customer.findUnique({
-      where: { id: userId },
+    const customer = await this.prisma.customer.findFirst({
+      where: { id: userId, ...cityWhere(user) },
       select: { id: true, name: true, status: true, flagsCount: true },
     });
     if (customer) userInfo = { ...customer, userType: 'CUSTOMER' };
     if (!userInfo) {
-      const companion = await this.prisma.companion.findUnique({
-        where: { id: userId },
+      const companion = await this.prisma.companion.findFirst({
+        where: { id: userId, ...cityWhere(user) },
         select: { id: true, name: true, status: true, trustScore: true },
       });
       if (companion) userInfo = { ...companion, userType: 'COMPANION' };
     }
 
+    if (!userInfo && scopedCities(user) !== undefined)
+      throw new NotFoundException('Account not found');
     return {
       data: {
         user: userInfo,
@@ -418,10 +487,10 @@ export class ModerationService {
     return this.getRiskConfig().then((r) => ({ ...r, message: 'Risk scoring config updated' }));
   }
 
-  async listReviews(dto: ListReviewsDto) {
+  async listReviews(dto: ListReviewsDto, user: AuthStaffPayload) {
     const { page, pageSize, status, rating, tagCodes } = dto;
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = this.reviewScope(user);
     if (status) where.moderationStatus = status;
     if (rating) where.rating = rating;
     if (tagCodes && tagCodes.length) where.tagCodes = { hasEvery: tagCodes };
@@ -453,7 +522,7 @@ export class ModerationService {
   }
 
   async approveReview(id: string, user: AuthStaffPayload) {
-    const review = await this.prisma.review.findUnique({ where: { id } });
+    const review = await this.prisma.review.findFirst({ where: { id, ...this.reviewScope(user) } });
     if (!review) throw new NotFoundException('Review not found');
     const updated = await this.prisma.review.update({
       where: { id },
@@ -463,7 +532,7 @@ export class ModerationService {
   }
 
   async removeReview(id: string, dto: RemoveReviewDto, user: AuthStaffPayload) {
-    const review = await this.prisma.review.findUnique({ where: { id } });
+    const review = await this.prisma.review.findFirst({ where: { id, ...this.reviewScope(user) } });
     if (!review) throw new NotFoundException('Review not found');
     const updated = await this.prisma.review.update({
       where: { id },
@@ -477,7 +546,7 @@ export class ModerationService {
   }
 
   async flagReview(id: string, user: AuthStaffPayload) {
-    const review = await this.prisma.review.findUnique({ where: { id } });
+    const review = await this.prisma.review.findFirst({ where: { id, ...this.reviewScope(user) } });
     if (!review) throw new NotFoundException('Review not found');
     const updated = await this.prisma.review.update({
       where: { id },
@@ -486,10 +555,10 @@ export class ModerationService {
     return { data: updated, message: 'Review flagged' };
   }
 
-  async listAppeals(dto: ListAppealsDto) {
+  async listAppeals(dto: ListAppealsDto, user: AuthStaffPayload) {
     const { page, pageSize, status } = dto;
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = await this.appealScope(user);
     if (status) where.status = status;
 
     const [items, total] = await Promise.all([
@@ -514,15 +583,19 @@ export class ModerationService {
     };
   }
 
-  async getAppeal(id: string) {
-    const appeal = await this.prisma.userBanAppeal.findUnique({ where: { id } });
+  async getAppeal(id: string, user: AuthStaffPayload) {
+    const appeal = await this.prisma.userBanAppeal.findFirst({
+      where: { id, ...(await this.appealScope(user)) },
+    });
     if (!appeal) throw new NotFoundException('Appeal not found');
     const ban = await this.prisma.userBan.findUnique({ where: { id: appeal.banId } });
     return { data: { ...appeal, ban } };
   }
 
   async updateAppealStatus(id: string, dto: UpdateAppealStatusDto, user: AuthStaffPayload) {
-    const appeal = await this.prisma.userBanAppeal.findUnique({ where: { id } });
+    const appeal = await this.prisma.userBanAppeal.findFirst({
+      where: { id, ...(await this.appealScope(user)) },
+    });
     if (!appeal) throw new NotFoundException('Appeal not found');
 
     const updated = await this.prisma.$transaction(async (tx: any) => {
@@ -564,7 +637,9 @@ export class ModerationService {
   }
 
   async addAppealNote(id: string, dto: AddAppealNoteDto, user: AuthStaffPayload) {
-    const appeal = await this.prisma.userBanAppeal.findUnique({ where: { id } });
+    const appeal = await this.prisma.userBanAppeal.findFirst({
+      where: { id, ...(await this.appealScope(user)) },
+    });
     if (!appeal) throw new NotFoundException('Appeal not found');
 
     const existing = appeal.reviewNote

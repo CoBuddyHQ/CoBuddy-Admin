@@ -7,6 +7,7 @@ import {
 import { BookingStatus, Prisma, RefundStatus, SOSStatus } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.module';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { cityWhere } from '@/common/auth/city-scope';
 import { MatchmakingConfigDto } from './dto/matchmaking-config.dto';
 import { OverrideDisputeRefundDto, UpdateDisputeStatusDto } from './dto/dispute.dto';
 
@@ -54,13 +55,7 @@ export class OperationsApiService {
   }
 
   private bookingScope(user: AuthStaffPayload): Prisma.BookingWhereInput {
-    if (user.roles.includes('SUPER_ADMIN')) return {};
-    if (user.roles.includes('CITY_OPS_MANAGER')) {
-      return {
-        cityId: { in: user.cityScopeIds.length ? user.cityScopeIds : ['__no_city_scope__'] },
-      };
-    }
-    return {};
+    return cityWhere(user);
   }
 
   async listBookings(statuses: BookingStatus[], user: AuthStaffPayload) {

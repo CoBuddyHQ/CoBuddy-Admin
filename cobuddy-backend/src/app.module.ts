@@ -33,6 +33,12 @@ import { OperationsApiModule } from '@/modules/operations-api/operations-api.mod
 import { SafetyApiModule } from '@/modules/safety-api/safety-api.module';
 import { ConfigService } from '@nestjs/config';
 import { AnalyticsModule } from '@/modules/analytics/analytics.module';
+import { AdminOptionsModule } from '@/modules/admin-options/admin-options.module';
+import { CatalogModule } from '@/modules/catalog/catalog.module';
+import { ContentModule } from '@/modules/platform-content/platform-content.module';
+import { SupportModule } from '@/modules/support/support.module';
+import { LegalModule } from '@/modules/legal/legal.module';
+import { MarketingModule } from '@/modules/marketing/marketing.module';
 
 @Module({
   imports: [
@@ -67,6 +73,12 @@ import { AnalyticsModule } from '@/modules/analytics/analytics.module';
     OperationsApiModule,
     SafetyApiModule,
     AnalyticsModule,
+    AdminOptionsModule,
+    CatalogModule,
+    ContentModule,
+    SupportModule,
+    LegalModule,
+    MarketingModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

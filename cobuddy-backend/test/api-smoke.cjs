@@ -455,11 +455,10 @@ async function main() {
       skipped: results.filter((x) => x.skipped).length,
       checks: results,
     };
-    fs.mkdirSync(path.join(__dirname, 'results'), { recursive: true });
-    fs.writeFileSync(
-      path.join(__dirname, 'results/api-smoke.json'),
-      JSON.stringify(report, null, 2) + '\n',
-    );
+    const reportPath =
+      process.env.SMOKE_REPORT_PATH || path.join(__dirname, 'results/api-smoke.json');
+    fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
     console.log(
       JSON.stringify(
         {

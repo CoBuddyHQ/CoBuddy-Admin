@@ -275,13 +275,20 @@ All endpoints are prefixed with: `{baseURL}/api` (e.g. `http://localhost:4000/ap
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/companion-applications` | Filter status (SUBMITTED/SCREENING/INTERVIEW/APPROVED/REJECTED), cityId, search |
-| `GET` | `/companion-applications/:id` | Full application — CV, documents, answers |
-| `PATCH` | `/companion-applications/:id/status` | Advance status. Body: `{ status, reviewNotes }` |
-| `POST` | `/companion-applications/:id/schedule-interview` | Body: `{ scheduledAt, interviewerStaffId, meetingLink }` → Send email/SMS |
-| `POST` | `/companion-applications/:id/approve` | Creates actual Companion + Wallet + sends onboarding SMS |
-| `POST` | `/companion-applications/:id/reject` | Body: `{ reason }` → sends rejection email |
+| `GET` | `/companion-applications` | Filter persisted application status, cityId and search; city-scoped, paginated records |
+| `GET` | `/companion-applications/:id` | Stored profile, CV/portfolio URLs, review notes, reviewer/city labels and saved interview details |
+| `POST` | `/companion-applications/:id/assign-self` | Atomically claim an open application using the authenticated staff identity |
+| `PATCH` | `/companion-applications/:id/status` | Body: `{ status, reviewNotes }`. Changes open workflow state and clears the appointment; scheduling/approval/rejection require their dedicated actions |
+| `GET` | `/companion-applications/:id/interviewers` | Active, accepted moderators/super admins with access to the application's city; returns only IDs and names |
+| `POST` | `/companion-applications/:id/schedule-interview` | Body: `{ scheduledAt, interviewerStaffId, meetingLink? }`. Persists the future appointment, validates reviewer eligibility and detects competing application updates |
+| `POST` | `/companion-applications/:id/approve` | Creates the Companion + Wallet and stores decision notes |
+| `POST` | `/companion-applications/:id/reject` | Body: `{ reason }`. Closes the application with a recorded reason |
 | `POST` | `/companion-applications/:id/add-note` | Body: `{ note }` → internal audit log |
+
+Scheduling stores an appointment; it does not send an email, SMS or calendar invitation.
+The saved `interview` appears on subsequent list/detail reads. Rescheduling without
+`meetingLink` clears the previous link. Existing records without appointment data
+return `interview: null` rather than fabricated details.
 
 ---
 
@@ -523,7 +530,7 @@ All endpoints are prefixed with: `{baseURL}/api` (e.g. `http://localhost:4000/ap
 |---|---|---|
 | `GET` | `/operations/city-launch/:cityId/checklist` | Pre-launch checklist items completed status |
 | `POST` | `/operations/city-launch/:cityId/mark-step` | Body: `{ stepKey, done, note }` |
-| `POST` | `/operations/city-launch/:cityId/launch` | Flip city.active=true + notify all staff with cityScope + seed sample data |
+| `POST` | `/operations/city-launch/:cityId/launch` | Activate a city after launch prerequisites pass; no sample records are created |
 
 ### Growth Abuse Monitoring
 **Roles**: MODERATOR, SUP

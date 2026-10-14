@@ -5,6 +5,7 @@ export const APPLICATION_STATUSES = [
   'SUBMITTED',
   'SCREENING',
   'INTERVIEW_SCHEDULED',
+  'WAITLISTED',
   'APPROVED',
   'REJECTED',
 ] as const;

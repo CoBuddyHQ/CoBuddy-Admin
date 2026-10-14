@@ -6,6 +6,7 @@ import { AuthStaffPayload, CurrentUser } from '@/common/decorators/current-user.
 import { OperationsApiService } from './operations-api.service';
 import { MatchmakingConfigDto } from './dto/matchmaking-config.dto';
 import { OverrideDisputeRefundDto, UpdateDisputeStatusDto } from './dto/dispute.dto';
+import { requireGlobal } from '@/common/auth/city-scope';
 
 @Controller()
 export class OperationsApiController {
@@ -24,7 +25,11 @@ export class OperationsApiController {
     module: 'matchmaking',
     resourceType: 'AppConfig',
   })
-  updateMatchmakingConfig(@Body() dto: MatchmakingConfigDto) {
+  updateMatchmakingConfig(
+    @Body() dto: MatchmakingConfigDto,
+    @CurrentUser() user: AuthStaffPayload,
+  ) {
+    requireGlobal(user);
     return this.service.updateMatchmakingConfig(dto);
   }
 

@@ -6,6 +6,7 @@ import {
   CityScopeMetadata,
 } from '@/common/decorators/auth.decorators';
 import { PrismaService } from '@/prisma/prisma.module';
+import { scopedCities } from '@/common/auth/city-scope';
 
 @Injectable()
 export class CityScopeGuard implements CanActivate {
@@ -30,9 +31,8 @@ export class CityScopeGuard implements CanActivate {
     const user = req.user;
 
     if (!user) return false;
-    if (user.roles?.includes('SUPER_ADMIN')) return true;
-    const cities: string[] = user.cityScopeIds || [];
-    if (cities.length === 0 && !user.roles?.includes('CITY_OPS_MANAGER')) return true;
+    const cities = scopedCities(user);
+    if (cities === undefined) return true;
 
     req.cityScopeFilter = cities;
     req.cityScopeField = meta?.field || 'cityId';

@@ -1,8 +1,11 @@
 # CoBuddy Admin — Backend
 
+Current implementation: [backend structure](../docs/BACKEND_STRUCTURE.md) and
+[pre-push verification](../docs/PRE_PUSH_REVIEW.md).
+
 NestJS + Prisma + PostgreSQL + Redis admin backend for CoBuddy companion booking platform.
 
-Current release scope and acceptance evidence: [Handover report](../HANDOVER_READINESS_REPORT.md).
+Current release scope and acceptance evidence: [Audit repair report](../AUDIT_REPAIR_REPORT.md).
 The old demo seed has been removed; existing database records are not automatically deleted.
 
 ---
@@ -104,23 +107,17 @@ npm run start:dev
 
 ---
 
-## 🌱 Default Seed Login Credentials
+## Administrator access and reference data
 
-**Default password** sab demo accounts ke liye: `CoBuddy@2026`
+There are no default/demo login credentials. Keep your existing administrator login. For a new, empty installation, set ADMIN_BOOTSTRAP_EMAIL, ADMIN_BOOTSTRAP_NAME and ADMIN_BOOTSTRAP_PASSWORD in the backend environment, then run npm run admin:bootstrap. The bootstrap command refuses to replace an existing super administrator.
 
-Admin account ka password reset karne ke liye backend folder mein `ADMIN_LOGIN_PASSWORD` environment variable set karke `npm run admin:reset-password` chalao. Isse sirf `admin@cobuddy.com` ka password hash update hota hai; demo seed dobara chalane ki zaroorat nahi.
+npm run db:seed only initializes the English application language. It does not create staff, customers, companions, bookings, balances or demo activity. Add reference data through the administration screens.
 
-## 🔑 Forgot password
+The local legacy demo data was removed after a PostgreSQL backup. To inspect another local database, use npm run db:inventory-demo and npm run db:cleanup-demo (dry run). Applying cleanup requires an explicit --apply --backup argument pointing at a PostgreSQL custom-format backup under the repository .local-backups directory; see ../docs/VERIFY_BACKEND_INTEGRATION.md. Unknown related activity aborts cleanup.
 
-The login page includes a **Forgot password?** link. It sends a one-time reset link that expires after one hour and invalidates all existing sessions after the password changes.
+## Forgot password
 
-Set `RESEND_API_KEY`, `EMAIL_FROM_NAME`, `EMAIL_FROM_ADDR`, and `FRONTEND_URL` in `.env` to deliver reset emails. During local development without `RESEND_API_KEY`, the backend prints the reset URL only in its terminal so the flow can be tested without sending an email.
-
-Seed data mein yeh entries hoti hain:
-- Super Admin, Staff Employees (Operations, Finance, Moderation roles)
-- 10 Cities (Mumbai, Delhi, Bangalore, Pune, Hyderabad, etc.)
-- 13+ Interests, 15 Languages, 20+ Cancellation/Dispute Reasons
-- Categories, Review Tags, KYC Document Types, etc.
+Use the login page's Forgot password link. Configure RESEND_API_KEY, EMAIL_FROM_NAME, EMAIL_FROM_ADDR and FRONTEND_URL in the backend .env for email delivery. Password changes invalidate existing sessions.
 
 ---
 

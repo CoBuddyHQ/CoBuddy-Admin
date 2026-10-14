@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BookingStatus, Prisma } from '@prisma/client';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
 import { PrismaService } from '@/prisma/prisma.module';
+import { cityWhere } from '@/common/auth/city-scope';
 
 const cancelled: BookingStatus[] = [
   'CUSTOMER_CANCELLED',
@@ -14,14 +15,33 @@ const cancelled: BookingStatus[] = [
 ];
 
 export function analyticsCityScope(user: AuthStaffPayload) {
-  return user.roles.includes('CITY_OPS_MANAGER') && !user.roles.includes('SUPER_ADMIN')
-    ? { cityId: { in: user.cityScopeIds } }
-    : {};
+  return cityWhere(user);
 }
 
 @Injectable()
 export class AnalyticsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private async safetyOwnerFilters(user: AuthStaffPayload) {
+    const scope = analyticsCityScope(user);
+    if (!scope.cityId) return null;
+
+    const [customers, companions] = await Promise.all([
+      this.prisma.customer.findMany({
+        where: { cityId: scope.cityId },
+        select: { id: true },
+      }),
+      this.prisma.companion.findMany({
+        where: { cityId: scope.cityId },
+        select: { id: true },
+      }),
+    ]);
+
+    return [
+      { userType: 'CUSTOMER', userId: { in: customers.map(({ id }) => id) } },
+      { userType: 'COMPANION', userId: { in: companions.map(({ id }) => id) } },
+    ];
+  }
 
   private sqlScope(user: AuthStaffPayload): Prisma.Sql {
     const scope = analyticsCityScope(user);
@@ -101,6 +121,67 @@ export class AnalyticsService {
         })),
         timezone: 'UTC',
         measuredAt: now.toISOString(),
+      },
+    };
+  }
+
+  async safety(user: AuthStaffPayload) {
+    const measuredAt = new Date();
+    const ownerFilters = await this.safetyOwnerFilters(user);
+    const ownerScope = ownerFilters ? { OR: ownerFilters } : {};
+    const activeBanWhere = {
+      AND: [
+        ...(ownerFilters ? [{ OR: ownerFilters }] : []),
+        { startsAt: { lte: measuredAt } },
+        { liftedAt: null },
+        { OR: [{ endsAt: null }, { endsAt: { gt: measuredAt } }] },
+      ],
+    };
+
+    const [activeBans, fraudFlags, ageEscalations] = await Promise.all([
+      this.prisma.userBan.groupBy({
+        by: ['userId', 'userType'],
+        where: activeBanWhere,
+        _count: { _all: true },
+      }),
+      this.prisma.fraudFlag.groupBy({
+        by: ['category'],
+        where: ownerScope,
+        _count: { _all: true },
+      }),
+      this.prisma.minorAgeEscalation.groupBy({
+        by: ['status'],
+        where: ownerScope,
+        _count: { _all: true },
+      }),
+    ]);
+
+    const activeBanCount = activeBans.reduce((total, row) => total + row._count._all, 0);
+    const repeatOffenderCount = activeBans.filter((row) => row._count._all > 1).length;
+    const fraudHits = fraudFlags.reduce((total, row) => total + row._count._all, 0);
+    const spoofHits = fraudFlags
+      .filter((row) => ['GPS_SPOOFING', 'FAKE_SELFIE'].includes(row.category))
+      .reduce((total, row) => total + row._count._all, 0);
+    const totalAgeEscalations = ageEscalations.reduce((total, row) => total + row._count._all, 0);
+    const resolvedAgeEscalations = ageEscalations
+      .filter((row) => ['APPROVED', 'REJECTED'].includes(row.status))
+      .reduce((total, row) => total + row._count._all, 0);
+
+    return {
+      data: {
+        activeRestrictions: activeBanCount,
+        repeatOffenders: repeatOffenderCount,
+        repeatOffenderRate: activeBans.length
+          ? Number(((repeatOffenderCount / activeBans.length) * 100).toFixed(1))
+          : 0,
+        fraudHits,
+        spoofHits,
+        totalAgeEscalations,
+        resolvedAgeEscalations,
+        ageResolutionRate: totalAgeEscalations
+          ? Number(((resolvedAgeEscalations / totalAgeEscalations) * 100).toFixed(1))
+          : 0,
+        measuredAt: measuredAt.toISOString(),
       },
     };
   }

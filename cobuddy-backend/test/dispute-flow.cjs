@@ -51,7 +51,7 @@ async function main() {
           passwordHash,
           designation: 'Test',
           department: 'ENGINEERING',
-          roles: index ? ['FINANCE_ADMIN'] : ['SUPPORT_AGENT', 'CITY_OPS_MANAGER'],
+          roles: index ? ['FINANCE_ADMIN'] : ['SUPPORT_AGENT'],
           cityScopeIds: index ? [] : [cityIds[0]],
           status: 'ACTIVE',
           inviteStatus: 'ACCEPTED',
@@ -262,6 +262,11 @@ async function main() {
       ).status === 409,
       'Terminal dispute must not reopen',
     );
+    // Dispute checks above deliberately use SUPPORT_AGENT without CITY_OPS_MANAGER.
+    await prisma.staffEmployee.update({
+      where: { id: staffIds[0] },
+      data: { roles: ['SUPPORT_AGENT', 'CITY_OPS_MANAGER'] },
+    });
     const growth = await request('GET', '/analytics/growth', support);
     check(
       growth.status === 200 && growth.body.data.totalUsers === 1,

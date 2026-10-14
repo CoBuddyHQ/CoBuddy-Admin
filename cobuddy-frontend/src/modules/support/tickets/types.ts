@@ -1,0 +1,23 @@
+export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+export type TicketStatus =
+  'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'PENDING_USER' | 'ESCALATED';
+export type TicketCategory = string;
+export type EscalationLevel = 'L1' | 'L2' | 'L3';
+
+export interface SupportTicket {
+  id: string;
+  userId: string;
+  userName: string;
+  userType: 'CUSTOMER' | 'COMPANION';
+  category: TicketCategory;
+  priority: TicketPriority;
+  status: TicketStatus;
+  subject: string;
+  thread: { sender: string; message: string; timestamp: string }[];
+  slaDeadline: string;
+  escalationLevel: EscalationLevel;
+  assignedTo?: string; // Staff name
+  assignedToId?: string;
+  resolutionNote?: string;
+  createdAt: string;
+}

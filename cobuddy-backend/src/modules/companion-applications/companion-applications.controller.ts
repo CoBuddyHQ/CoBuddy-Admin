@@ -9,6 +9,7 @@ import { AllowModule } from '@/common/decorators/auth.decorators';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { ApproveApplicationDto } from './dto/approve-application.dto';
 
 @Controller('companion-applications')
 @AllowModule('companion-applications')
@@ -21,8 +22,19 @@ export class CompanionApplicationsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.findOne(id, user);
+  }
+
+  @Post(':id/assign-self')
+  @AuditLog({
+    action: 'ASSIGN_APPLICATION',
+    module: 'companion-applications',
+    resourceType: 'CompanionApplication',
+    resourceIdParam: 'id',
+  })
+  assignSelf(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.assignSelf(id, user);
   }
 
   @Patch(':id/status')
@@ -47,8 +59,17 @@ export class CompanionApplicationsController {
     resourceType: 'CompanionApplication',
     resourceIdParam: 'id',
   })
-  scheduleInterview(@Param('id') id: string, @Body() dto: ScheduleInterviewDto) {
-    return this.service.scheduleInterview(id, dto);
+  scheduleInterview(
+    @Param('id') id: string,
+    @Body() dto: ScheduleInterviewDto,
+    @CurrentUser() user: AuthStaffPayload,
+  ) {
+    return this.service.scheduleInterview(id, dto, user);
+  }
+
+  @Get(':id/interviewers')
+  interviewers(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.interviewers(id, user);
   }
 
   @Post(':id/approve')
@@ -58,8 +79,12 @@ export class CompanionApplicationsController {
     resourceType: 'CompanionApplication',
     resourceIdParam: 'id',
   })
-  approve(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
-    return this.service.approve(id, user);
+  approve(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthStaffPayload,
+    @Body() dto: ApproveApplicationDto,
+  ) {
+    return this.service.approve(id, user, dto?.notes);
   }
 
   @Post(':id/reject')

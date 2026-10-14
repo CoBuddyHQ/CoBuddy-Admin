@@ -4,6 +4,8 @@ import { UpdateChatSettingsDto } from '../dto/chat-settings.dto';
 import { AllowModule, Roles } from '@/common/decorators/auth.decorators';
 import { StaffRole } from '@prisma/client';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
+import { CurrentUser, AuthStaffPayload } from '@/common/decorators/current-user.decorator';
+import { requireGlobal } from '@/common/auth/city-scope';
 
 @Controller('moderation/chat-settings')
 @AllowModule('chat-settings')
@@ -18,7 +20,8 @@ export class ChatSettingsController {
   @Put()
   @Roles(StaffRole.SUPER_ADMIN, StaffRole.MODERATOR)
   @AuditLog({ action: 'CHAT_SETTINGS_UPDATE', module: 'moderation', captureDiff: true })
-  update(@Body() dto: UpdateChatSettingsDto) {
+  update(@Body() dto: UpdateChatSettingsDto, @CurrentUser() user: AuthStaffPayload) {
+    requireGlobal(user);
     return this.service.updateChatSettings(dto);
   }
 }

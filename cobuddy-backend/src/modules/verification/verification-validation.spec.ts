@@ -4,16 +4,31 @@ import request from 'supertest';
 import { VerificationCasesController } from './verification-cases.controller';
 import { ThresholdsController } from './thresholds.controller';
 import { VerificationService } from './verification.service';
+import { Request, Response, NextFunction } from 'express';
+import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
 
 describe('Verification request contracts', () => {
   let app: INestApplication;
   const service = { decideCase: jest.fn(), updateThresholds: jest.fn() };
+  const user: AuthStaffPayload = {
+    sub: 'reviewer',
+    employeeId: 'REVIEWER',
+    email: 'reviewer@example.invalid',
+    name: 'Reviewer',
+    roles: ['MODERATOR'],
+    cityScopeIds: [],
+  };
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       controllers: [VerificationCasesController, ThresholdsController],
       providers: [{ provide: VerificationService, useValue: service }],
     }).compile();
     app = module.createNestApplication();
+    // This contract test omits the real JWT guard; provide its authenticated payload.
+    app.use((req: Request & { user?: AuthStaffPayload }, _res: Response, next: NextFunction) => {
+      req.user = user;
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -63,7 +78,7 @@ describe('Verification request contracts', () => {
         reason: 'Document expired',
         notes: 'Reviewed',
       }),
-      undefined,
+      user,
     );
   });
 

@@ -13,13 +13,13 @@ export class VerificationCasesController {
   constructor(private service: VerificationService) {}
 
   @Get()
-  list(@Query() dto: ListCasesDto) {
-    return this.service.listCases(dto);
+  list(@Query() dto: ListCasesDto, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.listCases(dto, user);
   }
 
   @Get(':id')
-  get(@Param('id') id: string) {
-    return this.service.getCase(id);
+  get(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.getCase(id, user);
   }
 
   @Post(':id/decision')

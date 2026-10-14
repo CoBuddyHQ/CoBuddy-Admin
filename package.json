@@ -31,6 +31,11 @@
     "verify": "npm run verify:frontend && npm run verify:backend",
     "check:production-config": "npm --prefix cobuddy-backend run check:production-config && npm --prefix cobuddy-frontend run check:production-config",
     "audit:production": "npm --prefix cobuddy-frontend audit --omit=dev --audit-level=moderate && npm --prefix cobuddy-backend audit --omit=dev --audit-level=moderate",
-    "build:production": "npm run check:production-config && npm run audit:production && npm run build"
+    "build:production": "npm run check:production-config && npm run audit:production && npm run build",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps"
   }
 }

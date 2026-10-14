@@ -126,6 +126,7 @@ enum RefundStatus {
   REJECTED
 }
 
+
 enum InvoiceStatus {
   DRAFT
   ISSUED

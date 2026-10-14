@@ -1,0 +1,99 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: cobuddy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cobuddy
+      POSTGRES_PASSWORD: cobuddy
+      POSTGRES_DB: cobuddy_admin
+      TZ: Asia/Kolkata
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./cobuddy-backend/docker/data/postgres:/var/lib/postgresql/data
+      - ./cobuddy-backend/docker/pg-init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cobuddy -d cobuddy_admin']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cobuddy-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: cobuddy-redis
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', 'cobuddy-redis-pw']
+    environment:
+      TZ: Asia/Kolkata
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./cobuddy-backend/docker/data/redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'cobuddy-redis-pw', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - cobuddy-net
+
+  backend:
+    build:
+      context: ./cobuddy-backend
+      dockerfile: Dockerfile
+    image: cobuddy-admin-backend:latest
+    container_name: cobuddy-admin-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      POSTGRES_HOST: postgres
+      DATABASE_URL: postgresql://cobuddy:cobuddy@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer
+      DIRECT_URL: postgresql://cobuddy:cobuddy@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer
+      REDIS_URL: redis://:cobuddy-redis-pw@redis:6379/0
+      JWT_ACCESS_SECRET: cobuddy-admin-access-secret-key-2026-min-32-chars
+      JWT_REFRESH_SECRET: cobuddy-admin-refresh-secret-key-2026-min-32-chars
+      JWT_MFA_SECRET: cobuddy-admin-mfa-secret-key-2026-min-32-chars-xx
+      JWT_ACCESS_TTL: 15m
+      JWT_REFRESH_TTL: 7d
+      BCRYPT_SALT_ROUNDS: 12
+      ENCRYPTION_KEY_PII: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      CORS_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cobuddy-net
+
+  frontend:
+    build:
+      context: ./cobuddy-frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api
+    image: cobuddy-admin-frontend:latest
+    container_name: cobuddy-admin-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+    ports:
+      - '3000:3000'
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - cobuddy-net
+
+networks:
+  cobuddy-net:
+    driver: bridge

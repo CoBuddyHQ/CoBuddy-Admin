@@ -62,6 +62,30 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
       failureReason: a.failureReason,
     }));
   }
+  async activeAnnouncements() {
+    const now = new Date();
+    const list = await this.db.announcement.findMany({
+      where: {
+        status: { in: ['PUBLISHED', 'SENT'] },
+        OR: [
+          { expiresAt: null },
+          { expiresAt: { gt: now } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+    return list.map((a) => ({
+      id: a.id,
+      title: label(a.title),
+      message: label(a.body),
+      category: a.category,
+      targetAudience: a.targetAudience,
+      publishedAt: a.publishedAt,
+      expiresAt: a.expiresAt,
+      status: a.status,
+    }));
+  }
   settings() {
     return {
       deliveryConfigured: !!(this.endpoint && this.token),

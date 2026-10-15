@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Get, Post, Put, Patch } from '@nestjs/common';
-import { AllowModule } from '@/common/decorators/auth.decorators';
+import { AllowModule, Public } from '@/common/decorators/auth.decorators';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { AuthStaffPayload, CurrentUser } from '@/common/decorators/current-user.decorator';
 import { MarketingService } from './marketing.service';
@@ -14,6 +14,12 @@ import {
 @Controller()
 export class MarketingController {
   constructor(private readonly service: MarketingService) {}
+
+  @Get('marketing/announcements/active')
+  @Public()
+  activeAnnouncements() {
+    return this.service.activeAnnouncements();
+  }
 
   @Get('marketing/notifications')
   @AllowModule('notifications')

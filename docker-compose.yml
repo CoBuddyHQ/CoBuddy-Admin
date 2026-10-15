@@ -47,6 +47,8 @@ services:
     image: cobuddy-admin-backend:latest
     container_name: cobuddy-admin-backend
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       NODE_ENV: development
       PORT: 4000
@@ -63,6 +65,10 @@ services:
       ENCRYPTION_KEY_PII: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       CORS_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
       FRONTEND_URL: http://localhost:3000
+      CUSTOMER_API_URL: http://host.docker.internal:4002
+      COMPANION_API_URL: http://host.docker.internal:4001
+      INTERNAL_SERVICE_SECRET: c0buddY_s2s_s3cr3t_pr0d_2026_xK9#mQ
+      INTERNAL_SERVICE_TOKEN: cobuddy-internal-service-s2s-token-2026
     ports:
       - '4000:4000'
     depends_on:

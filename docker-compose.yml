@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: cobuddy
-      POSTGRES_PASSWORD: cobuddy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: cobuddy_admin
       TZ: Asia/Kolkata
     ports:
@@ -25,15 +25,16 @@ services:
     image: redis:7-alpine
     container_name: cobuddy-redis
     restart: unless-stopped
-    command: ['redis-server', '--appendonly', 'yes', '--requirepass', 'cobuddy-redis-pw']
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}']
     environment:
       TZ: Asia/Kolkata
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}
     ports:
       - '6379:6379'
     volumes:
       - ./cobuddy-backend/docker/data/redis:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', '-a', 'cobuddy-redis-pw', 'ping']
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" ping']
       interval: 5s
       timeout: 3s
       retries: 5
@@ -53,22 +54,21 @@ services:
       NODE_ENV: development
       PORT: 4000
       POSTGRES_HOST: postgres
-      DATABASE_URL: postgresql://cobuddy:cobuddy@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer
-      DIRECT_URL: postgresql://cobuddy:cobuddy@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer
-      REDIS_URL: redis://:cobuddy-redis-pw@redis:6379/0
-      JWT_ACCESS_SECRET: cobuddy-admin-access-secret-key-2026-min-32-chars
-      JWT_REFRESH_SECRET: cobuddy-admin-refresh-secret-key-2026-min-32-chars
-      JWT_MFA_SECRET: cobuddy-admin-mfa-secret-key-2026-min-32-chars-xx
+      DATABASE_URL: postgresql://cobuddy:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer
+      DIRECT_URL: postgresql://cobuddy:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer
+      REDIS_URL: redis://:${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}@redis:6379/0
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?Set JWT_ACCESS_SECRET in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?Set JWT_REFRESH_SECRET in .env}
+      JWT_MFA_SECRET: ${JWT_MFA_SECRET:?Set JWT_MFA_SECRET in .env}
       JWT_ACCESS_TTL: 15m
       JWT_REFRESH_TTL: 7d
       BCRYPT_SALT_ROUNDS: 12
-      ENCRYPTION_KEY_PII: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      ENCRYPTION_KEY_PII: ${ENCRYPTION_KEY_PII:?Set ENCRYPTION_KEY_PII in .env}
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SERVICE_SECRET:?Set INTERNAL_SERVICE_SECRET in .env}
       CORS_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
       FRONTEND_URL: http://localhost:3000
       CUSTOMER_API_URL: http://host.docker.internal:4002
       COMPANION_API_URL: http://host.docker.internal:4001
-      INTERNAL_SERVICE_SECRET: c0buddY_s2s_s3cr3t_pr0d_2026_xK9#mQ
-      INTERNAL_SERVICE_TOKEN: cobuddy-internal-service-s2s-token-2026
     ports:
       - '4000:4000'
     depends_on:

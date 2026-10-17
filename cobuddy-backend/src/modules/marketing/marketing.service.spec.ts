@@ -6,6 +6,9 @@ describe('Broadcast provider receipts', () => {
   const make = () => {
     const db = {
       announcement: {
+        findMany: jest.fn().mockResolvedValue([]),
+        findUniqueOrThrow: jest.fn(),
+        create: jest.fn(),
         findFirst: jest.fn().mockResolvedValue({
           id: 'broadcast',
           title: { en: 'Title' },
@@ -40,6 +43,110 @@ describe('Broadcast provider receipts', () => {
     };
   };
   afterEach(() => jest.restoreAllMocks());
+  it('exposes only active announcements addressed to customers or everyone', async () => {
+    const { db, service } = make();
+    await service.activeAnnouncements();
+    const query = db.announcement.findMany.mock.calls[0][0];
+    const now = query.where.publishedAt.lte;
+    expect(query.where).toEqual({
+      isPublished: true,
+      targetAudience: { in: ['ALL', 'CUSTOMERS'] },
+      publishedAt: { lte: now },
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+    });
+  });
+  it('exposes only active announcements addressed to companions or everyone', async () => {
+    const { db, service } = make();
+    await service.activeCompanionAnnouncements();
+    const query = db.announcement.findMany.mock.calls[0][0];
+    expect(query.where.targetAudience).toEqual({ in: ['ALL', 'COMPANIONS'] });
+    expect(query.where.isPublished).toBe(true);
+  });
+  it('creates a draft without publishing it or requiring the delivery gateway', async () => {
+    const { db, service } = make();
+    const createdAt = new Date('2026-10-17T10:00:00.000Z');
+    db.announcement.create.mockResolvedValue({ id: 'draft', createdAt, isPublished: false });
+    await service.create(
+      {
+        title: 'Campaign title',
+        message: 'Campaign message',
+        category: 'GENERAL',
+        targetAudience: 'CUSTOMERS',
+        status: 'DRAFT',
+      },
+      { sub: 'admin', roles: ['SUPER_ADMIN'], cityScopeIds: [] } as never,
+    );
+    expect(db.announcement.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ status: 'DRAFT', isPublished: false }) }),
+    );
+  });
+  it('publishes customer campaigns independently of notification delivery', async () => {
+    const { db, service } = make();
+    db.announcement.findFirst.mockResolvedValue({ id: 'campaign', targetAudience: 'CUSTOMERS' });
+    await expect(
+      service.publishAnnouncement('campaign', {
+        sub: 'admin',
+        roles: ['SUPER_ADMIN'],
+        cityScopeIds: [],
+      } as never),
+    ).resolves.toMatchObject({ id: 'campaign', isPublished: true });
+    expect(db.announcement.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'campaign' },
+        data: expect.objectContaining({ isPublished: true, publishedAt: expect.any(Date) }),
+      }),
+    );
+  });
+  it('does not publish city-specific campaigns into an in-app feed without city eligibility', async () => {
+    const { db, service } = make();
+    db.announcement.findFirst.mockResolvedValue({ id: 'campaign', targetAudience: 'CITY_SPECIFIC' });
+    await expect(
+      service.publishAnnouncement('campaign', {
+        sub: 'admin',
+        roles: ['SUPER_ADMIN'],
+        cityScopeIds: [],
+      } as never),
+    ).rejects.toThrow('City-specific in-app campaign eligibility is not configured');
+    expect(db.announcement.updateMany).not.toHaveBeenCalled();
+  });
+  it('unpublishes a campaign immediately without changing broadcast delivery status', async () => {
+    const { db, service } = make();
+    await expect(
+      service.unpublishAnnouncement('campaign', {
+        sub: 'admin',
+        roles: ['SUPER_ADMIN'],
+        cityScopeIds: [],
+      } as never),
+    ).resolves.toEqual({ id: 'campaign', isPublished: false });
+    expect(db.announcement.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'campaign', isPublished: true },
+        data: { isPublished: false },
+      }),
+    );
+  });
+  it('updates published campaign content without changing its publication state', async () => {
+    const { db, service } = make();
+    db.announcement.findFirst.mockResolvedValue({ isPublished: true });
+    db.announcement.updateMany.mockResolvedValue({ count: 1 });
+    db.announcement.findUniqueOrThrow.mockResolvedValue({ id: 'campaign', isPublished: true });
+    await service.updateAnnouncement(
+      'campaign',
+      {
+        title: 'Updated title',
+        message: 'Updated message',
+        category: 'GENERAL',
+        targetAudience: 'CUSTOMERS',
+      },
+      { sub: 'admin', roles: ['SUPER_ADMIN'], cityScopeIds: [] } as never,
+    );
+    expect(db.announcement.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ title: { en: 'Updated title' }, body: { en: 'Updated message' } }),
+      }),
+    );
+    expect(db.announcement.findUniqueOrThrow).toHaveBeenCalledWith({ where: { id: 'campaign' } });
+  });
   it('requires explicit provider acceptance and retains its receipt', async () => {
     const { db, service } = make();
     const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({

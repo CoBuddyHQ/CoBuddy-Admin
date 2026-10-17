@@ -5,6 +5,8 @@ export interface PushNotification {
   category: string;
   targetAudience: 'ALL' | 'CUSTOMERS' | 'COMPANIONS' | 'CITY_SPECIFIC';
   targetCity?: string;
+  isPublished: boolean;
+  expiresAt?: string | null;
   status: 'DRAFT' | 'SCHEDULED' | 'QUEUED' | 'SENDING' | 'SENT' | 'FAILED' | 'PARTIAL';
   scheduledFor?: string;
   sentAt?: string;

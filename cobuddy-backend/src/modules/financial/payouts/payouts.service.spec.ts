@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { Prisma, PayoutStatus } from '@prisma/client';
 import { PayoutsService } from './payouts.service';
 
@@ -85,25 +85,12 @@ describe('Payout state transitions', () => {
     expect(payout.updateMany).not.toHaveBeenCalled();
   });
 
-  it('lifts a hold before processing, and records a payment only from PROCESSING', async () => {
+  it('does not mark a payout paid without provider settlement verification', async () => {
     const { service, row } = fixture(PayoutStatus.ON_HOLD);
     await expect(service.markPaid('payout-1', { utrNumber: 'UTR-123' }, user)).rejects.toThrow(
-      BadRequestException,
+      ServiceUnavailableException,
     );
-    await service.liftHold('payout-1', user);
-    await service.process('payout-1', {}, user);
-    await service.markPaid('payout-1', { utrNumber: 'UTR-123' }, user);
-    expect(row()).toMatchObject({
-      status: PayoutStatus.PAID,
-      utrNumber: 'UTR-123',
-      paidByAdminId: 'finance-1',
-    });
-    await expect(service.hold('payout-1', { reason: 'Review' }, user)).rejects.toThrow(
-      BadRequestException,
-    );
-    await expect(service.markFailed('payout-1', 'Failed', user)).rejects.toThrow(
-      BadRequestException,
-    );
+    expect(row().status).toBe(PayoutStatus.ON_HOLD);
   });
 
   it('clears stale failure and transfer references before retrying', async () => {

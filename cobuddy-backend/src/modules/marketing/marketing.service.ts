@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  BadRequestException,
   Injectable,
   OnModuleDestroy,
   OnModuleInit,
@@ -12,7 +13,10 @@ import { PrismaService } from '@/prisma/prisma.module';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
 import { cityWhere, requireCity, requireGlobal, scopedCities } from '@/common/auth/city-scope';
 import { label } from '@/common/utils/localized-label';
-import { NotificationInput } from '@/common/validation/workflow-inputs';
+import {
+  AnnouncementUpdateInput,
+  NotificationInput,
+} from '@/common/validation/workflow-inputs';
 
 @Injectable()
 export class MarketingService implements OnModuleInit, OnModuleDestroy {
@@ -57,16 +61,28 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
       targetAudience: a.targetAudience,
       targetCity: a.targetCityIds[0],
       status: a.status,
+      isPublished: a.isPublished,
+      expiresAt: a.expiresAt,
       scheduledFor: a.scheduledFor,
       sentAt: a.sentAt,
       failureReason: a.failureReason,
     }));
   }
   async activeAnnouncements() {
+    return this.activeAnnouncementsFor(['ALL', 'CUSTOMERS']);
+  }
+
+  async activeCompanionAnnouncements() {
+    return this.activeAnnouncementsFor(['ALL', 'COMPANIONS']);
+  }
+
+  private async activeAnnouncementsFor(targetAudiences: string[]) {
     const now = new Date();
     const list = await this.db.announcement.findMany({
       where: {
-        status: { in: ['PUBLISHED', 'SENT'] },
+        isPublished: true,
+        targetAudience: { in: targetAudiences },
+        publishedAt: { lte: now },
         OR: [
           { expiresAt: null },
           { expiresAt: { gt: now } },
@@ -81,6 +97,7 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
       message: label(a.body),
       category: a.category,
       targetAudience: a.targetAudience,
+      isPublished: a.isPublished,
       publishedAt: a.publishedAt,
       expiresAt: a.expiresAt,
       status: a.status,
@@ -109,12 +126,82 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
         targetAudience: input.targetAudience,
         targetCityIds: input.targetAudience === 'CITY_SPECIFIC' ? [input.targetCity!] : [],
         publishedAt: new Date(),
+        isPublished: false,
         createdById: user.sub,
         status: input.status,
         category: input.category,
         scheduledFor: input.scheduledFor ? new Date(input.scheduledFor) : null,
+        expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
       },
     });
+  }
+
+  async updateAnnouncement(id: string, input: AnnouncementUpdateInput, user: AuthStaffPayload) {
+    if (input.targetAudience === 'CITY_SPECIFIC') {
+      requireCity(user, input.targetCity!);
+      await this.db.city.findUniqueOrThrow({ where: { id: input.targetCity! } });
+    } else requireGlobal(user);
+
+    const current = await this.db.announcement.findFirst({
+      where: { id, ...this.scope(user) },
+      select: { isPublished: true },
+    });
+    if (!current) throw new ConflictException('Announcement is unavailable');
+    if (current.isPublished && input.targetAudience === 'CITY_SPECIFIC') {
+      throw new BadRequestException(
+        'Unpublish the announcement before changing it to a city-specific audience.',
+      );
+    }
+
+    const result = await this.db.announcement.updateMany({
+      where: {
+        id,
+        ...this.scope(user),
+        status: { notIn: ['QUEUED', 'SENDING'] },
+      },
+      data: {
+        title: { en: input.title },
+        body: { en: input.message },
+        category: input.category,
+        targetAudience: input.targetAudience,
+        targetCityIds: input.targetAudience === 'CITY_SPECIFIC' ? [input.targetCity!] : [],
+        ...(input.expiresAt !== undefined
+          ? { expiresAt: input.expiresAt ? new Date(input.expiresAt) : null }
+          : {}),
+      },
+    });
+    if (!result.count) throw new ConflictException('Announcement is unavailable or currently sending');
+    return this.db.announcement.findUniqueOrThrow({ where: { id } });
+  }
+
+  async publishAnnouncement(id: string, user: AuthStaffPayload) {
+    const announcement = await this.db.announcement.findFirst({
+      where: { id, ...this.scope(user) },
+      select: { id: true, targetAudience: true, status: true },
+    });
+    if (!announcement) throw new ConflictException('Announcement is unavailable');
+    if (announcement.targetAudience === 'CITY_SPECIFIC') {
+      throw new BadRequestException(
+        'City-specific in-app campaign eligibility is not configured; the campaign was not published.',
+      );
+    }
+
+    const now = new Date();
+    const result = await this.db.announcement.updateMany({
+      where: { id, ...this.scope(user) },
+      data: { isPublished: true, publishedAt: now },
+    });
+    if (!result.count) throw new ConflictException('Announcement is unavailable');
+    return { id, isPublished: true, publishedAt: now };
+  }
+
+  async unpublishAnnouncement(id: string, user: AuthStaffPayload) {
+    const result = await this.db.announcement.updateMany({
+      where: { id, ...this.scope(user), isPublished: true },
+      data: { isPublished: false },
+    });
+    if (!result.count) throw new ConflictException('Published announcement is unavailable');
+    return { id, isPublished: false };
   }
   async queue(id: string, user: AuthStaffPayload) {
     if (!this.settings().deliveryConfigured)
@@ -273,6 +360,9 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
             dispatchLeaseExpiresAt: null,
             status: failed ? 'PARTIAL' : 'SENT',
             sentAt: failed ? null : new Date(),
+            ...(failed || broadcast.isPublished
+              ? {}
+              : { isPublished: true, publishedAt: new Date(), scheduledFor: null }),
             failureReason: failed ? `${failed} deliveries require retry` : null,
           },
         });

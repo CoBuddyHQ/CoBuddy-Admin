@@ -1550,6 +1550,7 @@ model Announcement {
   createdById            String
   createdAt              DateTime            @default(now())
   status                 String              @default("DRAFT")
+  isPublished            Boolean             @default(false)
   category               String              @default("GENERAL")
   scheduledFor           DateTime?
   sentAt                 DateTime?

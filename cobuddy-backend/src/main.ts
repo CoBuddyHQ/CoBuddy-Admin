@@ -12,6 +12,9 @@ export async function createApplication() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true, bodyParser: false });
   const configService = app.get(ConfigService);
   const environment = configService.get<string>('NODE_ENV');
+  if (environment === 'production' && !process.env.INTERNAL_SERVICE_SECRET) {
+    throw new Error('INTERNAL_SERVICE_SECRET is required in production');
+  }
   app.use(helmet());
   configureHttpServer(
     app.getHttpAdapter().getInstance(),

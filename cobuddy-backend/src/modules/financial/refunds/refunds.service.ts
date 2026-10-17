@@ -1,11 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.module';
 import {
   RefundStatus,
   Prisma,
-  TransactionType,
-  WalletTransactionCategory,
-  TransactionStatus,
 } from '@prisma/client';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
 import {
@@ -116,75 +113,14 @@ export class RefundsService {
     };
   }
 
-  async process(id: string, user: AuthStaffPayload) {
+  async process(id: string, _user: AuthStaffPayload) {
     const refund = await this.prisma.refund.findUnique({ where: { id } });
     if (!refund) throw new NotFoundException('Refund not found');
     if (refund.status !== RefundStatus.APPROVED)
       throw new BadRequestException('Refund must be approved before processing');
-
-    const booking = await this.prisma.booking.findUnique({ where: { id: refund.bookingId } });
-    if (!booking) throw new NotFoundException('Booking not found');
-
-    const customerWallet = await this.prisma.wallet.findFirst({
-      where: { customerId: booking.customerId },
-    });
-    if (!customerWallet) throw new NotFoundException('Customer wallet not found');
-
-    const result = await this.prisma.$transaction(async (tx) => {
-      // A conditional update locks and claims this refund once, even across concurrent workers.
-      const claim = await tx.refund.updateMany({
-        where: { id, status: RefundStatus.APPROVED },
-        data: { status: RefundStatus.PROCESSED, processedAt: new Date() },
-      });
-      if (claim.count !== 1)
-        throw new BadRequestException('Refund already processed or state changed');
-
-      const refundAmount = new Prisma.Decimal(refund.amount);
-      if (refundAmount.lte(0)) throw new BadRequestException('Refund amount must be positive');
-      const wallet = await tx.wallet.update({
-        where: { id: customerWallet.id },
-        data: {
-          balance: { increment: refundAmount },
-          ledgerVersion: { increment: 1 },
-          lastTopupAt: new Date(),
-        },
-      });
-
-      const txn = await tx.walletTransaction.create({
-        data: {
-          walletId: wallet.id,
-          transactionType: TransactionType.CREDIT,
-          category: WalletTransactionCategory.BOOKING_REFUND,
-          amount: refundAmount,
-          balanceAfter: wallet.balance,
-          description: `Refund for booking ${booking.bookingRef}`,
-          status: TransactionStatus.SUCCESS,
-          bookingId: booking.id,
-          refundId: id,
-          metadata: { processedBy: user.sub, processedByName: user.name },
-        },
-      });
-
-      await tx.customer.update({
-        where: { id: booking.customerId },
-        data: { walletBalance: wallet.balance },
-      });
-      await tx.bookingDispute.updateMany({
-        where: { refundId: id, workflowStatus: 'REFUND_PENDING' },
-        data: {
-          workflowStatus: 'RESOLVED_REFUND',
-          status: RefundStatus.PROCESSED,
-          resolvedAt: new Date(),
-          resolvedBy: user.sub,
-          version: { increment: 1 },
-        },
-      });
-      const updated = await tx.refund.findUnique({ where: { id } });
-
-      return { refund: updated, transaction: txn };
-    });
-
-    return { data: result, message: 'Refund processed and credited to customer wallet' };
+    throw new ServiceUnavailableException(
+      'Refund settlement is not connected to the payment provider. The refund remains approved and no wallet credit was posted.',
+    );
   }
 
   async reject(id: string, dto: RejectRefundDto, user: AuthStaffPayload) {

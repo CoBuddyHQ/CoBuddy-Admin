@@ -24,12 +24,24 @@ import { getLocalizedText } from '@/lib/i18n/getLocalizedText';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CityPicker } from '@/components/ui/city-picker';
+import type { PushNotification } from '@/modules/marketing/notifications/types';
 
 export default function NotificationsPage() {
-  const { notifications, config, isLoading, createNotification, isCreating, sendNow } =
-    useNotifications();
+  const {
+    notifications,
+    config,
+    isLoading,
+    createNotification,
+    isCreating,
+    sendNow,
+    updateAnnouncement,
+    isUpdating,
+    setPublished,
+    isChangingPublication,
+  } = useNotifications();
   const { notificationCategories, isLoading: isMasterDataLoading } = useWorkflowOptions();
   const [isOpen, setIsOpen] = useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<PushNotification | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -38,6 +50,7 @@ export default function NotificationsPage() {
     targetCity: '',
     status: 'DRAFT',
     scheduledFor: '',
+    expiresAt: '',
   });
 
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
@@ -45,19 +58,28 @@ export default function NotificationsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createNotification({
+      const content = {
         title: formData.title,
         message: formData.message,
         category: formData.category,
-        targetAudience: formData.targetAudience as any,
+        targetAudience: formData.targetAudience as PushNotification['targetAudience'],
         targetCity: formData.targetAudience === 'CITY_SPECIFIC' ? formData.targetCity : undefined,
+        expiresAt: formData.expiresAt ? new Date(formData.expiresAt).toISOString() : null,
+      };
+      if (editingAnnouncement) {
+        await updateAnnouncement({ id: editingAnnouncement.id, announcement: content });
+      } else {
+        await createNotification({
+          ...content,
         status: formData.status as any,
         scheduledFor: formData.status === 'SCHEDULED' ? formData.scheduledFor : undefined,
-      });
+        });
+      }
     } catch {
       return;
     }
     setIsOpen(false);
+    setEditingAnnouncement(null);
     setFormData({
       title: '',
       message: '',
@@ -66,7 +88,23 @@ export default function NotificationsPage() {
       targetCity: '',
       status: 'DRAFT',
       scheduledFor: '',
+      expiresAt: '',
     });
+  };
+
+  const editAnnouncement = (announcement: PushNotification) => {
+    setEditingAnnouncement(announcement);
+    setFormData({
+      title: announcement.title,
+      message: announcement.message,
+      category: announcement.category,
+      targetAudience: announcement.targetAudience,
+      targetCity: announcement.targetCity || '',
+      status: announcement.status === 'SCHEDULED' ? 'SCHEDULED' : 'DRAFT',
+      scheduledFor: announcement.scheduledFor ? new Date(announcement.scheduledFor).toISOString().slice(0, 16) : '',
+      expiresAt: announcement.expiresAt ? new Date(announcement.expiresAt).toISOString().slice(0, 16) : '',
+    });
+    setIsOpen(true);
   };
 
   const filteredNotifications =
@@ -107,7 +145,24 @@ export default function NotificationsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => setIsOpen(true)}>New Message</Button>
+            <Button
+              onClick={() => {
+                setEditingAnnouncement(null);
+                setFormData({
+                  title: '',
+                  message: '',
+                  category: '',
+                  targetAudience: 'ALL',
+                  targetCity: '',
+                  status: 'DRAFT',
+                  scheduledFor: '',
+                  expiresAt: '',
+                });
+                setIsOpen(true);
+              }}
+            >
+              New Announcement
+            </Button>
           </div>
         }
       />
@@ -128,6 +183,7 @@ export default function NotificationsPage() {
                   <TableHeaderCell>Audience</TableHeaderCell>
                   <TableHeaderCell>Message</TableHeaderCell>
                   <TableHeaderCell>Status</TableHeaderCell>
+                  <TableHeaderCell>In-App Campaign</TableHeaderCell>
                   <TableHeaderCell>Timing</TableHeaderCell>
                   <TableHeaderCell>Action</TableHeaderCell>
                 </TableRow>
@@ -159,6 +215,11 @@ export default function NotificationsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      <Badge variant={n.isPublished ? 'default' : 'outline'}>
+                        {n.isPublished ? 'Published' : 'Not published'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
                       {n.status === 'SENT'
                         ? new Date(n.sentAt!).toLocaleString()
                         : n.status === 'SCHEDULED'
@@ -166,19 +227,37 @@ export default function NotificationsPage() {
                           : '-'}
                     </TableCell>
                     <TableCell>
-                      {(n.status === 'DRAFT' || n.status === 'SCHEDULED') && (
+                      <div className="flex flex-wrap gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={!config?.deliveryConfigured}
-                          onClick={() => {
-                            if (window.confirm('Send this broadcast to its selected audience?'))
-                              sendNow(n.id);
-                          }}
+                          disabled={n.status === 'QUEUED' || n.status === 'SENDING' || isUpdating}
+                          onClick={() => editAnnouncement(n)}
                         >
-                          <Send className="w-4 h-4 mr-2" /> Send Now
+                          Edit
                         </Button>
-                      )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isChangingPublication || (!n.isPublished && n.targetAudience === 'CITY_SPECIFIC')}
+                          onClick={() => setPublished({ id: n.id, isPublished: !n.isPublished })}
+                        >
+                          {n.isPublished ? 'Unpublish' : 'Publish in app'}
+                        </Button>
+                        {(n.status === 'DRAFT' || n.status === 'SCHEDULED') && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={!config?.deliveryConfigured}
+                            onClick={() => {
+                              if (window.confirm('Send this broadcast to its selected audience?'))
+                                sendNow(n.id);
+                            }}
+                          >
+                            <Send className="w-4 h-4 mr-2" /> Send push
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -205,7 +284,7 @@ export default function NotificationsPage() {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Compose Push Notification</DialogTitle>
+            <DialogTitle>{editingAnnouncement ? 'Edit Announcement' : 'Compose Announcement'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4 pt-4">
             <div className="space-y-2">
@@ -271,7 +350,15 @@ export default function NotificationsPage() {
                 />
               </div>
             )}
-            <div className="space-y-2 border-t pt-4">
+            <div className="space-y-2">
+              <Label>Expire at (optional)</Label>
+              <Input
+                type="datetime-local"
+                value={formData.expiresAt}
+                onChange={(e) => setFormData((p) => ({ ...p, expiresAt: e.target.value }))}
+              />
+            </div>
+            {!editingAnnouncement && <div className="space-y-2 border-t pt-4">
               <Label>Send Options</Label>
               <Select
                 value={formData.status}
@@ -285,8 +372,8 @@ export default function NotificationsPage() {
                   <SelectItem value="SCHEDULED">Schedule for Later</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            {formData.status === 'SCHEDULED' && (
+            </div>}
+            {!editingAnnouncement && formData.status === 'SCHEDULED' && (
               <div className="space-y-2">
                 <Label>Schedule Time</Label>
                 <Input
@@ -301,8 +388,8 @@ export default function NotificationsPage() {
               <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isCreating}>
-                Save
+              <Button type="submit" disabled={isCreating || isUpdating}>
+                {isUpdating ? 'Updating...' : 'Save'}
               </Button>
             </div>
           </form>

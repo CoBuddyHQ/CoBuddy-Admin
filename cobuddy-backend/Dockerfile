@@ -18,7 +18,7 @@ COPY tsconfig*.json ./
 COPY nest-cli.json ./
 COPY src ./src/
 
-ENV DATABASE_URL="postgresql://cobuddy:cobuddy@postgres:5432/cobuddy_admin?schema=public&sslmode=prefer"
+ENV DATABASE_URL="postgresql://audit:audit@localhost:5432/audit?schema=public&sslmode=prefer"
 RUN npx prisma generate
 RUN npm run build
 

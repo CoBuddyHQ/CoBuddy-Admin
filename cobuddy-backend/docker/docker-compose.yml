@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: cobuddy
-      POSTGRES_PASSWORD: cobuddy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: cobuddy
       TZ: Asia/Kolkata
     ports:
@@ -25,15 +25,16 @@ services:
     image: redis:7-alpine
     container_name: cobuddy-redis
     restart: unless-stopped
-    command: ['redis-server', '--appendonly', 'yes', '--requirepass', 'cobuddy-redis-pw']
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}']
     environment:
       TZ: Asia/Kolkata
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}
     ports:
       - '6379:6379'
     volumes:
       - ./data/redis:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', '-a', 'cobuddy-redis-pw', 'ping']
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" ping']
       interval: 5s
       timeout: 3s
       retries: 5

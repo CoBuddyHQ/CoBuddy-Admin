@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.module';
 import { PayoutStatus, Prisma } from '@prisma/client';
@@ -96,15 +97,10 @@ export class PayoutsService {
     return { data: updated, message: 'Payout marked as processing' };
   }
 
-  async markPaid(id: string, dto: MarkPaidDto, user: AuthStaffPayload) {
-    const updated = await this.transition(id, [PayoutStatus.PROCESSING], {
-      status: PayoutStatus.PAID,
-      utrNumber: dto.utrNumber,
-      gatewayPayoutId: dto.gatewayPayoutId,
-      processedAt: new Date(),
-      paidByAdminId: user.sub,
-    });
-    return { data: updated, message: 'Payout marked as paid' };
+  async markPaid(_id: string, _dto: MarkPaidDto, _user: AuthStaffPayload) {
+    throw new ServiceUnavailableException(
+      'Payout settlement verification is not connected to a payout provider. The payout remains processing.',
+    );
   }
 
   async markFailed(id: string, reason: string, _user: AuthStaffPayload) {

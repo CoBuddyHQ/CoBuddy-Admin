@@ -193,10 +193,23 @@ export const notificationSchema = z
     targetCity: id.optional(),
     status: z.enum(['DRAFT', 'SCHEDULED']),
     scheduledFor: future.optional(),
+    expiresAt: date.nullable().optional(),
   })
   .strict()
   .refine((v) => v.targetAudience !== 'CITY_SPECIFIC' || !!v.targetCity, 'Choose a city')
   .refine((v) => v.status !== 'SCHEDULED' || !!v.scheduledFor, 'Choose a scheduled time');
+
+export const announcementUpdateSchema = z
+  .object({
+    title: text,
+    message: z.string().trim().min(1).max(4000),
+    category: text,
+    targetAudience: z.enum(['ALL', 'CUSTOMERS', 'COMPANIONS', 'CITY_SPECIFIC']),
+    targetCity: id.optional(),
+    expiresAt: date.nullable().optional(),
+  })
+  .strict()
+  .refine((v) => v.targetAudience !== 'CITY_SPECIFIC' || !!v.targetCity, 'Choose a city');
 
 export type EventInput = z.infer<typeof eventSchema>;
 export type VenueInput = z.infer<typeof venueSchema>;
@@ -207,6 +220,7 @@ export type LessonInput = z.infer<typeof lessonSchema>;
 export type TicketInput = z.infer<typeof ticketSchema>;
 export type LegalInput = z.infer<typeof legalRequestSchema>;
 export type NotificationInput = z.infer<typeof notificationSchema>;
+export type AnnouncementUpdateInput = z.infer<typeof announcementUpdateSchema>;
 export const templateSchema = z
   .object({
     templateKey: text,

@@ -26,7 +26,9 @@ export const notificationsApi = {
     await axios.put('/marketing/announcements/' + encodeURIComponent(id), {
       ...announcement,
       targetCity: announcement.targetCity || undefined,
-      expiresAt: announcement.expiresAt ? new Date(announcement.expiresAt).toISOString() : announcement.expiresAt,
+      expiresAt: announcement.expiresAt
+        ? new Date(announcement.expiresAt).toISOString()
+        : announcement.expiresAt,
     });
   },
   setPublished: async (id: string, isPublished: boolean): Promise<void> => {

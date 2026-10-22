@@ -13,10 +13,7 @@ import { PrismaService } from '@/prisma/prisma.module';
 import { AuthStaffPayload } from '@/common/decorators/current-user.decorator';
 import { cityWhere, requireCity, requireGlobal, scopedCities } from '@/common/auth/city-scope';
 import { label } from '@/common/utils/localized-label';
-import {
-  AnnouncementUpdateInput,
-  NotificationInput,
-} from '@/common/validation/workflow-inputs';
+import { AnnouncementUpdateInput, NotificationInput } from '@/common/validation/workflow-inputs';
 
 @Injectable()
 export class MarketingService implements OnModuleInit, OnModuleDestroy {
@@ -68,24 +65,59 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
       failureReason: a.failureReason,
     }));
   }
-  async activeAnnouncements() {
-    return this.activeAnnouncementsFor(['ALL', 'CUSTOMERS']);
+  async activeAnnouncements(customerCity?: string) {
+    return this.activeAnnouncementsFor(['ALL', 'CUSTOMERS'], customerCity);
   }
 
   async activeCompanionAnnouncements() {
     return this.activeAnnouncementsFor(['ALL', 'COMPANIONS']);
   }
 
-  private async activeAnnouncementsFor(targetAudiences: string[]) {
+  private async resolveCity(name?: string) {
+    if (!name?.trim()) return undefined;
+    const cities = await this.db.city.findMany({
+      where: { active: true },
+      select: { id: true, name: true },
+    });
+    const normalized = name.trim().toLowerCase();
+    const matches = cities.filter((city) => label(city.name).trim().toLowerCase() === normalized);
+    // The Customer database has a city name, not a shared city ID or country.
+    // Never guess an alias or choose between places with the same name.
+    return matches.length === 1
+      ? { id: matches[0].id, name: label(matches[0].name).trim() }
+      : undefined;
+  }
+
+  private async assertCityCanPublish(cityIds: string[]) {
+    if (cityIds.length !== 1) {
+      throw new BadRequestException('Choose one active city for this campaign.');
+    }
+    const city = await this.db.city.findUnique({ where: { id: cityIds[0] } });
+    const resolved = city?.active ? await this.resolveCity(label(city.name)) : undefined;
+    if (!resolved || resolved.id !== cityIds[0]) {
+      throw new BadRequestException(
+        'The selected city must have a unique active English name for customer campaign eligibility.',
+      );
+    }
+  }
+
+  private async activeAnnouncementsFor(targetAudiences: string[], customerCity?: string) {
+    const city = await this.resolveCity(customerCity);
     const now = new Date();
     const list = await this.db.announcement.findMany({
       where: {
         isPublished: true,
-        targetAudience: { in: targetAudiences },
         publishedAt: { lte: now },
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: now } },
+        AND: [
+          {
+            OR: [
+              { targetAudience: { in: targetAudiences } },
+              ...(city
+                ? [{ targetAudience: 'CITY_SPECIFIC', targetCityIds: { has: city.id } }]
+                : []),
+            ],
+          },
+          { OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] },
         ],
       },
       orderBy: { createdAt: 'desc' },
@@ -97,6 +129,7 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
       message: label(a.body),
       category: a.category,
       targetAudience: a.targetAudience,
+      ...(a.targetAudience === 'CITY_SPECIFIC' ? { targetCity: city?.name } : {}),
       isPublished: a.isPublished,
       publishedAt: a.publishedAt,
       expiresAt: a.expiresAt,
@@ -144,19 +177,19 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
 
     const current = await this.db.announcement.findFirst({
       where: { id, ...this.scope(user) },
-      select: { isPublished: true },
+      select: { isPublished: true, targetAudience: true, targetCityIds: true },
     });
     if (!current) throw new ConflictException('Announcement is unavailable');
     if (current.isPublished && input.targetAudience === 'CITY_SPECIFIC') {
-      throw new BadRequestException(
-        'Unpublish the announcement before changing it to a city-specific audience.',
-      );
+      await this.assertCityCanPublish([input.targetCity!]);
     }
 
     const result = await this.db.announcement.updateMany({
       where: {
         id,
         ...this.scope(user),
+        targetAudience: current.targetAudience,
+        targetCityIds: { equals: current.targetCityIds },
         status: { notIn: ['QUEUED', 'SENDING'] },
       },
       data: {
@@ -170,25 +203,33 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
           : {}),
       },
     });
-    if (!result.count) throw new ConflictException('Announcement is unavailable or currently sending');
+    if (!result.count)
+      throw new ConflictException('Announcement is unavailable or currently sending');
     return this.db.announcement.findUniqueOrThrow({ where: { id } });
   }
 
   async publishAnnouncement(id: string, user: AuthStaffPayload) {
     const announcement = await this.db.announcement.findFirst({
       where: { id, ...this.scope(user) },
-      select: { id: true, targetAudience: true, status: true },
+      select: { id: true, targetAudience: true, targetCityIds: true, expiresAt: true },
     });
     if (!announcement) throw new ConflictException('Announcement is unavailable');
     if (announcement.targetAudience === 'CITY_SPECIFIC') {
-      throw new BadRequestException(
-        'City-specific in-app campaign eligibility is not configured; the campaign was not published.',
-      );
+      await this.assertCityCanPublish(announcement.targetCityIds);
     }
 
     const now = new Date();
+    if (announcement.expiresAt && announcement.expiresAt <= now) {
+      throw new BadRequestException('Update the expiry before publishing this campaign.');
+    }
     const result = await this.db.announcement.updateMany({
-      where: { id, ...this.scope(user) },
+      where: {
+        id,
+        ...this.scope(user),
+        targetAudience: announcement.targetAudience,
+        targetCityIds: { equals: announcement.targetCityIds },
+        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+      },
       data: { isPublished: true, publishedAt: now },
     });
     if (!result.count) throw new ConflictException('Announcement is unavailable');
@@ -360,9 +401,6 @@ export class MarketingService implements OnModuleInit, OnModuleDestroy {
             dispatchLeaseExpiresAt: null,
             status: failed ? 'PARTIAL' : 'SENT',
             sentAt: failed ? null : new Date(),
-            ...(failed || broadcast.isPublished
-              ? {}
-              : { isPublished: true, publishedAt: new Date(), scheduledFor: null }),
             failureReason: failed ? `${failed} deliveries require retry` : null,
           },
         });

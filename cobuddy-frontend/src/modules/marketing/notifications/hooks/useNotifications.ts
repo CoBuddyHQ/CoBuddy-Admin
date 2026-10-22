@@ -39,7 +39,10 @@ export const useNotifications = () => {
 
   const updateMutation = useMutation({
     meta: { workflow: true },
-    mutationFn: ({ id, announcement }: {
+    mutationFn: ({
+      id,
+      announcement,
+    }: {
       id: string;
       announcement: Parameters<typeof notificationsApi.updateAnnouncement>[1];
     }) => notificationsApi.updateAnnouncement(id, announcement),
@@ -55,7 +58,11 @@ export const useNotifications = () => {
       notificationsApi.setPublished(id, isPublished),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success(variables.isPublished ? 'Announcement published in the app' : 'Announcement removed from the app');
+      toast.success(
+        variables.isPublished
+          ? 'Announcement published in the app'
+          : 'Announcement removed from the app',
+      );
     },
   });
 

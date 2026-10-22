@@ -71,8 +71,8 @@ export default function NotificationsPage() {
       } else {
         await createNotification({
           ...content,
-        status: formData.status as any,
-        scheduledFor: formData.status === 'SCHEDULED' ? formData.scheduledFor : undefined,
+          status: formData.status as any,
+          scheduledFor: formData.status === 'SCHEDULED' ? formData.scheduledFor : undefined,
         });
       }
     } catch {
@@ -101,8 +101,12 @@ export default function NotificationsPage() {
       targetAudience: announcement.targetAudience,
       targetCity: announcement.targetCity || '',
       status: announcement.status === 'SCHEDULED' ? 'SCHEDULED' : 'DRAFT',
-      scheduledFor: announcement.scheduledFor ? new Date(announcement.scheduledFor).toISOString().slice(0, 16) : '',
-      expiresAt: announcement.expiresAt ? new Date(announcement.expiresAt).toISOString().slice(0, 16) : '',
+      scheduledFor: announcement.scheduledFor
+        ? new Date(announcement.scheduledFor).toISOString().slice(0, 16)
+        : '',
+      expiresAt: announcement.expiresAt
+        ? new Date(announcement.expiresAt).toISOString().slice(0, 16)
+        : '',
     });
     setIsOpen(true);
   };
@@ -239,7 +243,10 @@ export default function NotificationsPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={isChangingPublication || (!n.isPublished && n.targetAudience === 'CITY_SPECIFIC')}
+                          disabled={
+                            isChangingPublication ||
+                            (!n.isPublished && n.targetAudience === 'CITY_SPECIFIC')
+                          }
                           onClick={() => setPublished({ id: n.id, isPublished: !n.isPublished })}
                         >
                           {n.isPublished ? 'Unpublish' : 'Publish in app'}
@@ -284,7 +291,9 @@ export default function NotificationsPage() {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingAnnouncement ? 'Edit Announcement' : 'Compose Announcement'}</DialogTitle>
+            <DialogTitle>
+              {editingAnnouncement ? 'Edit Announcement' : 'Compose Announcement'}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4 pt-4">
             <div className="space-y-2">
@@ -358,21 +367,23 @@ export default function NotificationsPage() {
                 onChange={(e) => setFormData((p) => ({ ...p, expiresAt: e.target.value }))}
               />
             </div>
-            {!editingAnnouncement && <div className="space-y-2 border-t pt-4">
-              <Label>Send Options</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(v) => setFormData((p) => ({ ...p, status: v as string }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="DRAFT">Save as Draft</SelectItem>
-                  <SelectItem value="SCHEDULED">Schedule for Later</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>}
+            {!editingAnnouncement && (
+              <div className="space-y-2 border-t pt-4">
+                <Label>Send Options</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(v) => setFormData((p) => ({ ...p, status: v as string }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DRAFT">Save as Draft</SelectItem>
+                    <SelectItem value="SCHEDULED">Schedule for Later</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             {!editingAnnouncement && formData.status === 'SCHEDULED' && (
               <div className="space-y-2">
                 <Label>Schedule Time</Label>

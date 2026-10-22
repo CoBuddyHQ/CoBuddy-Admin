@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { Prisma, PayoutStatus } from '@prisma/client';
 import { PayoutsService } from './payouts.service';
 

@@ -1,4 +1,8 @@
-import { ExecutionContext, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InternalServiceGuard } from './internal-service.guard';
 
 describe('InternalServiceGuard', () => {

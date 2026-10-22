@@ -1,9 +1,10 @@
-import { Body, Controller, Param, Get, Post, Put, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Get, Post, Put, Patch, Query, UseGuards } from '@nestjs/common';
 import { AllowModule, Public } from '@/common/decorators/auth.decorators';
 import { InternalServiceGuard } from '@/common/guards/internal-service.guard';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { AuthStaffPayload, CurrentUser } from '@/common/decorators/current-user.decorator';
 import { MarketingService } from './marketing.service';
+import { CustomerCampaignQueryDto } from './dto/customer-campaign-query.dto';
 import {
   WorkflowBody,
   notificationSchema,
@@ -26,8 +27,8 @@ export class MarketingController {
   @Get('internal/announcements/customers/active')
   @Public()
   @UseGuards(InternalServiceGuard)
-  activeCustomerAnnouncements() {
-    return this.service.activeAnnouncements();
+  activeCustomerAnnouncements(@Query() query: CustomerCampaignQueryDto) {
+    return this.service.activeAnnouncements(query.city);
   }
 
   @Get('internal/announcements/companions/active')

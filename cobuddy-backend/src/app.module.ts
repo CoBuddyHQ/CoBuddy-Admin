@@ -39,6 +39,7 @@ import { ContentModule } from '@/modules/platform-content/platform-content.modul
 import { SupportModule } from '@/modules/support/support.module';
 import { LegalModule } from '@/modules/legal/legal.module';
 import { MarketingModule } from '@/modules/marketing/marketing.module';
+import { InternalSyncModule } from '@/modules/internal-sync/internal-sync.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { MarketingModule } from '@/modules/marketing/marketing.module';
     SupportModule,
     LegalModule,
     MarketingModule,
+    InternalSyncModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

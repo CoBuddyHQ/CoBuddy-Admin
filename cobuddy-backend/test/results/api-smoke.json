@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-10T11:33:32.301Z",
-  "operationCount": 299,
-  "passed": 420,
+  "generatedAt": "2026-10-15T10:41:14.517Z",
+  "operationCount": 302,
+  "passed": 423,
   "failed": 0,
   "skipped": 0,
   "checks": [
@@ -542,6 +542,11 @@
     },
     {
       "name": "Anonymous POST /api/companion-applications/{id}/schedule-interview",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/companion-applications/{id}/interviewers",
       "passed": true,
       "detail": "HTTP 401"
     },
@@ -1116,6 +1121,11 @@
       "detail": "HTTP 401"
     },
     {
+      "name": "Anonymous GET /api/analytics/safety",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
       "name": "Anonymous GET /api/analytics/market",
       "passed": true,
       "detail": "HTTP 401"
@@ -1276,56 +1286,6 @@
       "detail": "HTTP 401"
     },
     {
-      "name": "Anonymous GET /api/support/tickets",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous POST /api/support/tickets",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous GET /api/support/agents",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous PATCH /api/support/tickets/{id}/status",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous POST /api/support/tickets/{id}/replies",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous POST /api/support/tickets/{id}/escalate",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous POST /api/support/tickets/{id}/assign-self",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous PATCH /api/support/tickets/{id}/assignment",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous GET /api/support/sla-dashboard/alerts",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
-      "name": "Anonymous GET /api/support/sla-dashboard/performance",
-      "passed": true,
-      "detail": "HTTP 401"
-    },
-    {
       "name": "Anonymous PUT /api/platform-config/policy-docs/{id}",
       "passed": true,
       "detail": "HTTP 401"
@@ -1382,6 +1342,56 @@
     },
     {
       "name": "Anonymous GET /api/platform-config/training/quiz",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/tickets",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/agents",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/support/tickets/{id}/status",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets/{id}/replies",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets/{id}/escalate",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous POST /api/support/tickets/{id}/assign-self",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous PATCH /api/support/tickets/{id}/assignment",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/sla-dashboard/alerts",
+      "passed": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "name": "Anonymous GET /api/support/sla-dashboard/performance",
       "passed": true,
       "detail": "HTTP 401"
     },
@@ -1856,6 +1866,11 @@
       "detail": "HTTP 200"
     },
     {
+      "name": "Authenticated GET /api/analytics/safety",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
       "name": "Authenticated GET /api/analytics/market",
       "passed": true,
       "detail": "HTTP 200"
@@ -1921,26 +1936,6 @@
       "detail": "HTTP 200"
     },
     {
-      "name": "Authenticated GET /api/support/tickets",
-      "passed": true,
-      "detail": "HTTP 200"
-    },
-    {
-      "name": "Authenticated GET /api/support/agents",
-      "passed": true,
-      "detail": "HTTP 200"
-    },
-    {
-      "name": "Authenticated GET /api/support/sla-dashboard/alerts",
-      "passed": true,
-      "detail": "HTTP 200"
-    },
-    {
-      "name": "Authenticated GET /api/support/sla-dashboard/performance",
-      "passed": true,
-      "detail": "HTTP 200"
-    },
-    {
       "name": "Authenticated GET /api/platform-config/policy-docs",
       "passed": true,
       "detail": "HTTP 200"
@@ -1957,6 +1952,26 @@
     },
     {
       "name": "Authenticated GET /api/platform-config/training/quiz",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/tickets",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/agents",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/sla-dashboard/alerts",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Authenticated GET /api/support/sla-dashboard/performance",
       "passed": true,
       "detail": "HTTP 200"
     },

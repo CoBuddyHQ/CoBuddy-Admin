@@ -5,6 +5,7 @@ export const useCompletedBookings = () => {
   const query = useQuery({
     queryKey: ['completed-bookings'],
     queryFn: completedBookingsApi.getBookings,
+    refetchInterval: 2000,
   });
 
   return {

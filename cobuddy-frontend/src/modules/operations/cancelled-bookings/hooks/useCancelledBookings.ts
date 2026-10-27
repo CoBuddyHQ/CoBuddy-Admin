@@ -5,6 +5,7 @@ export const useCancelledBookings = () => {
   const query = useQuery({
     queryKey: ['cancelled-bookings'],
     queryFn: cancelledBookingsApi.getBookings,
+    refetchInterval: 2000,
   });
 
   return {

@@ -143,6 +143,7 @@ async function main() {
       '/api/auth/forgot-password',
       '/api/auth/reset-password',
       '/api/employees/accept-invite',
+      '/api/marketing/announcements/active',
     ]);
     for (const op of operations) {
       if (publicRoutes.has(op.route) || op.route.includes('accept-invite')) continue;

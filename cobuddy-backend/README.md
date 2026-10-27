@@ -164,16 +164,16 @@ File: `cobuddy-backend/.env`
 |---|---|---|
 | `NODE_ENV` | `development` | `production` / `staging` bhi ho sakta |
 | `PORT` | `4000` | Backend HTTP port |
-| `DATABASE_URL` | `postgresql://cobuddy:cobuddy@localhost:5432/cobuddy` | Prisma DB URL |
-| `DIRECT_URL` | same as DATABASE_URL | Prisma migrate deploy ke liye |
-| `REDIS_URL` | `redis://:cobuddy-redis-pw@localhost:6379/0` | Throttler + queue storage |
-| `JWT_ACCESS_SECRET` | `cobuddy-dev-access-secret-min-32-chars` | ⚠️ Production mein change karo |
-| `JWT_REFRESH_SECRET` | `cobuddy-dev-refresh-secret-min-32-chars` | ⚠️ Production mein change karo |
-| `JWT_MFA_SECRET` | `cobuddy-dev-mfa-secret-min-32-characters` | ⚠️ Production mein change karo |
+| `DATABASE_URL` | Required in private runtime env | PostgreSQL connection string; never use a committed default |
+| `DIRECT_URL` | Required in private runtime env | Direct PostgreSQL migration connection |
+| `REDIS_URL` | Required in private runtime env | Redis connection string; provide matching Redis password |
+| `JWT_ACCESS_SECRET` | Required in private runtime env | Generate a unique high-entropy signing secret |
+| `JWT_REFRESH_SECRET` | Required in private runtime env | Generate a separate unique high-entropy signing secret |
+| `JWT_MFA_SECRET` | Required in private runtime env | Generate a separate unique high-entropy MFA secret |
 | `JWT_ACCESS_TTL` | `15m` | Access token expiry |
 | `JWT_REFRESH_TTL` | `7d` | Refresh token expiry |
 | `BCRYPT_SALT_ROUNDS` | `12` | Password hash cost factor |
-| `ENCRYPTION_KEY_PII` | 64 char hex key | ⚠️ PII fields ke liye — production mein random generate |
+| `ENCRYPTION_KEY_PII` | Required in private runtime env | Generate a unique 32-byte hex key and protect it with secret management |
 | `CORS_ORIGIN` | `http://localhost:3000` | Frontend URL (comma-separated multiple) |
 | `FRONTEND_URL` | `http://localhost:3000` | Invite/reset email links ke liye |
 

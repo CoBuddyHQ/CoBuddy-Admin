@@ -1,11 +1,14 @@
-import { Body, Controller, Param, Get, Post, Put, Patch } from '@nestjs/common';
-import { AllowModule } from '@/common/decorators/auth.decorators';
+import { Body, Controller, Param, Get, Post, Put, Patch, Query, UseGuards } from '@nestjs/common';
+import { AllowModule, Public } from '@/common/decorators/auth.decorators';
+import { InternalServiceGuard } from '@/common/guards/internal-service.guard';
 import { AuditLog } from '@/common/decorators/audit-log.decorator';
 import { AuthStaffPayload, CurrentUser } from '@/common/decorators/current-user.decorator';
 import { MarketingService } from './marketing.service';
+import { CustomerCampaignQueryDto } from './dto/customer-campaign-query.dto';
 import {
   WorkflowBody,
   notificationSchema,
+  announcementUpdateSchema,
   templateSchema,
   referralSchema,
   activeSchema,
@@ -14,6 +17,26 @@ import {
 @Controller()
 export class MarketingController {
   constructor(private readonly service: MarketingService) {}
+
+  @Get('marketing/announcements/active')
+  @Public()
+  activeAnnouncements() {
+    return this.service.activeAnnouncements();
+  }
+
+  @Get('internal/announcements/customers/active')
+  @Public()
+  @UseGuards(InternalServiceGuard)
+  activeCustomerAnnouncements(@Query() query: CustomerCampaignQueryDto) {
+    return this.service.activeAnnouncements(query.city);
+  }
+
+  @Get('internal/announcements/companions/active')
+  @Public()
+  @UseGuards(InternalServiceGuard)
+  activeCompanionAnnouncements() {
+    return this.service.activeCompanionAnnouncements();
+  }
 
   @Get('marketing/notifications')
   @AllowModule('notifications')
@@ -64,6 +87,31 @@ export class MarketingController {
     @CurrentUser() user: AuthStaffPayload,
   ) {
     return this.service.create(body, user);
+  }
+
+  @Put('marketing/announcements/:id')
+  @AllowModule('announcements')
+  @AuditLog({ action: 'UPDATE_ANNOUNCEMENT', module: 'announcements', resourceIdParam: 'id' })
+  updateAnnouncement(
+    @Param('id') id: string,
+    @Body(new WorkflowBody(announcementUpdateSchema)) body: any,
+    @CurrentUser() user: AuthStaffPayload,
+  ) {
+    return this.service.updateAnnouncement(id, body, user);
+  }
+
+  @Post('marketing/announcements/:id/publish')
+  @AllowModule('announcements')
+  @AuditLog({ action: 'PUBLISH_ANNOUNCEMENT', module: 'announcements', resourceIdParam: 'id' })
+  publishAnnouncement(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.publishAnnouncement(id, user);
+  }
+
+  @Post('marketing/announcements/:id/unpublish')
+  @AllowModule('announcements')
+  @AuditLog({ action: 'UNPUBLISH_ANNOUNCEMENT', module: 'announcements', resourceIdParam: 'id' })
+  unpublishAnnouncement(@Param('id') id: string, @CurrentUser() user: AuthStaffPayload) {
+    return this.service.unpublishAnnouncement(id, user);
   }
 
   @Get('marketing/templates')

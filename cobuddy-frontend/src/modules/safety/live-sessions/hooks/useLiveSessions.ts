@@ -11,7 +11,7 @@ export const useLiveSessions = () => {
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['liveSessions'],
     queryFn: liveSessionsApi.getLiveSessions,
-    refetchInterval: 10000, // Poll every 10s for live updates
+    refetchInterval: 2000,
   });
 
   const conflictingSessionIds = useMemo(() => {

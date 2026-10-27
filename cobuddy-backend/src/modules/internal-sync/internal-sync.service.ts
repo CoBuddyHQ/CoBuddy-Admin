@@ -39,7 +39,10 @@ export class InternalSyncService {
     if (['NO_SHOW_COMPANION'].includes(s)) {
       return BookingStatus.NO_SHOW_COMPANION;
     }
-    return BookingStatus.PENDING_COMPANION_ACCEPT;
+    if (['PENDING', 'REQUESTED', 'COUNTER_PROPOSED', 'PENDING_COMPANION_ACCEPT'].includes(s)) {
+      return BookingStatus.PENDING_COMPANION_ACCEPT;
+    }
+    throw new BadRequestException('Unsupported source booking status');
   }
 
   async syncBooking(dto: SyncBookingDto) {
@@ -53,8 +56,10 @@ export class InternalSyncService {
     });
 
     if (existingBooking) {
-      if (existingBooking.status === mappedStatus ||
-        ['COMPLETED', 'CUSTOMER_CANCELLED', 'COMPANION_CANCELLED', 'REJECTED_BY_COMPANION', 'NO_SHOW_CUSTOMER', 'NO_SHOW_COMPANION'].includes(existingBooking.status) ||
+      if ((existingBooking.status === mappedStatus &&
+          (!dto.paymentStatus || dto.paymentStatus === existingBooking.paymentStatus) &&
+          (!dto.cancelReason || dto.cancelReason === existingBooking.adminCancelNote)) ||
+        (existingBooking.status !== mappedStatus && ['COMPLETED', 'CUSTOMER_CANCELLED', 'COMPANION_CANCELLED', 'REJECTED_BY_COMPANION', 'NO_SHOW_CUSTOMER', 'NO_SHOW_COMPANION'].includes(existingBooking.status)) ||
         (['IN_PROGRESS', 'EXTENDED'].includes(existingBooking.status) && ['ARRIVING', 'PENDING_COMPANION_ACCEPT'].includes(mappedStatus))) {
         return { success: true, ignored: true, bookingId: existingBooking.id, status: existingBooking.status };
       }

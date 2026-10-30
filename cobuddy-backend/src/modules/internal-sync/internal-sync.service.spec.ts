@@ -15,3 +15,65 @@ describe('authoritative booking synchronization', () => {
     await expect(new InternalSyncService({} as any).syncBooking({ bookingId: 'booking', status: 'unknown' })).rejects.toThrow('Unsupported source booking status');
   });
 });
+
+describe('authoritative review synchronization', () => {
+  it('stores a real companion-authored review without inventing a customer record', async () => {
+    const prisma = {
+      customer: { findUnique: jest.fn().mockResolvedValue({ id: 'customer-1' }), create: jest.fn() },
+      companion: { findUnique: jest.fn().mockResolvedValue({ id: 'companion-1' }), create: jest.fn() },
+      review: { upsert: jest.fn().mockResolvedValue({ id: 'review-1' }) },
+      city: { create: jest.fn(), findFirst: jest.fn() },
+    };
+    const service = new InternalSyncService(prisma as any);
+
+    await expect(service.syncReview({
+      bookingId: 'booking-1',
+      byCompanionId: 'companion-1',
+      toCustomerId: 'customer-1',
+      rating: 4,
+    })).resolves.toMatchObject({ success: true, reviewId: 'review-1' });
+
+    expect(prisma.review.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        bookingId_byCompanionId_toCustomerId: {
+          bookingId: 'booking-1',
+          byCompanionId: 'companion-1',
+          toCustomerId: 'customer-1',
+        },
+      },
+      create: expect.objectContaining({
+        byCustomerId: undefined,
+        byCompanionId: 'companion-1',
+        toCustomerId: 'customer-1',
+      }),
+    }));
+    expect(prisma.customer.create).not.toHaveBeenCalled();
+    expect(prisma.companion.create).not.toHaveBeenCalled();
+    expect(prisma.city.create).not.toHaveBeenCalled();
+  });
+
+  it('leaves a review pending for retry when a referenced identity has not synced', async () => {
+    const prisma = {
+      customer: { findUnique: jest.fn().mockResolvedValue(null) },
+      companion: { findUnique: jest.fn().mockResolvedValue({ id: 'companion-1' }) },
+      review: { upsert: jest.fn() },
+      city: { create: jest.fn(), findFirst: jest.fn() },
+    };
+    const service = new InternalSyncService(prisma as any);
+
+    await expect(service.syncReview({
+      bookingId: 'booking-1',
+      byCustomerId: 'customer-1',
+      toCompanionId: 'companion-1',
+      rating: 5,
+    })).rejects.toThrow('not synchronized to Admin yet');
+    expect(prisma.review.upsert).not.toHaveBeenCalled();
+    expect(prisma.city.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects reviews without a single explicit author and recipient', async () => {
+    const service = new InternalSyncService({} as any);
+    await expect(service.syncReview({ bookingId: 'booking-1', rating: 5 }))
+      .rejects.toThrow('exactly one author');
+  });
+});

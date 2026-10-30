@@ -1126,7 +1126,7 @@ model UserBan {
 model Review {
   id               String                 @id @default(uuid())
   bookingId        String
-  byCustomerId     String
+  byCustomerId     String?
   toCompanionId    String?
   byCompanionId    String?
   toCustomerId     String?
@@ -1138,14 +1138,17 @@ model Review {
   moderatedById    String?
   createdAt        DateTime               @default(now())
 
-  byCustomer  Customer   @relation("ReviewByCustomer", fields: [byCustomerId], references: [id])
+  byCustomer  Customer?  @relation("ReviewByCustomer", fields: [byCustomerId], references: [id])
   toCompanion Companion? @relation("ReviewCompanionReceived", fields: [toCompanionId], references: [id])
   byCompanion Companion? @relation("ReviewByCompanion", fields: [byCompanionId], references: [id])
   toCustomer  Customer?  @relation("ReviewCustomerReceived", fields: [toCustomerId], references: [id])
 
   @@unique([bookingId, byCustomerId, toCompanionId])
+  @@unique([bookingId, byCompanionId, toCustomerId])
   @@index([byCustomerId])
   @@index([toCompanionId])
+  @@index([byCompanionId])
+  @@index([toCustomerId])
   @@index([moderationStatus])
   @@index([createdAt(sort: Desc)])
 }

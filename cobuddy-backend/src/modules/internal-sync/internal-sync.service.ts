@@ -1,4 +1,4 @@
-import { Injectable, Logger, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { BookingStatus, Prisma, ReviewModerationStatus } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { SyncBookingDto } from './dto/sync-booking.dto';
@@ -182,69 +182,48 @@ export class InternalSyncService {
 
   async syncReview(dto: SyncReviewDto) {
     this.logger.log(`[Admin S2S Sync] Syncing review for booking ${dto.bookingId}`);
-
-    // Ensure customer exists
-    let customer: any = null;
-    if (dto.byCustomerId || dto.toCustomerId) {
-      const cId = dto.byCustomerId || dto.toCustomerId;
-      customer = await this.prisma.customer.findUnique({ where: { id: cId } });
-      if (!customer) {
-        // Fallback default city
-        const city = await this.prisma.city.findFirst() || await this.prisma.city.create({
-          data: {
-            cityCode: 'BLR',
-            name: { en: 'Bengaluru' },
-            state: 'Karnataka',
-            country: 'India',
-          },
-        });
-        customer = await this.prisma.customer.create({
-          data: {
-            id: cId!,
-            name: 'Customer',
-            phone: `+91${Date.now().toString().slice(-10)}`,
-            passwordHash: '',
-            cityId: city.id,
-          },
-        });
-      }
+    const customerAuthored = Boolean(dto.byCustomerId);
+    const companionAuthored = Boolean(dto.byCompanionId);
+    if (customerAuthored === companionAuthored) {
+      throw new BadRequestException('A review must identify exactly one author.');
+    }
+    if (customerAuthored && !dto.toCompanionId) {
+      throw new BadRequestException('A customer review must identify its companion recipient.');
+    }
+    if (companionAuthored && !dto.toCustomerId) {
+      throw new BadRequestException('A companion review must identify its customer recipient.');
     }
 
-    // Ensure companion exists
-    let companion: any = null;
-    if (dto.toCompanionId || dto.byCompanionId) {
-      const compId = dto.toCompanionId || dto.byCompanionId;
-      companion = await this.prisma.companion.findUnique({ where: { id: compId } });
-      if (!companion) {
-        const city = await this.prisma.city.findFirst() || await this.prisma.city.create({
-          data: {
-            cityCode: 'BLR',
-            name: { en: 'Bengaluru' },
-            state: 'Karnataka',
-            country: 'India',
-          },
-        });
-        companion = await this.prisma.companion.create({
-          data: {
-            id: compId!,
-            name: 'Companion',
-            phone: `+91${Date.now().toString().slice(-10)}`,
-            passwordHash: '',
-            gender: 'Female',
-            cityId: city.id,
-          },
-        });
-      }
+    const customerId = dto.byCustomerId || dto.toCustomerId!;
+    const companionId = dto.toCompanionId || dto.byCompanionId!;
+    const [customer, companion] = await Promise.all([
+      this.prisma.customer.findUnique({ where: { id: customerId }, select: { id: true } }),
+      this.prisma.companion.findUnique({ where: { id: companionId }, select: { id: true } }),
+    ]);
+    if (!customer) {
+      throw new NotFoundException('Review customer is not synchronized to Admin yet.');
+    }
+    if (!companion) {
+      throw new NotFoundException('Review companion is not synchronized to Admin yet.');
     }
 
+    const where = customerAuthored
+      ? {
+          bookingId_byCustomerId_toCompanionId: {
+            bookingId: dto.bookingId,
+            byCustomerId: dto.byCustomerId!,
+            toCompanionId: dto.toCompanionId!,
+          },
+        }
+      : {
+          bookingId_byCompanionId_toCustomerId: {
+            bookingId: dto.bookingId,
+            byCompanionId: dto.byCompanionId!,
+            toCustomerId: dto.toCustomerId!,
+          },
+        };
     const review = await this.prisma.review.upsert({
-      where: {
-        bookingId_byCustomerId_toCompanionId: {
-          bookingId: dto.bookingId,
-          byCustomerId: dto.byCustomerId || customer?.id || '',
-          toCompanionId: dto.toCompanionId || companion?.id || '',
-        },
-      },
+      where,
       update: {
         rating: Math.round(dto.rating),
         text: dto.text,
@@ -253,8 +232,8 @@ export class InternalSyncService {
       },
       create: {
         bookingId: dto.bookingId,
-        byCustomerId: dto.byCustomerId || customer?.id || '',
-        toCompanionId: dto.toCompanionId || companion?.id,
+        byCustomerId: dto.byCustomerId,
+        toCompanionId: dto.toCompanionId,
         byCompanionId: dto.byCompanionId,
         toCustomerId: dto.toCustomerId,
         rating: Math.round(dto.rating),

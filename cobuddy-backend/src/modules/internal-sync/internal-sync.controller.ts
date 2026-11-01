@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { Public } from '@/common/decorators/auth.decorators';
 import { InternalServiceGuard } from '@/common/guards/internal-service.guard';
 import { InternalSyncService } from './internal-sync.service';
@@ -11,6 +11,13 @@ import { SyncUserReportDto } from './dto/sync-user-report.dto';
 @Controller('internal')
 export class InternalSyncController {
   constructor(private readonly service: InternalSyncService) {}
+
+  @Get('master-data/bundle')
+  @Public()
+  @UseGuards(InternalServiceGuard)
+  async getMasterDataBundle() {
+    return this.service.getMasterDataBundle();
+  }
 
   @Post('bookings/sync')
   @Public()

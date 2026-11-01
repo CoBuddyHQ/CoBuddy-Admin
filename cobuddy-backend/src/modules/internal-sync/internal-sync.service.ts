@@ -566,4 +566,62 @@ export class InternalSyncService {
     };
   }
 
+  async getMasterDataBundle() {
+    const [
+      cities,
+      areas,
+      interests,
+      languages,
+      ticketCategories,
+      incidentTypes,
+      reviewTags,
+      disputeReasons,
+      cancellationReasons,
+      placeTypes,
+      sessionDurations,
+      defaults,
+    ] = await Promise.all([
+      this.prisma.city.findMany({
+        where: { active: true },
+        include: { areas: { where: { active: true } } },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.area.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
+      this.prisma.interest.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
+      this.prisma.spokenLanguage.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
+      this.prisma.ticketCategory.findMany({ where: { active: true } }),
+      this.prisma.incidentType.findMany({ where: { active: true } }),
+      this.prisma.reviewTagOption.findMany({ where: { active: true } }),
+      this.prisma.disputeReason.findMany({ where: { active: true } }),
+      this.prisma.cancellationReason.findMany({ where: { active: true } }),
+      this.prisma.placeTypeConfig.findMany({ where: { isAllowed: true } }),
+      this.prisma.sessionDurationOption.findMany({ where: { active: true } }),
+      this.prisma.systemDefault.findUnique({ where: { id: 'singleton' } }),
+    ]);
+
+    return {
+      success: true,
+      data: {
+        cities: cities.map((c) => ({
+          id: c.id,
+          cityCode: c.cityCode,
+          name: this.cityLabel(c.name),
+          state: c.state,
+          areas: (c.areas || []).map((a) => ({ id: a.id, name: a.name })),
+        })),
+        areas: areas.map((a) => ({ id: a.id, name: a.name, cityId: a.cityId })),
+        interests: interests.map((i) => ({ id: i.id, name: this.cityLabel(i.name), category: i.type, icon: i.icon })),
+        languages: languages.map((l) => ({ code: l.code, name: this.cityLabel(l.name) })),
+        ticketCategories,
+        incidentTypes,
+        reviewTags,
+        disputeReasons,
+        cancellationReasons,
+        placeTypes,
+        sessionDurations,
+        defaults,
+      },
+      message: 'Master data bundle fetched successfully',
+    };
+  }
 }

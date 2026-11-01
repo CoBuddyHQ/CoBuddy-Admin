@@ -317,6 +317,21 @@ export class CompanionApplicationsService {
       return { companion, application: updatedApplication };
     });
 
+    const targetCompanionId = application.companionId || result.companion.id;
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
+    if (targetCompanionId && internalSecret) {
+      const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+      fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(targetCompanionId)}/verification-decision`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Internal-Service-Key': internalSecret,
+        },
+        body: JSON.stringify({ status: 'approved', reason: notes }),
+        signal: AbortSignal.timeout(5000),
+      }).catch(() => {});
+    }
+
     return {
       data: result,
       message: 'Application approved. Companion account and wallet created.',
@@ -341,6 +356,22 @@ export class CompanionApplicationsService {
       },
     });
     if (!updated.count) throw new ConflictException('Application changed. Reload and try again.');
+
+    const targetCompanionId = application.companionId;
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
+    if (targetCompanionId && internalSecret) {
+      const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+      fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(targetCompanionId)}/verification-decision`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Internal-Service-Key': internalSecret,
+        },
+        body: JSON.stringify({ status: 'rejected', reason: dto.reason }),
+        signal: AbortSignal.timeout(5000),
+      }).catch(() => {});
+    }
+
     return { ...(await this.findOne(id, admin)), message: 'Application rejected' };
   }
 

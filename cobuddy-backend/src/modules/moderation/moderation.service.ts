@@ -250,13 +250,38 @@ export class ModerationService {
     });
 
     const userUpdate: any = { status: 'BANNED' };
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
     if (report.reportedUserType === 'CUSTOMER') {
       await this.prisma.customer.update({ where: { id: report.reportedUserId }, data: userUpdate });
+      if (internalSecret) {
+        const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+        fetch(`${customerApiUrl}/api/v1/internal/bookings/customers/${encodeURIComponent(report.reportedUserId)}/ban`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({ isBanned: true, reason: dto.reason }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
     } else if (report.reportedUserType === 'COMPANION') {
       await this.prisma.companion.update({
         where: { id: report.reportedUserId },
         data: userUpdate,
       });
+      if (internalSecret) {
+        const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+        fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(report.reportedUserId)}/ban`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({ isBanned: true, reason: dto.reason }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
     }
 
     return { data: ban, message: 'User banned' };

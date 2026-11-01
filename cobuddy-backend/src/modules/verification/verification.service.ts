@@ -71,8 +71,24 @@ export class VerificationService {
       this.prisma.verificationCase.count({ where }),
     ]);
 
+    // Enrich cases with applicantName
+    const companionIds = items.filter(i => i.applicantType === 'COMPANION').map(i => i.applicantId);
+    const customerIds = items.filter(i => i.applicantType === 'CUSTOMER').map(i => i.applicantId);
+    const [companions, customers] = await Promise.all([
+      this.prisma.companion.findMany({ where: { id: { in: companionIds } }, select: { id: true, name: true } }),
+      this.prisma.customer.findMany({ where: { id: { in: customerIds } }, select: { id: true, name: true } }),
+    ]);
+    const nameMap = new Map<string, string>();
+    companions.forEach(c => nameMap.set(c.id, c.name));
+    customers.forEach(c => nameMap.set(c.id, c.name));
+
+    const enrichedItems = items.map(item => ({
+      ...item,
+      applicantName: nameMap.get(item.applicantId) || (item.applicantType === 'COMPANION' ? 'Companion Partner' : 'Customer'),
+    }));
+
     return {
-      data: items,
+      data: enrichedItems,
       meta: {
         page,
         pageSize,
@@ -155,6 +171,26 @@ export class VerificationService {
 
       return tx.verificationCase.findUniqueOrThrow({ where: { id } });
     });
+
+    // Notify Companion Backend via S2S
+    if (result.applicantType === VerificationApplicantType.COMPANION) {
+      const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+      const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
+      if (internalSecret) {
+        fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(result.applicantId)}/verification-decision`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({
+            status: dto.decision === VerificationStatus.APPROVED ? 'approved' : 'rejected',
+            reason: dto.reason || dto.notes,
+          }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
+    }
 
     return { data: result, message: `Case ${dto.decision.toLowerCase()}` };
   }

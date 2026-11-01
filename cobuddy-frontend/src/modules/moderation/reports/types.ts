@@ -1,7 +1,11 @@
 export interface ReportSummary {
   id: string;
+  reportRef?: string;
   reporterId: string;
+  reporterName?: string;
   reportedUserId: string;
+  reportedUserName?: string;
+  reportedUserBanStatus?: 'BANNED' | 'ACTIVE';
   category: string;
   status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'ESCALATED';
   timestamp: string;

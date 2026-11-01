@@ -3,8 +3,12 @@ import axios from '@/lib/api/client';
 
 const mapReport = (item: any): ReportSummary => ({
   id: item.id,
+  reportRef: item.reportRef,
   reporterId: item.reporterId,
+  reporterName: item.reporterName,
   reportedUserId: item.reportedUserId,
+  reportedUserName: item.reportedUserName,
+  reportedUserBanStatus: item.reportedUserBanStatus,
   category: item.categoryCode,
   status: item.status,
   timestamp: item.createdAt,

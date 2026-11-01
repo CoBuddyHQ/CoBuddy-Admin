@@ -26,6 +26,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { CityPicker } from '@/components/ui/city-picker';
 import type { PushNotification } from '@/modules/marketing/notifications/types';
 
+const FALLBACK_CATEGORIES = [
+  { code: 'PROMOTION', label: { en: 'Promotions & Offers' } },
+  { code: 'SYSTEM', label: { en: 'System Announcement' } },
+  { code: 'SAFETY', label: { en: 'Safety Alert' } },
+  { code: 'POLICY', label: { en: 'Policy Update' } },
+  { code: 'REMINDER', label: { en: 'Reminder' } },
+  { code: 'GENERAL', label: { en: 'General' } },
+];
+
 export default function NotificationsPage() {
   const {
     notifications,
@@ -40,6 +49,7 @@ export default function NotificationsPage() {
     isChangingPublication,
   } = useNotifications();
   const { notificationCategories, isLoading: isMasterDataLoading } = useWorkflowOptions();
+  const categories = notificationCategories && notificationCategories.length > 0 ? notificationCategories : FALLBACK_CATEGORIES;
   const [isOpen, setIsOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<PushNotification | null>(null);
   const [formData, setFormData] = useState({
@@ -117,7 +127,7 @@ export default function NotificationsPage() {
       : notifications.filter((n) => n.category === categoryFilter);
 
   const getCategoryLabel = (code: string) => {
-    const cat = notificationCategories.find((c) => c.code === code);
+    const cat = categories.find((c) => c.code === code);
     return cat ? getLocalizedText(cat.label, 'en') : code;
   };
 
@@ -141,7 +151,7 @@ export default function NotificationsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">All Categories</SelectItem>
-                  {notificationCategories.map((c) => (
+                  {categories.map((c) => (
                     <SelectItem key={c.code} value={c.code}>
                       {getLocalizedText(c.label, 'en')}
                     </SelectItem>
@@ -325,7 +335,7 @@ export default function NotificationsPage() {
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {notificationCategories.map((c) => (
+                  {categories.map((c) => (
                     <SelectItem key={c.code} value={c.code}>
                       {getLocalizedText(c.label, 'en')}
                     </SelectItem>

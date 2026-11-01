@@ -37,10 +37,26 @@ export default function ReportsPage() {
           <TableBody>
             {reports.map((rep) => (
               <TableRow key={rep.id}>
-                <TableCell>{rep.id}</TableCell>
-                <TableCell>{rep.category}</TableCell>
-                <TableCell>{rep.reporterId}</TableCell>
-                <TableCell>{rep.reportedUserId}</TableCell>
+                <TableCell className="font-mono text-xs">{rep.reportRef || rep.id.slice(0, 8)}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="capitalize">{rep.category.toLowerCase()}</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium text-sm">{rep.reporterName || 'Reporter'}</div>
+                  <div className="text-xs text-muted-foreground font-mono">{rep.reporterId.slice(0, 8)}...</div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">{rep.reportedUserName || 'Reported User'}</span>
+                    <Badge
+                      variant={rep.reportedUserBanStatus === 'BANNED' ? 'destructive' : 'secondary'}
+                      className="text-[10px] px-1.5 py-0"
+                    >
+                      {rep.reportedUserBanStatus === 'BANNED' ? 'BANNED' : 'ACTIVE'}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground font-mono">{rep.reportedUserId.slice(0, 8)}...</div>
+                </TableCell>
                 <TableCell>{new Date(rep.timestamp).toLocaleDateString()}</TableCell>
                 <TableCell>
                   {rep.assignedTo ? (

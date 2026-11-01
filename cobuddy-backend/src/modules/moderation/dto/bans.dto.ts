@@ -2,7 +2,7 @@ import { IsString, IsEnum, IsOptional, IsUUID, IsIn } from 'class-validator';
 import { PaginationQueryDto } from '@/common/dto/pagination.dto';
 
 export class CreateBanDto {
-  @IsUUID() userId: string;
+  @IsString() userId: string;
   @IsIn(['CUSTOMER', 'COMPANION']) userType: string;
   @IsString() reason: string;
   @IsEnum(['TEMPORARY_24H', 'TEMPORARY_7D', 'TEMPORARY_30D', 'PERMANENT'])
@@ -15,6 +15,6 @@ export class LiftBanDto {
 }
 
 export class ListBansDto extends PaginationQueryDto {
-  @IsOptional() @IsUUID() userId?: string;
+  @IsOptional() @IsString() userId?: string;
   @IsOptional() @IsIn(['CUSTOMER', 'COMPANION']) userType?: string;
 }

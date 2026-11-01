@@ -90,8 +90,72 @@ export class ModerationService {
       }),
       this.prisma.userReport.count({ where }),
     ]);
+
+    const customerIds = new Set<string>();
+    const companionIds = new Set<string>();
+    const reportedUserIds = new Set<string>();
+
+    for (const item of items) {
+      if (item.reporterType === 'CUSTOMER') customerIds.add(item.reporterId);
+      else if (item.reporterType === 'COMPANION') companionIds.add(item.reporterId);
+
+      if (item.reportedUserType === 'CUSTOMER') customerIds.add(item.reportedUserId);
+      else if (item.reportedUserType === 'COMPANION') companionIds.add(item.reportedUserId);
+
+      reportedUserIds.add(item.reportedUserId);
+    }
+
+    const [customers, companions, activeBans] = await Promise.all([
+      this.prisma.customer.findMany({
+        where: { id: { in: Array.from(customerIds) } },
+        select: { id: true, name: true },
+      }),
+      this.prisma.companion.findMany({
+        where: { id: { in: Array.from(companionIds) } },
+        select: { id: true, name: true },
+      }),
+      this.prisma.userBan.findMany({
+        where: {
+          userId: { in: Array.from(reportedUserIds) },
+          liftedAt: null,
+          OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }],
+        },
+        select: { userId: true, duration: true, reason: true },
+      }),
+    ]);
+
+    const nameMap = new Map<string, string>();
+    customers.forEach((c) => nameMap.set(c.id, c.name));
+    companions.forEach((c) => nameMap.set(c.id, c.name));
+
+    const banMap = new Map<string, any>();
+    activeBans.forEach((b) => banMap.set(b.userId, b));
+
+    const enriched = items.map((item) => {
+      let descReportedName = '';
+      if (item.description && item.description.includes('Companion:')) {
+        const match = item.description.match(/Companion:\s*([^\r\n]+)/);
+        if (match && match[1]) descReportedName = match[1].trim();
+      }
+
+      const activeBan = banMap.get(item.reportedUserId);
+      const isBanned = Boolean(activeBan);
+
+      return {
+        ...item,
+        reporterName:
+          nameMap.get(item.reporterId) || (item.reporterType === 'CUSTOMER' ? 'Customer' : 'Companion'),
+        reportedUserName:
+          nameMap.get(item.reportedUserId) ||
+          descReportedName ||
+          (item.reportedUserType === 'COMPANION' ? 'Companion' : 'Customer'),
+        reportedUserBanStatus: isBanned ? 'BANNED' : 'ACTIVE',
+        activeBan: activeBan || null,
+      };
+    });
+
     return {
-      data: items,
+      data: enriched,
       meta: {
         page,
         pageSize,
@@ -228,8 +292,24 @@ export class ModerationService {
       this.prisma.userBan.findMany({ where, skip, take: pageSize, orderBy: { startsAt: 'desc' } }),
       this.prisma.userBan.count({ where }),
     ]);
+
+    const customerIds = items.filter(b => b.userType === 'CUSTOMER').map(b => b.userId);
+    const companionIds = items.filter(b => b.userType === 'COMPANION').map(b => b.userId);
+    const [customers, companions] = await Promise.all([
+      this.prisma.customer.findMany({ where: { id: { in: customerIds } }, select: { id: true, name: true } }),
+      this.prisma.companion.findMany({ where: { id: { in: companionIds } }, select: { id: true, name: true } }),
+    ]);
+    const nameMap = new Map<string, string>();
+    customers.forEach(c => nameMap.set(c.id, c.name));
+    companions.forEach(c => nameMap.set(c.id, c.name));
+
+    const enriched = items.map(item => ({
+      ...item,
+      userName: nameMap.get(item.userId) || (item.userType === 'COMPANION' ? 'Companion' : 'Customer'),
+    }));
+
     return {
-      data: items,
+      data: enriched,
       meta: {
         page,
         pageSize,
@@ -269,10 +349,35 @@ export class ModerationService {
     });
 
     const userUpdate: any = { status: 'BANNED' };
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
     if (dto.userType === 'CUSTOMER') {
-      await this.prisma.customer.update({ where: { id: dto.userId }, data: userUpdate });
+      await this.prisma.customer.update({ where: { id: dto.userId }, data: userUpdate }).catch(() => {});
+      if (internalSecret) {
+        const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+        fetch(`${customerApiUrl}/api/v1/internal/bookings/customers/${encodeURIComponent(dto.userId)}/ban`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({ isBanned: true, reason: dto.reason }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
     } else if (dto.userType === 'COMPANION') {
-      await this.prisma.companion.update({ where: { id: dto.userId }, data: userUpdate });
+      await this.prisma.companion.update({ where: { id: dto.userId }, data: userUpdate }).catch(() => {});
+      if (internalSecret) {
+        const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+        fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(dto.userId)}/ban`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({ isBanned: true, reason: dto.reason }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
     }
 
     return { data: ban, message: 'Ban created' };
@@ -290,10 +395,35 @@ export class ModerationService {
     });
 
     const userUpdate: any = { status: 'ACTIVE' };
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
     if (ban.userType === 'CUSTOMER') {
-      await this.prisma.customer.update({ where: { id: ban.userId }, data: userUpdate });
+      await this.prisma.customer.update({ where: { id: ban.userId }, data: userUpdate }).catch(() => {});
+      if (internalSecret) {
+        const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+        fetch(`${customerApiUrl}/api/v1/internal/bookings/customers/${encodeURIComponent(ban.userId)}/ban`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({ isBanned: false, reason: dto.reason }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
     } else if (ban.userType === 'COMPANION') {
-      await this.prisma.companion.update({ where: { id: ban.userId }, data: userUpdate });
+      await this.prisma.companion.update({ where: { id: ban.userId }, data: userUpdate }).catch(() => {});
+      if (internalSecret) {
+        const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+        fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(ban.userId)}/ban`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({ isBanned: false, reason: dto.reason }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
     }
 
     return { data: updated, message: 'Ban lifted' };

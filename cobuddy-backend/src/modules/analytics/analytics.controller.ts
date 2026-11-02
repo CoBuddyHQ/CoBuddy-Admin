@@ -11,7 +11,7 @@ export class AnalyticsController {
   growth(@CurrentUser() user: AuthStaffPayload) {
     return this.service.growth(user);
   }
-  @Get('sessions')
+  @Get(['sessions', 'operational'])
   @AllowModule('analytics-operational')
   sessions(@CurrentUser() user: AuthStaffPayload) {
     return this.service.sessions(user);
@@ -21,7 +21,7 @@ export class AnalyticsController {
   safety(@CurrentUser() user: AuthStaffPayload) {
     return this.service.safety(user);
   }
-  @Get('market')
+  @Get(['market', 'financial'])
   @AllowModule('analytics-financial')
   market(@CurrentUser() user: AuthStaffPayload) {
     return this.service.market(user);

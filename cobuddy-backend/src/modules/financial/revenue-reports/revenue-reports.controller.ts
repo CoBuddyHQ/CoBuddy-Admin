@@ -16,7 +16,7 @@ class DateRangeDto {
 export class RevenueReportsController {
   constructor(private service: RevenueReportsService) {}
 
-  @Get('overview')
+  @Get(['', 'overview'])
   overview() {
     return this.service.overview();
   }

@@ -60,7 +60,7 @@ export class LegalController {
     return this.service.export(id, user);
   }
 
-  @Get('legal/legal-requests')
+  @Get(['legal/legal-requests', 'legal/requests'])
   @AllowModule('legal-requests')
   legal(@CurrentUser() user: AuthStaffPayload) {
     return this.service.legal(user);

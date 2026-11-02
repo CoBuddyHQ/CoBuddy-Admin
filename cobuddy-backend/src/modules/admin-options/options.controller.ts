@@ -7,6 +7,47 @@ import { PrismaService } from '@/prisma/prisma.module';
 @Roles(...Object.values(StaffRole))
 export class WorkflowOptionsController {
   constructor(private readonly db: PrismaService) {}
+
+  @Get('cities')
+  async cities() {
+    return this.db.city.findMany({
+      select: { id: true, name: true, state: true, active: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  @Get('interests')
+  async interests() {
+    return this.db.interest.findMany({
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  @Get('languages')
+  async languages() {
+    return this.db.spokenLanguage.findMany({
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  @Get('kyc-doc-types')
+  async kycDocTypes() {
+    return this.db.kYCDocumentType.findMany();
+  }
+
+  @Get('system-defaults')
+  async systemDefaults() {
+    let record = await this.db.systemDefault.findUnique({
+      where: { id: 'singleton' },
+    });
+    if (!record) {
+      record = await this.db.systemDefault.create({
+        data: { id: 'singleton' },
+      });
+    }
+    return record;
+  }
+
   @Get('workflow')
   async options() {
     let [appLanguages, placeTypes, ticketCategories, notificationCategories] = await Promise.all([

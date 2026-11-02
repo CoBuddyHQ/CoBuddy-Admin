@@ -38,7 +38,7 @@ export class MarketingController {
     return this.service.activeCompanionAnnouncements();
   }
 
-  @Get('marketing/notifications')
+  @Get(['marketing/notifications', 'marketing/broadcasts'])
   @AllowModule('notifications')
   notifications(@CurrentUser() user: AuthStaffPayload) {
     return this.service.notifications(user);

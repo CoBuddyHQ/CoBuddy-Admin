@@ -12,7 +12,7 @@ import { requireGlobal } from '@/common/auth/city-scope';
 export class TrustScoreController {
   constructor(private service: TrustScoreService) {}
 
-  @Get('dashboard')
+  @Get(['', 'dashboard'])
   dashboard(@CurrentUser() user: AuthStaffPayload) {
     return this.service.getDashboard(user);
   }

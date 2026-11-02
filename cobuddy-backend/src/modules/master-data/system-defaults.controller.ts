@@ -6,7 +6,7 @@ import { PrismaService } from '@/prisma/prisma.module';
 import { MasterDataService } from './master-data.service';
 import { UpdateSystemDefaultsDto } from './dto/master-data.dto';
 
-@Controller('master-data/defaults')
+@Controller(['master-data/defaults', 'master-data/system-defaults'])
 @Roles(StaffRole.SUPER_ADMIN)
 export class SystemDefaultsController {
   constructor(

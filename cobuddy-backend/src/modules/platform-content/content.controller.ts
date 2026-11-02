@@ -44,7 +44,7 @@ export class ContentController {
     return this.service.updateLesson(id, body, user);
   }
 
-  @Get('platform-config/policy-docs')
+  @Get(['platform-config/policy-docs', 'content/policies'])
   @AllowModule('policy-docs')
   policies() {
     return this.service.policies();
@@ -77,7 +77,7 @@ export class ContentController {
     return this.service.consents();
   }
 
-  @Get('platform-config/training')
+  @Get(['platform-config/training', 'content/training'])
   @AllowModule('training')
   lessons() {
     return this.service.lessons();

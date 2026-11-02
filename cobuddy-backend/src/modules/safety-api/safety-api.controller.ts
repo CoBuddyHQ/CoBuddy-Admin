@@ -16,7 +16,7 @@ import {
 export class SafetyApiController {
   constructor(private readonly service: SafetyApiService) {}
 
-  @Get('safety/sos')
+  @Get(['safety/sos', 'safety/sos-alerts'])
   @AllowModule('sos-dashboard')
   getSos(@CurrentUser() user: AuthStaffPayload, @Query() query: SosAlertQueryDto) {
     return this.service.getSosAlerts(user, query.activeOnly === 'true');
@@ -78,7 +78,7 @@ export class SafetyApiController {
     return this.service.toggleEvidenceHold(id);
   }
 
-  @Get('safety/geofence/alerts')
+  @Get(['safety/geofence/alerts', 'safety/geofence-zones'])
   @AllowModule('geofence')
   getGeofenceAlerts(@CurrentUser() user: AuthStaffPayload) {
     return this.service.getGeofenceAlerts(user);
@@ -122,7 +122,7 @@ export class SafetyApiController {
     return this.service.updateAgeEscalation(id, body.status, body.resolutionNote, user);
   }
 
-  @Get('safety/emergency-workflows')
+  @Get(['safety/emergency-workflows', 'safety/emergency-workflow'])
   @AllowModule('emergency-workflow')
   getEmergencyWorkflows(@CurrentUser() user: AuthStaffPayload) {
     return this.service.getEmergencyWorkflows(user);

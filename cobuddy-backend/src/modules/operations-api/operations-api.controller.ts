@@ -12,7 +12,7 @@ import { requireGlobal } from '@/common/auth/city-scope';
 export class OperationsApiController {
   constructor(private readonly service: OperationsApiService) {}
 
-  @Get('operations/matchmaking/config')
+  @Get(['operations/matchmaking', 'operations/matchmaking/config'])
   @AllowModule('matchmaking')
   getMatchmakingConfig() {
     return this.service.getMatchmakingConfig();
@@ -65,7 +65,7 @@ export class OperationsApiController {
     );
   }
 
-  @Get('operations/live-map/active-bookings')
+  @Get(['operations/live-map', 'operations/live-map/active-bookings'])
   @AllowModule('ops.liveMap')
   liveMapBookings(@CurrentUser() user: AuthStaffPayload) {
     return this.service.listBookings(

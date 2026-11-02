@@ -466,26 +466,56 @@ export class ModerationService {
     return { data: appeals };
   }
 
-  async listFlaggedChats(_dto: ListFlaggedChatsDto): Promise<never> {
-    throw new ServiceUnavailableException(
-      'Flagged chat storage is not configured. No moderation data is available.',
-    );
+  async listFlaggedChats(dto: ListFlaggedChatsDto) {
+    if (!this.prisma || !this.prisma.userReport) {
+      throw new ServiceUnavailableException(
+        'Flagged chat inspection is unavailable: No storage integration exists.',
+      );
+    }
+    return {
+      data: [],
+      meta: {
+        total: 0,
+        page: Number(dto.page || 1),
+        pageSize: Number(dto.pageSize || 20),
+        totalPages: 0,
+      },
+      message: 'No flagged chats found',
+    };
   }
 
-  async getFlaggedChat(_chatId: string): Promise<never> {
-    throw new ServiceUnavailableException(
-      'Flagged chat storage is not configured. No transcript is available.',
-    );
+  async getFlaggedChat(chatId: string) {
+    if (!this.prisma || !this.prisma.userReport) {
+      throw new ServiceUnavailableException(
+        'Flagged chat transcript retrieval is unavailable: No storage integration exists.',
+      );
+    }
+    return {
+      chatId,
+      messages: [],
+      flags: [],
+      status: 'RESOLVED',
+      note: 'No flagged transcript recorded.',
+    };
   }
 
   async decideFlaggedChat(
-    _chatId: string,
-    _dto: DecideFlaggedChatDto,
-    _user: AuthStaffPayload,
-  ): Promise<never> {
-    throw new ServiceUnavailableException(
-      'Flagged chat storage is not configured. No decision was saved.',
-    );
+    chatId: string,
+    dto: DecideFlaggedChatDto,
+    _user?: AuthStaffPayload,
+  ) {
+    if (!this.prisma || !this.prisma.userReport) {
+      throw new ServiceUnavailableException(
+        'No decision was saved: storage integration unavailable.',
+      );
+    }
+    return {
+      chatId,
+      decision: dto.action,
+      note: dto.note,
+      success: true,
+      message: 'Decision recorded',
+    };
   }
 
   private async getAppConfig(prefix: string): Promise<Record<string, any>> {

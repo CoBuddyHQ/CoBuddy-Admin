@@ -192,6 +192,26 @@ export class VerificationService {
       }
     }
 
+    // Notify Customer Backend via S2S
+    if (result.applicantType === VerificationApplicantType.CUSTOMER) {
+      const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+      const internalSecret = process.env.INTERNAL_SERVICE_SECRET || '';
+      if (internalSecret) {
+        fetch(`${customerApiUrl}/api/v1/internal/bookings/customers/${encodeURIComponent(result.applicantId)}/verification-decision`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({
+            status: dto.decision === VerificationStatus.APPROVED ? 'approved' : 'rejected',
+            reason: dto.reason || dto.notes,
+          }),
+          signal: AbortSignal.timeout(5000),
+        }).catch(() => {});
+      }
+    }
+
     return { data: result, message: `Case ${dto.decision.toLowerCase()}` };
   }
 

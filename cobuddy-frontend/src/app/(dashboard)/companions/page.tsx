@@ -36,10 +36,10 @@ export default function CompanionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <Table className="min-w-full">
+          <Table className="min-w-[1000px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="sticky left-0 bg-card z-10 min-w-[180px]">Companion</TableHead>
+                <TableHead className="min-w-[180px]">Companion</TableHead>
                 <TableHead className="min-w-[150px]">Contact</TableHead>
                 <TableHead className="min-w-[120px]">Joined</TableHead>
                 <TableHead className="min-w-[110px]">Verification</TableHead>
@@ -53,7 +53,7 @@ export default function CompanionsPage() {
             <TableBody>
               {companions.map((companion) => (
                 <TableRow key={companion.id}>
-                  <TableCell className="sticky left-0 bg-card z-10 font-medium">
+                  <TableCell className="font-medium">
                     <Link
                       href={`/companions/${companion.id}`}
                       className="font-medium hover:underline text-primary block"

@@ -508,7 +508,7 @@ export class ModerationService {
     const internalSecret = process.env.INTERNAL_SERVICE_SECRET;
 
     if (!internalSecret) {
-      throw new ServiceUnavailableException('Internal service secret not configured');
+      throw new ServiceUnavailableException('No decision was saved: internal service secret not configured');
     }
 
     try {
@@ -540,7 +540,7 @@ export class ModerationService {
     const internalSecret = process.env.INTERNAL_SERVICE_SECRET;
 
     if (!internalSecret) {
-      throw new ServiceUnavailableException('Internal service secret not configured');
+      throw new ServiceUnavailableException('No decision was saved: internal service secret not configured');
     }
 
     let backendResult: any = null;

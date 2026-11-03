@@ -20,7 +20,10 @@ describe('Companion application approval', () => {
         updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         update: jest.fn().mockResolvedValue({ ...application, applicationStatus: 'APPROVED' }),
       },
-      companion: { create: jest.fn().mockResolvedValue({ id: 'companion' }) },
+      companion: {
+        findUnique: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockResolvedValue({ id: 'companion' }),
+      },
       wallet: { create: jest.fn().mockResolvedValue({ id: 'wallet' }) },
     };
     db.$transaction = (work: any) => work(db);

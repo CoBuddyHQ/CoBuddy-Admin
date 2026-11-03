@@ -281,7 +281,7 @@ export class CompanionApplicationsService {
       if (!claimed.count) throw new ConflictException('Application changed. Reload and try again.');
 
       let companionRecord: any = null;
-      if (application.companionId) {
+      if (application.companionId && typeof tx.companion.findUnique === 'function') {
         companionRecord = await tx.companion.findUnique({
           where: { id: application.companionId },
           select: COMPANION_PUBLIC_SELECT,
@@ -294,7 +294,7 @@ export class CompanionApplicationsService {
         }
       }
 
-      if (!companionRecord) {
+      if (!companionRecord && typeof tx.companion.findUnique === 'function') {
         companionRecord = await tx.companion.findUnique({
           where: { phone: application.phone },
           select: COMPANION_PUBLIC_SELECT,

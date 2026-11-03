@@ -40,3 +40,4 @@ export class SyncSosAlertDto {
   @IsOptional()
   audioClipUrl?: string;
 }
+

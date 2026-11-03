@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { Public } from '@/common/decorators/auth.decorators';
 import { InternalServiceGuard } from '@/common/guards/internal-service.guard';
 import { InternalSyncService } from './internal-sync.service';
@@ -7,6 +7,7 @@ import { SyncReviewDto } from './dto/sync-review.dto';
 import { SyncVerificationCaseDto } from './dto/sync-verification-case.dto';
 import { SyncCompanionApplicationDto } from './dto/sync-companion-application.dto';
 import { SyncUserReportDto } from './dto/sync-user-report.dto';
+import { SyncTicketDto, SyncTicketMessageDto } from './dto/sync-ticket.dto';
 
 @Controller('internal')
 export class InternalSyncController {
@@ -57,5 +58,24 @@ export class InternalSyncController {
   @HttpCode(HttpStatus.OK)
   async syncUserReport(@Body() dto: SyncUserReportDto) {
     return this.service.syncUserReport(dto);
+  }
+
+  @Post('tickets/sync')
+  @Public()
+  @UseGuards(InternalServiceGuard)
+  @HttpCode(HttpStatus.OK)
+  async syncSupportTicket(@Body() dto: SyncTicketDto) {
+    return this.service.syncSupportTicket(dto);
+  }
+
+  @Post('tickets/:id/messages/sync')
+  @Public()
+  @UseGuards(InternalServiceGuard)
+  @HttpCode(HttpStatus.OK)
+  async syncTicketMessage(
+    @Param('id') id: string,
+    @Body() dto: SyncTicketMessageDto,
+  ) {
+    return this.service.syncTicketMessage(id, dto);
   }
 }

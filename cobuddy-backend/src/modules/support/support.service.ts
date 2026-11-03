@@ -178,7 +178,7 @@ export class SupportService {
       await tx.ticketAuditEvent.create({
         data: { ticketId: id, actorId: user.sub, event: 'STAFF_REPLY' },
       });
-      return tx.ticketMessage.create({
+      const createdMsg = await tx.ticketMessage.create({
         data: {
           ticketId: id,
           senderId: user.sub,
@@ -187,6 +187,34 @@ export class SupportService {
           attachmentUrls: [],
         },
       });
+
+      // Forward reply to downstream service (Customer or Companion)
+      const internalSecret = process.env.INTERNAL_SERVICE_SECRET;
+      if (internalSecret) {
+        const targetUrl =
+          ticket.userType === 'CUSTOMER'
+            ? `${(process.env.CUSTOMER_API_URL || 'http://localhost:4002').replace(/\/+$/, '')}/api/v1/internal/tickets/${encodeURIComponent(ticket.id)}/messages`
+            : `${(process.env.COMPANION_API_URL || 'http://localhost:4001').replace(/\/+$/, '')}/api/v1/internal/tickets/${encodeURIComponent(ticket.id)}/messages`;
+
+        fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Service-Key': internalSecret,
+          },
+          body: JSON.stringify({
+            message,
+            senderType: 'agent',
+            senderName: user.name || 'CoBuddy Support',
+          }),
+          signal: AbortSignal.timeout(4000),
+        }).catch((err) => {
+          // Non-blocking log
+          console.warn(`[Admin Support] Outbound reply forward failed: ${err.message}`);
+        });
+      }
+
+      return createdMsg;
     });
   }
   assign(id: string, staffId: string | null, user: AuthStaffPayload, self = false) {

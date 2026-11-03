@@ -1,11 +1,13 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
-import { BookingStatus, Prisma, ReviewModerationStatus, VerificationStatus, VerificationApplicantType, UserVerificationStatus } from '@prisma/client';
+import { BookingStatus, Prisma, ReviewModerationStatus, VerificationStatus, VerificationApplicantType, UserVerificationStatus, SupportTicketPriority, SupportTicketStatus } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { SyncBookingDto } from './dto/sync-booking.dto';
 import { SyncReviewDto } from './dto/sync-review.dto';
 import { SyncVerificationCaseDto } from './dto/sync-verification-case.dto';
 import { SyncCompanionApplicationDto } from './dto/sync-companion-application.dto';
 import { SyncUserReportDto } from './dto/sync-user-report.dto';
+import { SyncTicketDto, SyncTicketMessageDto } from './dto/sync-ticket.dto';
+import { randomUUID } from 'crypto';
 
 // Internal S2S mirrors cannot authenticate; this is a non-credential sentinel.
 const S2S_MANAGED_NO_LOGIN_HASH = '!S2S_MANAGED_NO_LOGIN!';
@@ -622,6 +624,142 @@ export class InternalSyncService {
         defaults,
       },
       message: 'Master data bundle fetched successfully',
+    };
+  }
+
+  async syncSupportTicket(dto: SyncTicketDto) {
+    this.logger.log(`[Admin S2S Sync] Syncing support ticket from ${dto.userType} (${dto.userId}): ${dto.subject}`);
+
+    let customerId: string | null = null;
+    let companionId: string | null = null;
+    let userName = dto.userName;
+
+    if (dto.userType === 'CUSTOMER') {
+      const customer = await this.prisma.customer.findUnique({ where: { id: dto.userId } });
+      if (customer) {
+        customerId = customer.id;
+        if (!userName) userName = customer.name;
+      }
+    } else if (dto.userType === 'COMPANION') {
+      const companion = await this.prisma.companion.findUnique({ where: { id: dto.userId } });
+      if (companion) {
+        companionId = companion.id;
+        if (!userName) userName = companion.name;
+      }
+    }
+
+    if (!userName) {
+      userName = dto.userType === 'CUSTOMER' ? 'Customer' : 'Companion';
+    }
+
+    let priority: SupportTicketPriority = SupportTicketPriority.MEDIUM;
+    if (dto.priority) {
+      const p = dto.priority.toUpperCase();
+      if (p === 'LOW') priority = SupportTicketPriority.LOW;
+      else if (p === 'HIGH') priority = SupportTicketPriority.HIGH;
+      else if (p === 'CRITICAL' || p === 'URGENT') priority = SupportTicketPriority.CRITICAL;
+      else priority = SupportTicketPriority.MEDIUM;
+    }
+
+    const ticketId = dto.ticketId || randomUUID();
+    const existing = await this.prisma.supportTicket.findUnique({
+      where: { id: ticketId },
+      include: { messages: true },
+    });
+
+    if (existing) {
+      if (dto.message) {
+        const msgExists = existing.messages.some((m) => m.message === dto.message);
+        if (!msgExists) {
+          await this.prisma.ticketMessage.create({
+            data: {
+              ticketId: existing.id,
+              senderId: dto.userId,
+              senderType: dto.userType,
+              message: dto.message,
+            },
+          });
+        }
+      }
+      return {
+        success: true,
+        message: 'Ticket already exists in Admin, message synced',
+        ticketId: existing.id,
+        ticketRef: existing.ticketRef,
+      };
+    }
+
+    const ticketRef = `TKT-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+
+    const created = await this.prisma.supportTicket.create({
+      data: {
+        id: ticketId,
+        ticketRef,
+        userId: dto.userId,
+        userName,
+        userType: dto.userType,
+        customerId,
+        companionId,
+        categoryCode: dto.categoryCode || 'GENERAL',
+        priority,
+        status: SupportTicketStatus.OPEN,
+        subject: dto.subject,
+        escalationLevel: 'L1',
+        relatedBookingId: dto.relatedBookingId || null,
+        messages: dto.message
+          ? {
+              create: {
+                senderId: dto.userId,
+                senderType: dto.userType,
+                message: dto.message,
+              },
+            }
+          : undefined,
+      },
+      include: { messages: true },
+    });
+
+    return {
+      success: true,
+      message: 'Support ticket successfully synced to Admin DB',
+      ticketId: created.id,
+      ticketRef: created.ticketRef,
+    };
+  }
+
+  async syncTicketMessage(ticketId: string, dto: SyncTicketMessageDto) {
+    this.logger.log(`[Admin S2S Sync] Syncing ticket message for ${ticketId} from ${dto.senderType}`);
+
+    const ticket = await this.prisma.supportTicket.findFirst({
+      where: {
+        OR: [{ id: ticketId }, { ticketRef: ticketId }],
+      },
+    });
+
+    if (!ticket) {
+      throw new NotFoundException(`Support ticket ${ticketId} not found in Admin DB`);
+    }
+
+    const message = await this.prisma.ticketMessage.create({
+      data: {
+        ticketId: ticket.id,
+        senderId: dto.senderId,
+        senderType: dto.senderType,
+        message: dto.message,
+      },
+    });
+
+    if (['RESOLVED', 'CLOSED'].includes(ticket.status) && ['CUSTOMER', 'COMPANION'].includes(dto.senderType)) {
+      await this.prisma.supportTicket.update({
+        where: { id: ticket.id },
+        data: { status: SupportTicketStatus.OPEN },
+      });
+    }
+
+    return {
+      success: true,
+      message: 'Message synced to Admin ticket',
+      messageId: message.id,
     };
   }
 }

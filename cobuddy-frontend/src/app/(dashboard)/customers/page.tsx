@@ -48,18 +48,18 @@ export default function CustomersPage() {
             View profiles, verification status, and manage account access.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-[950px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead>Verification</TableHead>
-                <TableHead>Bookings</TableHead>
-                <TableHead>Wallet</TableHead>
-                <TableHead>Status / Flags</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[180px]">Customer</TableHead>
+                <TableHead className="min-w-[160px]">Contact</TableHead>
+                <TableHead className="min-w-[130px]">Joined</TableHead>
+                <TableHead className="min-w-[110px]">Verification</TableHead>
+                <TableHead className="min-w-[90px]">Bookings</TableHead>
+                <TableHead className="min-w-[90px]">Wallet</TableHead>
+                <TableHead className="min-w-[120px]">Status / Flags</TableHead>
+                <TableHead className="min-w-[120px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.module';
 import { CustomerQueryDto } from './dto/customer-query.dto';
 import { UpdateCustomerStatusDto } from './dto/update-status.dto';
@@ -68,6 +68,8 @@ export class CustomersService {
     return { data: customer };
   }
 
+  private readonly logger = new Logger(CustomersService.name);
+
   async updateStatus(id: string, dto: UpdateCustomerStatusDto) {
     const customer = await this.prisma.customer.findUnique({ where: { id } });
     if (!customer) throw new NotFoundException('Customer not found');
@@ -76,6 +78,27 @@ export class CustomersService {
       data: { status: dto.status },
       select: CUSTOMER_PUBLIC_SELECT,
     });
+
+    const isBanned = dto.status === 'SUSPENDED' || dto.status === 'BANNED';
+    const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+    try {
+      await fetch(`${customerApiUrl}/api/v1/internal/bookings/customers/${encodeURIComponent(id)}/ban`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_SECRET || 'local-audit-placeholder-not-a-secret-20261018',
+        },
+        body: JSON.stringify({
+          isBanned,
+          reason: `Account status updated to ${dto.status} by Admin`,
+          phone: customer.phone,
+        }),
+      });
+      this.logger.log(`Synced customer ${id} ban status (isBanned: ${isBanned}) to customer-backend`);
+    } catch (e: any) {
+      this.logger.warn(`Failed to dispatch S2S customer ban update: ${e?.message}`);
+    }
+
     return { data: updated, message: `Customer status updated to ${dto.status}` };
   }
 

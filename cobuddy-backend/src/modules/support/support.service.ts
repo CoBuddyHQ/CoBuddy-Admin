@@ -56,6 +56,7 @@ export class SupportService {
       assignedToId: t.assignedToId,
       thread: t.messages.map((m) => ({
         sender: m.senderType === 'STAFF' ? 'Support' : t.userName,
+        senderType: m.senderType,
         message: m.message,
         timestamp: m.createdAt,
       })),

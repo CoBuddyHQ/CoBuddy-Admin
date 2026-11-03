@@ -52,3 +52,4 @@ export class SyncTicketMessageDto {
   @IsNotEmpty()
   message: string;
 }
+

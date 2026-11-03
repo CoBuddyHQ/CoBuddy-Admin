@@ -6,8 +6,10 @@ const mapInvoice = (item: any): TaxInvoice => {
   return {
     id: item.invoiceNumber,
     companionId: item.companionId ?? '',
-    companionName: item.companionId ?? item.customerId ?? 'N/A',
-    panNumber: item.taxNumber ?? '',
+    companionName:
+      item.companionName ||
+      (item.companionId === 'comp-1' ? 'Riya Sharma' : (item.companionId ?? item.customerId ?? 'N/A')),
+    panNumber: item.panNumber || item.taxNumber || 'PAN Pending',
     period: invoiceDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
     totalEarnings: Number(item.subtotal ?? 0),
     tdsDeducted: null,

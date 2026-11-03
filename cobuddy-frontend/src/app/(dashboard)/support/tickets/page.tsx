@@ -320,21 +320,30 @@ export default function TicketsPage() {
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-muted/20 rounded-md">
-            {selectedTicket?.thread.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex flex-col ${msg.sender === 'SUPPORT' ? 'items-end' : 'items-start'}`}
-              >
-                <div className="text-xs text-muted-foreground mb-1">
-                  {msg.sender === 'SUPPORT' ? 'Agent' : selectedTicket.userName}
-                </div>
+            {selectedTicket?.thread.map((msg, idx) => {
+              const isStaff =
+                msg.sender?.toUpperCase() === 'SUPPORT' ||
+                msg.sender?.toUpperCase() === 'STAFF' ||
+                msg.sender === 'Support' ||
+                (msg as any).senderType === 'STAFF';
+              return (
                 <div
-                  className={`p-3 rounded-lg text-sm max-w-[80%] ${msg.sender === 'SUPPORT' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                  key={idx}
+                  className={`flex flex-col ${isStaff ? 'items-end' : 'items-start'}`}
                 >
-                  {msg.message}
+                  <div className="text-xs text-muted-foreground mb-1 font-medium">
+                    {isStaff ? 'Support Agent' : selectedTicket.userName}
+                  </div>
+                  <div
+                    className={`p-3 rounded-lg text-sm max-w-[80%] shadow-sm ${
+                      isStaff ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
+                    }`}
+                  >
+                    {msg.message}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="pt-4 space-y-4">

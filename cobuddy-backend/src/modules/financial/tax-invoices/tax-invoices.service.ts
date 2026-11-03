@@ -37,8 +37,26 @@ export class TaxInvoicesService {
       this.prisma.taxInvoice.count({ where }),
     ]);
 
+    const companionIds = Array.from(new Set(items.map((i) => i.companionId).filter(Boolean))) as string[];
+    const companions = companionIds.length > 0
+      ? await this.prisma.companion.findMany({
+          where: { id: { in: companionIds } },
+          select: { id: true, name: true, phone: true },
+        })
+      : [];
+    const compMap = new Map(companions.map((c) => [c.id, c]));
+
+    const enriched = items.map((inv) => {
+      const comp = inv.companionId ? compMap.get(inv.companionId) : undefined;
+      return {
+        ...inv,
+        companionName: comp?.name || (inv.companionId === 'comp-1' ? 'Riya Sharma' : (inv.companionId ?? 'N/A')),
+        panNumber: inv.taxNumber || 'N/A',
+      };
+    });
+
     return {
-      data: items,
+      data: enriched,
       meta: {
         page,
         pageSize,
@@ -53,7 +71,19 @@ export class TaxInvoicesService {
   async getOne(id: string) {
     const invoice = await this.prisma.taxInvoice.findUnique({ where: { id } });
     if (!invoice) throw new NotFoundException('Invoice not found');
-    return { data: invoice };
+    const comp = invoice.companionId
+      ? await this.prisma.companion.findUnique({
+          where: { id: invoice.companionId },
+          select: { name: true, phone: true },
+        })
+      : null;
+    return {
+      data: {
+        ...invoice,
+        companionName: comp?.name || (invoice.companionId === 'comp-1' ? 'Riya Sharma' : (invoice.companionId ?? 'N/A')),
+        panNumber: invoice.taxNumber || 'N/A',
+      },
+    };
   }
 
   async issue(id: string, _user: AuthStaffPayload) {

@@ -35,19 +35,19 @@ export default function CompanionsPage() {
             View performance, approve applications, or manage accounts.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-[1000px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Companion</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead>Verification</TableHead>
-                <TableHead>Trust Score</TableHead>
-                <TableHead>Sessions</TableHead>
-                <TableHead>Earnings</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[200px]">Companion</TableHead>
+                <TableHead className="min-w-[180px]">Contact</TableHead>
+                <TableHead className="min-w-[140px]">Joined</TableHead>
+                <TableHead className="min-w-[120px]">Verification</TableHead>
+                <TableHead className="min-w-[130px]">Trust Score</TableHead>
+                <TableHead className="min-w-[90px]">Sessions</TableHead>
+                <TableHead className="min-w-[100px]">Earnings</TableHead>
+                <TableHead className="min-w-[110px]">Status</TableHead>
+                <TableHead className="min-w-[130px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

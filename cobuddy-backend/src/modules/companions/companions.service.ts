@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.module';
 import { CompanionQueryDto } from './dto/companion-query.dto';
 import { UpdateCompanionStatusDto } from './dto/update-status.dto';
@@ -71,6 +71,8 @@ export class CompanionsService {
     return { data: companion };
   }
 
+  private readonly logger = new Logger(CompanionsService.name);
+
   async updateStatus(id: string, dto: UpdateCompanionStatusDto) {
     const companion = await this.prisma.companion.findUnique({ where: { id } });
     if (!companion) throw new NotFoundException('Companion not found');
@@ -79,6 +81,27 @@ export class CompanionsService {
       data: { status: dto.status },
       select: COMPANION_PUBLIC_SELECT,
     });
+
+    const isBanned = dto.status === 'SUSPENDED' || dto.status === 'BANNED';
+    const companionApiUrl = (process.env.COMPANION_API_URL || 'http://companion-backend:4001').replace(/\/+$/, '');
+    try {
+      await fetch(`${companionApiUrl}/api/v1/internal/companions/${encodeURIComponent(id)}/ban`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Internal-Service-Key': process.env.INTERNAL_SERVICE_SECRET || 'local-audit-placeholder-not-a-secret-20261018',
+        },
+        body: JSON.stringify({
+          isBanned,
+          reason: `Account status updated to ${dto.status} by Admin`,
+          phone: companion.phone,
+        }),
+      });
+      this.logger.log(`Synced companion ${id} ban status (isBanned: ${isBanned}) to companion-backend`);
+    } catch (e: any) {
+      this.logger.warn(`Failed to dispatch S2S companion ban update: ${e?.message}`);
+    }
+
     return { data: updated, message: `Companion status updated to ${dto.status}` };
   }
 

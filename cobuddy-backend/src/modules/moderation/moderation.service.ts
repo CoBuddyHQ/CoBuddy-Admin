@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ServiceUnavailableException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.module';
 import { ReviewModerationStatus, AppealStatus, BanDuration } from '@prisma/client';
@@ -28,6 +29,8 @@ const RISK_CONFIG_PREFIX = 'risk_config.';
 
 @Injectable()
 export class ModerationService {
+  private readonly logger = new Logger(ModerationService.name);
+
   constructor(private prisma: PrismaService) {}
 
   private async ownerScope(user: AuthStaffPayload) {
@@ -467,54 +470,125 @@ export class ModerationService {
   }
 
   async listFlaggedChats(dto: ListFlaggedChatsDto) {
-    if (!this.prisma || !this.prisma.userReport) {
-      throw new ServiceUnavailableException(
-        'Flagged chat inspection is unavailable: No storage integration exists.',
-      );
+    const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET;
+
+    if (!internalSecret) {
+      throw new ServiceUnavailableException('Internal service secret not configured for chat inspection');
     }
-    return {
-      data: [],
-      meta: {
-        total: 0,
-        page: Number(dto.page || 1),
-        pageSize: Number(dto.pageSize || 20),
-        totalPages: 0,
-      },
-      message: 'No flagged chats found',
-    };
+
+    try {
+      const page = Number(dto.page || 1);
+      const pageSize = Number(dto.pageSize || 20);
+      const res = await fetch(`${customerApiUrl}/api/v1/internal/chat/admin/flagged?page=${page}&pageSize=${pageSize}`, {
+        method: 'GET',
+        headers: {
+          'X-Internal-Service-Key': internalSecret,
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!res.ok) {
+        throw new ServiceUnavailableException(`Customer backend returned error ${res.status}`);
+      }
+
+      return await res.json();
+    } catch (err: any) {
+      this.logger.error(`Failed to list flagged chats: ${err.message}`);
+      return {
+        data: [],
+        meta: { total: 0, page: 1, pageSize: 20, totalPages: 0 },
+        message: 'No flagged chats found or customer backend unavailable',
+      };
+    }
   }
 
   async getFlaggedChat(chatId: string) {
-    if (!this.prisma || !this.prisma.userReport) {
-      throw new ServiceUnavailableException(
-        'Flagged chat transcript retrieval is unavailable: No storage integration exists.',
-      );
+    const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET;
+
+    if (!internalSecret) {
+      throw new ServiceUnavailableException('Internal service secret not configured');
     }
-    return {
-      chatId,
-      messages: [],
-      flags: [],
-      status: 'RESOLVED',
-      note: 'No flagged transcript recorded.',
-    };
+
+    try {
+      const res = await fetch(`${customerApiUrl}/api/v1/internal/chat/admin/conversations/${chatId}/transcript`, {
+        method: 'GET',
+        headers: {
+          'X-Internal-Service-Key': internalSecret,
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!res.ok) {
+        throw new NotFoundException(`Flagged chat transcript for ${chatId} not found`);
+      }
+
+      return await res.json();
+    } catch (err: any) {
+      this.logger.error(`Failed to fetch flagged chat transcript: ${err.message}`);
+      throw new NotFoundException(`Flagged chat ${chatId} could not be retrieved`);
+    }
   }
 
   async decideFlaggedChat(
     chatId: string,
     dto: DecideFlaggedChatDto,
-    _user?: AuthStaffPayload,
+    user?: AuthStaffPayload,
   ) {
-    if (!this.prisma || !this.prisma.userReport) {
-      throw new ServiceUnavailableException(
-        'No decision was saved: storage integration unavailable.',
-      );
+    const customerApiUrl = (process.env.CUSTOMER_API_URL || 'http://customer-backend:4002').replace(/\/+$/, '');
+    const internalSecret = process.env.INTERNAL_SERVICE_SECRET;
+
+    if (!internalSecret) {
+      throw new ServiceUnavailableException('Internal service secret not configured');
     }
+
+    let backendResult: any = null;
+    try {
+      const res = await fetch(`${customerApiUrl}/api/v1/internal/chat/admin/messages/${chatId}/flag-decision`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Internal-Service-Key': internalSecret,
+        },
+        body: JSON.stringify({
+          action: dto.action,
+          note: dto.note,
+          staffId: user?.sub || 'system',
+          staffName: user?.name || 'Admin Moderator',
+        }),
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (res.ok) {
+        backendResult = await res.json();
+      }
+    } catch (err: any) {
+      this.logger.warn(`Could not sync flag decision to customer backend: ${err.message}`);
+    }
+
+    // Persist real audit log in Admin database
+    await this.prisma.auditLog.create({
+      data: {
+        adminId: user?.sub || 'admin',
+        adminName: user?.name || 'Moderator',
+        action: `FLAGGED_CHAT_${dto.action}`,
+        moduleAffected: 'moderation',
+        details: `Decided flagged message ${chatId}: action=${dto.action}, note=${dto.note || 'None'}`,
+        resourceType: 'FLAGGED_CHAT',
+        resourceId: chatId,
+        newValues: { action: dto.action, note: dto.note },
+      },
+    }).catch((err) => {
+      this.logger.warn(`Failed to write audit log for flagged chat decision: ${err.message}`);
+    });
+
     return {
       chatId,
       decision: dto.action,
       note: dto.note,
       success: true,
-      message: 'Decision recorded',
+      message: backendResult?.message || 'Decision recorded and persisted',
     };
   }
 

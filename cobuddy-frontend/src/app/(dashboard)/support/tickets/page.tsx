@@ -325,14 +325,15 @@ export default function TicketsPage() {
                 msg.sender?.toUpperCase() === 'SUPPORT' ||
                 msg.sender?.toUpperCase() === 'STAFF' ||
                 msg.sender === 'Support' ||
-                (msg as any).senderType === 'STAFF';
+                msg.senderType === 'STAFF' ||
+                (msg.sender && msg.sender !== selectedTicket.userName);
               return (
                 <div
                   key={idx}
                   className={`flex flex-col ${isStaff ? 'items-end' : 'items-start'}`}
                 >
                   <div className="text-xs text-muted-foreground mb-1 font-medium">
-                    {isStaff ? 'Support Agent' : selectedTicket.userName}
+                    {isStaff ? 'CoBuddy Support' : (selectedTicket.userName || 'User')}
                   </div>
                   <div
                     className={`p-3 rounded-lg text-sm max-w-[80%] shadow-sm ${

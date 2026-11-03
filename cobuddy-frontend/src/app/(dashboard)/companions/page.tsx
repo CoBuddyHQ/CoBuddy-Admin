@@ -36,31 +36,33 @@ export default function CompanionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <Table className="min-w-[1000px]">
+          <Table className="min-w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[200px]">Companion</TableHead>
-                <TableHead className="min-w-[180px]">Contact</TableHead>
-                <TableHead className="min-w-[140px]">Joined</TableHead>
-                <TableHead className="min-w-[120px]">Verification</TableHead>
-                <TableHead className="min-w-[130px]">Trust Score</TableHead>
-                <TableHead className="min-w-[90px]">Sessions</TableHead>
-                <TableHead className="min-w-[100px]">Earnings</TableHead>
-                <TableHead className="min-w-[110px]">Status</TableHead>
-                <TableHead className="min-w-[130px] text-right">Actions</TableHead>
+                <TableHead className="sticky left-0 bg-card z-10 min-w-[180px]">Companion</TableHead>
+                <TableHead className="min-w-[150px]">Contact</TableHead>
+                <TableHead className="min-w-[120px]">Joined</TableHead>
+                <TableHead className="min-w-[110px]">Verification</TableHead>
+                <TableHead className="min-w-[120px]">Trust Score</TableHead>
+                <TableHead className="min-w-[80px]">Sessions</TableHead>
+                <TableHead className="min-w-[90px]">Earnings</TableHead>
+                <TableHead className="min-w-[100px]">Status</TableHead>
+                <TableHead className="min-w-[120px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {companions.map((companion) => (
                 <TableRow key={companion.id}>
-                  <TableCell>
+                  <TableCell className="sticky left-0 bg-card z-10 font-medium">
                     <Link
                       href={`/companions/${companion.id}`}
-                      className="font-medium hover:underline text-primary"
+                      className="font-medium hover:underline text-primary block"
                     >
-                      {companion.name}
+                      {companion.name && companion.name !== 'Companion' ? companion.name : (companion.phone || 'Companion')}
                     </Link>
-                    <div className="text-xs text-muted-foreground">{companion.id}</div>
+                    <div className="text-xs text-muted-foreground truncate max-w-[170px]" title={companion.id}>
+                      {companion.id}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">{companion.email}</div>

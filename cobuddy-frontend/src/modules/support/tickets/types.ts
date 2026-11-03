@@ -13,7 +13,7 @@ export interface SupportTicket {
   priority: TicketPriority;
   status: TicketStatus;
   subject: string;
-  thread: { sender: string; message: string; timestamp: string }[];
+  thread: { sender: string; senderType?: string; message: string; timestamp: string }[];
   slaDeadline: string;
   escalationLevel: EscalationLevel;
   assignedTo?: string; // Staff name

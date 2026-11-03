@@ -8,6 +8,7 @@ import { SyncVerificationCaseDto } from './dto/sync-verification-case.dto';
 import { SyncCompanionApplicationDto } from './dto/sync-companion-application.dto';
 import { SyncUserReportDto } from './dto/sync-user-report.dto';
 import { SyncTicketDto, SyncTicketMessageDto } from './dto/sync-ticket.dto';
+import { SyncSosAlertDto } from './dto/sync-sos.dto';
 
 @Controller('internal')
 export class InternalSyncController {
@@ -77,5 +78,13 @@ export class InternalSyncController {
     @Body() dto: SyncTicketMessageDto,
   ) {
     return this.service.syncTicketMessage(id, dto);
+  }
+
+  @Post('sos/sync')
+  @Public()
+  @UseGuards(InternalServiceGuard)
+  @HttpCode(HttpStatus.OK)
+  async syncSosAlert(@Body() dto: SyncSosAlertDto) {
+    return this.service.syncSosAlert(dto);
   }
 }

@@ -2,7 +2,7 @@ import axiosInstance, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import type { StaffUser } from '@/types/role.types';
 
 const axios = axiosInstance.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4400/api',
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });

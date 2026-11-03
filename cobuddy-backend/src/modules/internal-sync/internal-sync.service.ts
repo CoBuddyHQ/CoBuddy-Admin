@@ -795,4 +795,53 @@ export class InternalSyncService {
       messageId: message.id,
     };
   }
+
+  async syncSosAlert(dto: any) {
+    const alertRef = dto.alertRef || `SOS-${dto.id || Date.now()}`;
+    const lat = Number.isFinite(dto.lat) ? Number(dto.lat) : 0;
+    const lng = Number.isFinite(dto.lng) ? Number(dto.lng) : 0;
+    const bookingId = dto.bookingId ? dto.bookingId : null;
+
+    let validBookingId: string | null = null;
+    if (bookingId) {
+      const b = await this.prisma.booking.findUnique({ where: { id: bookingId } });
+      if (b) validBookingId = b.id;
+    }
+
+    let sosStatus: any = 'TRIGGERED';
+    if (dto.status) {
+      const s = String(dto.status).toUpperCase();
+      if (['TRIGGERED', 'ACKNOWLEDGED', 'INVESTIGATING', 'RESOLVED_FALSE_ALARM', 'RESOLVED_REAL_INCIDENT', 'ESCALATED_AUTHORITIES'].includes(s)) {
+        sosStatus = s;
+      } else if (s === 'ACTIVE') {
+        sosStatus = 'TRIGGERED';
+      } else if (s === 'RESOLVED') {
+        sosStatus = 'RESOLVED_REAL_INCIDENT';
+      }
+    }
+
+    const sos = await this.prisma.sOSAlert.upsert({
+      where: { alertRef },
+      update: {
+        lat,
+        lng,
+        status: sosStatus,
+        authoritiesContacted: Boolean(dto.authoritiesContacted),
+      },
+      create: {
+        alertRef,
+        userId: dto.userId,
+        userType: dto.userType,
+        bookingId: validBookingId,
+        lat,
+        lng,
+        status: sosStatus,
+        authoritiesContacted: Boolean(dto.authoritiesContacted),
+        audioClipUrl: dto.audioClipUrl || null,
+      },
+    });
+
+    this.logger.warn(`🚨 [S2S SOS Sync] Recorded SOS Alert ${sos.alertRef} from ${dto.userType} ${dto.userId}`);
+    return { data: sos, message: 'SOS Alert synchronized to Admin' };
+  }
 }

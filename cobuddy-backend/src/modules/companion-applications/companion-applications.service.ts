@@ -70,7 +70,7 @@ export class CompanionApplicationsService {
   }
 
   private assertReviewable(application: CompanionApplication, admin: AuthStaffPayload) {
-    if (application.companionId || ['APPROVED', 'REJECTED'].includes(application.applicationStatus))
+    if (['APPROVED', 'REJECTED'].includes(application.applicationStatus))
       throw new ConflictException('This application is already closed');
     if (application.reviewedByStaffId && application.reviewedByStaffId !== admin.sub)
       throw new ConflictException('This application is assigned to another reviewer');
@@ -275,46 +275,74 @@ export class CompanionApplicationsService {
           id,
           applicationStatus: application.applicationStatus,
           reviewedByStaffId: application.reviewedByStaffId,
-          companionId: null,
         },
         data: { applicationStatus: 'APPROVED', reviewedByStaffId: admin.sub, reviewNotes: notes },
       });
       if (!claimed.count) throw new ConflictException('Application changed. Reload and try again.');
-      const companion = await tx.companion.create({
-        data: {
-          name: `${application.firstName} ${application.lastName}`,
-          email: application.email,
-          phone: application.phone,
-          passwordHash,
-          cityId: application.cityId,
-          status: UserStatus.ACTIVE,
-          verificationStatus: UserVerificationStatus.PENDING,
-          gender: 'OTHER',
-        },
-        select: COMPANION_PUBLIC_SELECT,
-      });
 
-      await tx.wallet.create({
-        data: {
-          ownerType: 'COMPANION',
-          companionId: companion.id,
-          currency: 'INR',
-          balance: 0,
-          ledgerVersion: 0,
-        },
-      });
+      let companionRecord: any = null;
+      if (application.companionId) {
+        companionRecord = await tx.companion.findUnique({
+          where: { id: application.companionId },
+          select: COMPANION_PUBLIC_SELECT,
+        });
+        if (companionRecord) {
+          await tx.companion.update({
+            where: { id: application.companionId },
+            data: { status: UserStatus.ACTIVE, verificationStatus: UserVerificationStatus.VERIFIED },
+          });
+        }
+      }
+
+      if (!companionRecord) {
+        companionRecord = await tx.companion.findUnique({
+          where: { phone: application.phone },
+          select: COMPANION_PUBLIC_SELECT,
+        });
+
+        if (companionRecord) {
+          await tx.companion.update({
+            where: { id: companionRecord.id },
+            data: { status: UserStatus.ACTIVE, verificationStatus: UserVerificationStatus.VERIFIED },
+          });
+        } else {
+          companionRecord = await tx.companion.create({
+            data: {
+              name: `${application.firstName} ${application.lastName}`,
+              email: application.email,
+              phone: application.phone,
+              passwordHash,
+              cityId: application.cityId,
+              status: UserStatus.ACTIVE,
+              verificationStatus: UserVerificationStatus.VERIFIED,
+              gender: 'OTHER',
+            },
+            select: COMPANION_PUBLIC_SELECT,
+          });
+
+          await tx.wallet.create({
+            data: {
+              ownerType: 'COMPANION',
+              companionId: companionRecord.id,
+              currency: 'INR',
+              balance: 0,
+              ledgerVersion: 0,
+            },
+          });
+        }
+      }
 
       const updatedApplication = await tx.companionApplication.update({
         where: { id },
         data: {
           applicationStatus: 'APPROVED',
-          companionId: companion.id,
+          companionId: companionRecord.id,
           reviewedByStaffId: admin.sub,
           reviewNotes: notes,
         },
       });
 
-      return { companion, application: updatedApplication };
+      return { companion: companionRecord, application: updatedApplication };
     });
 
     const targetCompanionId = application.companionId || result.companion.id;
@@ -347,7 +375,6 @@ export class CompanionApplicationsService {
         id,
         applicationStatus: application.applicationStatus,
         reviewedByStaffId: application.reviewedByStaffId,
-        companionId: null,
       },
       data: {
         applicationStatus: 'REJECTED',

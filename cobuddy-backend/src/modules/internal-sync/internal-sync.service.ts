@@ -730,14 +730,47 @@ export class InternalSyncService {
   async syncTicketMessage(ticketId: string, dto: SyncTicketMessageDto) {
     this.logger.log(`[Admin S2S Sync] Syncing ticket message for ${ticketId} from ${dto.senderType}`);
 
-    const ticket = await this.prisma.supportTicket.findFirst({
+    let ticket = await this.prisma.supportTicket.findFirst({
       where: {
         OR: [{ id: ticketId }, { ticketRef: ticketId }],
       },
     });
 
     if (!ticket) {
-      throw new NotFoundException(`Support ticket ${ticketId} not found in Admin DB`);
+      let customerId: string | null = null;
+      let companionId: string | null = null;
+      let userName = dto.senderType === 'CUSTOMER' ? 'Customer' : 'Companion';
+
+      if (dto.senderType === 'CUSTOMER') {
+        const c = await this.prisma.customer.findUnique({ where: { id: dto.senderId } });
+        if (c) {
+          customerId = c.id;
+          userName = c.name;
+        }
+      } else if (dto.senderType === 'COMPANION') {
+        const comp = await this.prisma.companion.findUnique({ where: { id: dto.senderId } });
+        if (comp) {
+          companionId = comp.id;
+          userName = comp.name;
+        }
+      }
+
+      ticket = await this.prisma.supportTicket.create({
+        data: {
+          id: ticketId,
+          ticketRef: `TKT-${ticketId.slice(0, 8)}`,
+          userId: dto.senderId,
+          userName,
+          userType: dto.senderType,
+          customerId,
+          companionId,
+          categoryCode: 'CONCIERGE',
+          priority: SupportTicketPriority.MEDIUM,
+          status: SupportTicketStatus.OPEN,
+          subject: 'Concierge Support Inquiry',
+          escalationLevel: 'L1',
+        },
+      });
     }
 
     const message = await this.prisma.ticketMessage.create({

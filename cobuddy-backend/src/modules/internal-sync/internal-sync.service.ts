@@ -585,6 +585,10 @@ export class InternalSyncService {
       placeTypes,
       sessionDurations,
       defaults,
+      venues,
+      kycDocumentTypes,
+      communicationStyles,
+      activityPaces,
     ] = await Promise.all([
       this.prisma.city.findMany({
         where: { active: true },
@@ -602,6 +606,10 @@ export class InternalSyncService {
       this.prisma.placeTypeConfig.findMany({ where: { isAllowed: true } }),
       this.prisma.sessionDurationOption.findMany({ where: { active: true } }),
       this.prisma.systemDefault.findUnique({ where: { id: 'singleton' } }),
+      this.prisma.venue.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
+      this.prisma.kYCDocumentType.findMany({ where: { active: true }, orderBy: { code: 'asc' } }),
+      this.prisma.communicationStyleOption.findMany({ where: { active: true } }),
+      this.prisma.activityPaceOption.findMany({ where: { active: true } }),
     ]);
 
     return {
@@ -617,6 +625,31 @@ export class InternalSyncService {
         areas: areas.map((a) => ({ id: a.id, name: a.name, cityId: a.cityId })),
         interests: interests.map((i) => ({ id: i.id, name: this.cityLabel(i.name), category: i.type, icon: i.icon })),
         languages: languages.map((l) => ({ code: l.code, name: this.cityLabel(l.name) })),
+        venues: venues.map((v) => ({
+          id: v.id,
+          name: v.name,
+          placeType: v.placeType,
+          cityId: v.cityId,
+          address: v.address,
+          lat: v.lat,
+          lng: v.lng,
+        })),
+        kycDocumentTypes: kycDocumentTypes.map((k) => ({
+          id: k.id,
+          code: k.code,
+          name: this.cityLabel(k.label),
+          requiresBackDoc: ['AADHAAR', 'DL', 'DRIVING_LICENSE', 'VOTER_ID'].includes(k.code.toUpperCase()),
+        })),
+        communicationStyles: communicationStyles.map((c) => ({
+          id: c.id,
+          code: c.code,
+          label: this.cityLabel(c.label),
+        })),
+        activityPaces: activityPaces.map((a) => ({
+          id: a.id,
+          code: a.code,
+          label: this.cityLabel(a.label),
+        })),
         ticketCategories,
         incidentTypes,
         reviewTags,

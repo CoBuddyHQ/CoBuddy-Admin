@@ -101,13 +101,17 @@ export class MasterDataService {
 
   async create(modelName: PrismaModelName, data: any) {
     const model = this.getModel(modelName);
-    return (model as any).create({ data });
+    const result = await (model as any).create({ data });
+    this.invalidateBundleCache();
+    return result;
   }
 
   async update(modelName: PrismaModelName, id: string, data: any) {
     await this.findById(modelName, id);
     const model = this.getModel(modelName);
-    return (model as any).update({ where: { id }, data });
+    const result = await (model as any).update({ where: { id }, data });
+    this.invalidateBundleCache();
+    return result;
   }
 
   async toggleActive(
@@ -117,16 +121,20 @@ export class MasterDataService {
   ) {
     const record = await this.findById(modelName, id);
     const model = this.getModel(modelName);
-    return (model as any).update({
+    const result = await (model as any).update({
       where: { id },
       data: { [field]: !record[field] } as any,
     });
+    this.invalidateBundleCache();
+    return result;
   }
 
   async delete(modelName: PrismaModelName, id: string) {
     await this.findById(modelName, id);
     const model = this.getModel(modelName);
-    return (model as any).delete({ where: { id } });
+    const result = await (model as any).delete({ where: { id } });
+    this.invalidateBundleCache();
+    return result;
   }
 
   private getModel(modelName: PrismaModelName) {

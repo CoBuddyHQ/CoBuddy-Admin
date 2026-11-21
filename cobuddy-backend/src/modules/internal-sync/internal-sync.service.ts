@@ -44,7 +44,10 @@ export class InternalSyncService {
       candidate.cityCode.trim().toLowerCase() === normalizedName ||
       this.cityLabel(candidate.name).toLowerCase() === normalizedName,
     );
-    if (!city) throw new BadRequestException('No active Admin city matches the supplied city.');
+    if (!city) {
+      if (required) throw new BadRequestException('No active Admin city matches the supplied city.');
+      return null;
+    }
     return city;
   }
 
